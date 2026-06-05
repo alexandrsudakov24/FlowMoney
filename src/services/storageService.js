@@ -1,0 +1,22 @@
+const KEY = 'expenses_data_v1';
+
+export const loadExpenses = () => {
+    try {
+        const raw = localStorage.getItem(KEY);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        // ensure date fields are strings in YYYY-MM-DD
+        return parsed.map((p) => ({ ...p }));
+    } catch (e) {
+        console.error('Failed to load expenses', e);
+        return [];
+    }
+};
+
+export const saveExpenses = (expenses) => {
+    try {
+        localStorage.setItem(KEY, JSON.stringify(expenses));
+    } catch (e) {
+        console.error('Failed to save expenses', e);
+    }
+};
