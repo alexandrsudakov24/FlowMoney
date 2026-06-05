@@ -41,7 +41,7 @@ export default function ExpenseList({ expenses }) {
                             <div className={styles.amount}>${Number(e.amount).toFixed(2)}</div>
                             <div className={styles.date}>{new Date(e.date).toLocaleDateString()}</div>
                             <div className={styles.actions}>
-                                <Link to={`/edit/${e.id}`} className="btn">✏️ Edit</Link>
+                                <Link to={`/edit/${e.id}`} className="btn">Edit</Link>
                                 <button className="btn danger" onClick={() => {
                                     if (confirm('Are you sure you want to delete this expense?')) deleteExpense(e.id);
                                 }}>🗑️ Delete</button>
