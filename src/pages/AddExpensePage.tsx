@@ -2,11 +2,18 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext.tsx';
 import ExpenseForm from '../components/ExpenseForm';
 
+interface ExpenseFormData {
+    amount: string;
+    category: string;
+    date: string;
+    note?: string;
+}
+
 export default function AddExpensePage() {
     const { addExpense } = useApp();
     const navigate = useNavigate();
 
-    const handleSubmit = (data) => {
+    const handleSubmit = (data: ExpenseFormData) => {
         addExpense({
             id: crypto.randomUUID(),
             ...data,
@@ -17,8 +24,11 @@ export default function AddExpensePage() {
 
     return (
         <div className="page">
-            <h2>Add Expense</h2>
-            <ExpenseForm onSubmit={handleSubmit} />
+            <h2>Add New Expense</h2>
+            <p style={{ color: '#718096', marginBottom: '24px' }}>
+                Track your spending by adding a new expense
+            </p>
+            <ExpenseForm onSubmit={handleSubmit} defaultValues={undefined} />
         </div>
     );
 }
