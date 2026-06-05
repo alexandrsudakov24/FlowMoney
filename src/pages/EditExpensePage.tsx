@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useApp } from '../context/AppContext';
-import ExpenseForm from '../components/ExpenseForm.jsx';
+import { useApp } from '../context/AppContext.tsx';
+import ExpenseForm from '../components/ExpenseForm';
 
 export default function EditExpensePage() {
     const { id } = useParams();

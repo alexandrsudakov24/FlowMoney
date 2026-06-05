@@ -1,6 +1,6 @@
-import { useApp } from '../context/AppContext';
-import ExpenseList from '../components/ExpenseList.jsx';
-import Charts from '../components/Charts.jsx';
+import { useApp } from '../context/AppContext.tsx';
+import ExpenseList from '../components/ExpenseList';
+import Charts from '../components/Charts';
 
 export default function DashboardPage() {
     const { expenses } = useApp();
