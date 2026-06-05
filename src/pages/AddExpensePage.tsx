@@ -2,12 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext.tsx';
 import ExpenseForm from '../components/ExpenseForm';
 
-interface ExpenseFormData {
+type ExpenseFormData = {
     amount: string;
     category: string;
     date: string;
     note?: string;
-}
+    type: 'expense' | 'income';
+};
 
 export default function AddExpensePage() {
     const { addExpense } = useApp();
@@ -24,9 +25,9 @@ export default function AddExpensePage() {
 
     return (
         <div className="page">
-            <h2>Add New Expense</h2>
+            <h2>Add Transaction</h2>
             <p style={{ color: '#718096', marginBottom: '24px' }}>
-                Track your spending by adding a new expense
+                Add an expense or income to track your finances
             </p>
             <ExpenseForm onSubmit={handleSubmit} defaultValues={undefined} />
         </div>

@@ -25,6 +25,27 @@
   font-size:14px;
 }
 
+.toggle{
+  display:flex;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.toggleButton{
+  padding:8px 12px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:transparent;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.toggleButton.active{
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: white;
+  border-color: transparent;
+}
+
 .formActions{
   display:flex;
   gap:12px;
