@@ -1,10 +1,21 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import { loadExpenses, saveExpenses } from '../services/storageService';
+import type { Expense } from '../services/storageService';
 
-const AppContext = createContext(null);
+type AppContextType = {
+    expenses: Expense[];
+    addExpense: (e: Expense) => void;
+    updateExpense: (id: string | undefined, data: Partial<Expense>) => void;
+    deleteExpense: (id: string) => void;
+    clearAll: () => void;
+};
 
-export const AppProvider = ({ children }) => {
-    const [expenses, setExpenses] = useState([]);
+const AppContext = createContext<AppContextType | undefined>(undefined);
+
+export const AppProvider = ({ children }: { children: ReactNode }) => {
+    const [expenses, setExpenses] = useState<Expense[]>([]);
 
     useEffect(() => {
         setExpenses(loadExpenses());
@@ -14,15 +25,15 @@ export const AppProvider = ({ children }) => {
         saveExpenses(expenses);
     }, [expenses]);
 
-    const addExpense = (expense) => {
+    const addExpense = (expense: Expense) => {
         setExpenses((prev) => [...prev, expense]);
     };
 
-    const updateExpense = (id, updatedData) => {
+    const updateExpense = (id: string, updatedData: Partial<Expense>) => {
         setExpenses((prev) => prev.map((e) => (e.id === id ? { ...e, ...updatedData } : e)));
     };
 
-    const deleteExpense = (id) => {
+    const deleteExpense = (id: string) => {
         setExpenses((prev) => prev.filter((e) => e.id !== id));
     };
 
@@ -37,4 +48,8 @@ export const AppProvider = ({ children }) => {
     );
 };
 
-export const useApp = () => useContext(AppContext);
+export const useApp = () => {
+    const ctx = useContext(AppContext);
+    if (!ctx) throw new Error('useApp must be used within AppProvider');
+    return ctx;
+};

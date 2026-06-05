@@ -1,7 +1,8 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { useMemo } from 'react';
+import styles from './Charts.module.css';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A28BFF', '#FF6B6B'];
+const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 export default function Charts({ expenses }) {
     const byCategory = useMemo(() => {
@@ -23,8 +24,8 @@ export default function Charts({ expenses }) {
     }, [expenses]);
 
     return (
-        <div className="charts">
-            <div className="chart-card">
+        <div className={styles.charts}>
+            <div className={styles.chartCard}>
                 <h3>By Category</h3>
                 {byCategory.length === 0 ? <p>No data</p> : (
                     <ResponsiveContainer width="100%" height={250}>
@@ -39,7 +40,7 @@ export default function Charts({ expenses }) {
                 )}
             </div>
 
-            <div className="chart-card">
+            <div className={styles.chartCard}>
                 <h3>By Date</h3>
                 {byDate.length === 0 ? <p>No data</p> : (
                     <ResponsiveContainer width="100%" height={250}>
