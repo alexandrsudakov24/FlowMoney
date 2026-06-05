@@ -4,6 +4,7 @@ export interface Expense {
     category: string;
     date: string; // YYYY-MM-DD
     note?: string;
+    type: 'expense' | 'income';
 }
 
 const KEY = 'expenses_data_v1';

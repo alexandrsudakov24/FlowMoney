@@ -7,13 +7,13 @@ export default function Navbar() {
 
     return (
         <header className={styles.navbar}>
-            <Link to="/" className={styles.brand}>💰 FlowMoney</Link>
+            <Link to="/" className={styles.brand}>FlowMoney</Link>
             <nav className={styles.navLinks}>
-                <Link to="/">📊 Dashboard</Link>
-                <Link to="/add">➕ Add Expense</Link>
-                <Link to="/profile">👤 Profile</Link>
+                <Link to="/">Dashboard</Link>
+                <Link to="/add">Add Transaction</Link>
+                <Link to="/profile">Profile</Link>
                 <button aria-label="Toggle theme" onClick={toggle} className="btn" style={{ marginLeft: 8 }}>
-                    {theme === 'dark' ? '🌞 Light' : '🌙 Dark'}
+                    {theme === 'dark' ? 'Light' : 'Dark'}
                 </button>
             </nav>
         </header>

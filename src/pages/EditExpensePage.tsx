@@ -17,8 +17,8 @@ export default function EditExpensePage() {
 
     return (
         <div className="page">
-            <h2>Edit Expense</h2>
-            <p style={{ color: '#718096', marginBottom: '24px' }}>Update your expense details</p>
+            <h2>Edit Transaction</h2>
+            <p style={{ color: '#718096', marginBottom: '24px' }}>Update your transaction details</p>
             <ExpenseForm defaultValues={expense} onSubmit={handleSubmit} />
         </div>
     );
