@@ -1,7 +1,7 @@
-.navbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 10px 16px;
   background: var(--card);
   border-radius: 8px;
@@ -11,57 +11,171 @@
   z-index: 120;
 }
 
-.brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:800;
-  font-size:18px;
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 18px;
   color: var(--accent);
+  text-decoration: none;
 }
 
-.brand::before{
+.brand::before {
   content: '';
-  width:36px;
-  height:36px;
-  border-radius:10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  display:inline-block;
-  box-shadow: 0 6px 18px rgba(99,102,241,0.12);
+  display: inline-block;
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.12);
 }
 
-.navLinks{
-  display:flex;
-  gap:12px;
-  align-items:center;
+.navLinks {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
-.navLinks a{
-  text-decoration:none;
-  color:var(--text);
-  font-weight:600;
-  padding:6px 10px;
+.navLinks a {
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 600;
+  padding: 6px 10px;
   background: transparent;
   border-radius: 6px;
   transition: color 0.12s ease, background 0.12s ease;
 }
 
-.navLinks a:hover{
-  background: rgba(99,102,241,0.06);
+.navLinks a:hover {
+  background: rgba(99, 102, 241, 0.06);
   color: var(--accent);
   box-shadow: var(--shadow-sm);
 }
 
-/* small avatar next to user name */
-.avatar{
-  width:36px;
-  height:36px;
-  border-radius:50%;
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  display:inline-block;
+  display: inline-block;
 }
 
-@media (max-width: 720px){
-  .navLinks{ display:none; }
+.themeBtn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.themeBtn:hover {
+  background: rgba(99, 102, 241, 0.06);
+  color: var(--accent);
+  box-shadow: var(--shadow-md);
+}
+
+/* ========================================
+   DESKTOP NAVIGATION (>= 768px)
+   ======================================== */
+.desktopNav {
+  display: flex;
+}
+
+.mobileHeader {
+  display: none;
+}
+
+.mobileNav {
+  display: none;
+}
+
+/* ========================================
+   MOBILE NAVIGATION (< 768px)
+   ======================================== */
+@media (max-width: 767px) {
+  .desktopNav {
+    display: none;
+  }
+
+  /* Mobile header: minimal, only brand + theme button */
+  .mobileHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--card);
+    border-radius: 0;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 120;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mobileHeader .brand::before {
+    width: 28px;
+    height: 28px;
+  }
+
+  .mobileHeader .brand {
+    font-size: 16px;
+  }
+
+  /* Mobile bottom navigation */
+  .mobileNav {
+    display: flex;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 110;
+    padding: 0;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0;
+    gap: 0;
+  }
+
+  .navItem {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 12px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  .navItem:hover {
+    background: rgba(99, 102, 241, 0.06);
+    color: var(--accent);
+  }
+
+  .navItem span {
+    display: inline-block;
+  }
+
+  .bottomNav {
+    display: flex;
+  }
 }
 
