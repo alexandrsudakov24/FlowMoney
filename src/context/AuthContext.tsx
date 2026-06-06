@@ -21,6 +21,7 @@ export type User = {
     name: string;
     email: string;
     language?: 'en' | 'ru' | 'he';
+    photoURL?: string;
 };
 
 type RegisterData = { name: string; email: string; password: string; language?: 'en' | 'ru' | 'he' };
@@ -54,12 +55,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             if (fbUser) {
                 try {
                     const userDoc = await getDoc(doc(db, 'users', fbUser.uid));
-                    const language = userDoc.exists() ? (userDoc.data()?.language as string | undefined) : undefined;
+                    const language = userDoc.exists() ? (userDoc.data()?.language as 'en' | 'ru' | 'he' | undefined) : undefined;
                     setUser({
                         id: fbUser.uid,
                         name: fbUser.displayName || fbUser.email || '',
                         email: fbUser.email || '',
                         language,
+                        photoURL: fbUser.photoURL || undefined,
                     });
                 } catch (e: unknown) {
                     console.warn('failed to load auth profile from firestore', e);
@@ -119,10 +121,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const login = async (data: LoginData) => {
         try {
             const cred = await signInWithEmailAndPassword(auth, data.email, data.password);
-            let language: string | undefined = undefined;
+            let language: 'en' | 'ru' | 'he' | undefined = undefined;
             try {
                 const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
-                language = userDoc.exists() ? (userDoc.data()?.language as string | undefined) : undefined;
+                language = userDoc.exists() ? (userDoc.data()?.language as 'en' | 'ru' | 'he' | undefined) : undefined;
             } catch (profileErr) {
                 console.warn('failed to load profile from firestore:', profileErr);
             }
@@ -131,6 +133,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 name: cred.user.displayName || cred.user.email || '',
                 email: cred.user.email || '',
                 language,
+                photoURL: cred.user.photoURL || undefined,
             };
             setUser(publicUser);
             return publicUser;
@@ -163,6 +166,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         id: fbUser.uid,
                         name: fbUser.displayName || '',
                         email: fbUser.email || '',
+                        photoURL: fbUser.photoURL || undefined,
                     };
                     setUser(publicUser);
                     return publicUser;
@@ -194,6 +198,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 name: fbUser.displayName || '',
                 email: fbUser.email || '',
                 language,
+                photoURL: fbUser.photoURL || undefined,
             };
             setUser(publicUser);
             return publicUser;
