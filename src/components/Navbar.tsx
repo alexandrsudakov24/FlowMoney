@@ -4,6 +4,7 @@ import styles from '../styles/components/Navbar.module.css';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import SettingsModal from './SettingsModal';
+import Avatar from './Avatar';
 
 export default function Navbar() {
     const { isAuthenticated, user, logout } = useAuth();
@@ -30,7 +31,7 @@ export default function Navbar() {
                             <Link to="/">{t('dashboard')}</Link>
                             <Link to="/add">{t('add_transaction')}</Link>
                             <Link to="/profile">{t('profile')}</Link>
-                            <span className={styles.avatar} aria-hidden="true" />
+                            <Avatar name={user?.name || ''} photoURL={user?.photoURL} size="medium" />
                             <span style={{ marginLeft: 8 }}>{t('hi')}, {user?.name}</span>
                             <button className="btn" onClick={handleLogout} style={{ marginLeft: 8 }}>
                                 {t('logout')}
