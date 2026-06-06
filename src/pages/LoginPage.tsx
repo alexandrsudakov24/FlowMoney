@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import styles from '../styles/pages/LoginPage.module.css';
 
 export default function LoginPage() {
     const { login } = useAuth();
+    const { t } = useLanguage();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -25,20 +27,20 @@ export default function LoginPage() {
     return (
         <div className={styles.page}>
             <div className={styles.container}>
-                <h2 className={styles.title}>Login</h2>
+                <h2 className={styles.title}>{t('login')}</h2>
                 <form onSubmit={submit} className={styles.form}>
                     <div className={styles.formGroup}>
-                        <label>Email</label>
+                        <label>{t('email')}</label>
                         <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required />
                     </div>
                     <div className={styles.formGroup}>
-                        <label>Password</label>
+                        <label>{t('password')}</label>
                         <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required />
                     </div>
                     {error && <div className={styles.error}>{error}</div>}
                     <div className={styles.actions}>
-                        <button type="submit">Login</button>
-                        <Link to="/register">Register</Link>
+                        <button type="submit">{t('login')}</button>
+                        <Link to="/register">{t('register')}</Link>
                     </div>
                 </form>
             </div>

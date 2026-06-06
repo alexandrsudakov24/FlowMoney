@@ -6,9 +6,10 @@ export type User = {
     id: string;
     name: string;
     email: string;
+    language?: 'en' | 'ru' | 'he';
 };
 
-type RegisterData = { name: string; email: string; password: string };
+type RegisterData = { name: string; email: string; password: string; language?: 'en' | 'ru' | 'he' };
 type LoginData = { email: string; password: string };
 
 type AuthContextType = {
@@ -24,7 +25,7 @@ const CURRENT_KEY = 'flowmoney_current_user_v1';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const readUsers = (): Array<{ id: string; name: string; email: string; password: string }> => {
+const readUsers = (): Array<{ id: string; name: string; email: string; password: string; language?: 'en' | 'ru' | 'he' }> => {
     try {
         const raw = localStorage.getItem(USERS_KEY);
         if (!raw) return [];
@@ -34,7 +35,7 @@ const readUsers = (): Array<{ id: string; name: string; email: string; password:
     }
 };
 
-const writeUsers = (users: Array<{ id: string; name: string; email: string; password: string }>) => {
+const writeUsers = (users: Array<{ id: string; name: string; email: string; password: string; language?: 'en' | 'ru' | 'he' }>) => {
     try {
         localStorage.setItem(USERS_KEY, JSON.stringify(users));
     } catch {
@@ -68,10 +69,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             return Promise.reject(new Error('User with this email already exists'));
         }
         const id = Date.now().toString();
-        const newUser = { id, name: data.name, email: data.email, password: data.password };
+        const newUser = {
+            id,
+            name: data.name,
+            email: data.email,
+            password: data.password,
+            language: data.language || 'en'
+        };
         const next = [...users, newUser];
         writeUsers(next);
-        const publicUser: User = { id, name: data.name, email: data.email };
+        const publicUser: User = {
+            id,
+            name: data.name,
+            email: data.email,
+            language: data.language || 'en'
+        };
         setUser(publicUser);
         return Promise.resolve(publicUser);
     };
@@ -82,7 +94,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             (u) => u.email.toLowerCase() === data.email.toLowerCase() && u.password === data.password,
         );
         if (!found) return Promise.reject(new Error('Invalid credentials'));
-        const publicUser: User = { id: found.id, name: found.name, email: found.email };
+        const publicUser: User = {
+            id: found.id,
+            name: found.name,
+            email: found.email,
+            language: found.language || 'en'
+        };
         setUser(publicUser);
         return Promise.resolve(publicUser);
     };
