@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext.tsx';
-import styles from './ExpenseList.module.css';
+import styles from '../styles/components/ExpenseList.module.css';
 
 export default function ExpenseList({ expenses }: { expenses: any[] }) {
     const { deleteExpense } = useApp();
@@ -22,11 +22,13 @@ export default function ExpenseList({ expenses }: { expenses: any[] }) {
                 {sorted.map((e) => (
                     <li key={e.id} className={styles.expenseItem}>
                         <div className={styles.left}>
-                            <div className={styles.category}>{e.category}</div>
+                            <div className={styles.category}>{e.type === 'income' ? 'Income' : e.category}</div>
                             <div className={styles.note}>{e.note || 'No note'}</div>
                         </div>
                         <div className={styles.right}>
-                            <div className={styles.amount} style={{ color: e.type === 'income' ? 'var(--success)' : 'var(--accent)' }}>${Number(e.amount).toFixed(2)}</div>
+                            <div className={styles.amount} style={{ color: e.type === 'income' ? 'var(--success)' : 'var(--accent)' }}>
+                                {e.type === 'income' ? '+' : '-'}${Number(e.amount).toFixed(2)}
+                            </div>
                             <div className={styles.date}>{new Date(e.date).toLocaleDateString()}</div>
                             <div className={styles.actions}>
                                 <Link to={`/edit/${e.id}`} className="btn">Edit</Link>

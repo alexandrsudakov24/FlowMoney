@@ -1,0 +1,80 @@
+/* ============================================
+   Design System: Material-Inspired Tokens
+   ============================================ */
+
+:root {
+    /* Material-inspired design tokens (mapped to existing variable names for compatibility) */
+    --md-surface: #ffffff;
+    --md-background: #f5f7fb;
+    --md-on-surface: #111827;
+    --md-on-surface-muted: #6b7280;
+    --md-primary: #6200ee;
+    --md-primary-variant: #3700b3;
+    --md-primary-light: #8b5cf6;
+    --md-secondary: #03dac6;
+    --md-error: #b00020;
+
+    /* Backwards-compatible tokens used throughout the app */
+    --bg: var(--md-background);
+    --bg-solid: #f8fafc;
+    --card: var(--md-surface);
+    --text: var(--md-on-surface);
+    --text-light: var(--md-on-surface-muted);
+    --muted: var(--md-on-surface-muted);
+    --accent: var(--md-primary);
+    --accent-light: var(--md-primary-light);
+    --accent-dark: var(--md-primary-variant);
+    --success: #10b981;
+    --danger: #b00020;
+    --warning: #f59e0b;
+    --border: rgba(16,24,40,0.06);
+
+    /* Material-like elevation shadows */
+    --shadow-sm: 0 1px 3px rgba(16,24,40,0.08), 0 1px 2px rgba(16,24,40,0.06);
+    --shadow-md: 0 6px 18px rgba(16,24,40,0.10), 0 2px 4px rgba(16,24,40,0.08);
+    --shadow-lg: 0 20px 40px rgba(16,24,40,0.12), 0 8px 12px rgba(16,24,40,0.10);
+    --shadow-xl: 0 30px 60px rgba(16,24,40,0.14), 0 12px 18px rgba(16,24,40,0.12);
+
+    /* Typography */
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    --font-size-xs: 12px;
+    --font-size-sm: 14px;
+    --font-size-md: 16px;
+    --font-size-lg: 18px;
+    --font-size-xl: 20px;
+    --font-size-2xl: 28px;
+
+    /* Border radius */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+}
+
+/* Dark theme overrides */
+[data-theme="dark"] {
+    --md-surface: #071022;
+    --md-background: linear-gradient(135deg,#071022 0%, #0f1724 100%);
+    --md-on-surface: #e6eef8;
+    --md-on-surface-muted: #9aa8bd;
+    --md-primary: #bb86fc;
+    --md-primary-variant: #7c3aed;
+    --md-primary-light: #a78bfa;
+    --md-secondary: #03dac6;
+    --md-error: #f87171;
+
+    /* Backwards-compatible mappings */
+    --bg: var(--md-background);
+    --card: var(--md-surface);
+    --text: var(--md-on-surface);
+    --text-light: var(--md-on-surface-muted);
+    --muted: var(--md-on-surface-muted);
+    --accent: var(--md-primary);
+    --accent-light: var(--md-primary-light);
+    --accent-dark: var(--md-primary-variant);
+    --border: rgba(255,255,255,0.06);
+
+    --shadow-sm: 0 1px 3px rgba(2,6,23,0.6), 0 1px 2px rgba(2,6,23,0.5);
+    --shadow-md: 0 6px 18px rgba(2,6,23,0.6), 0 2px 4px rgba(2,6,23,0.5);
+    --shadow-lg: 0 20px 40px rgba(2,6,23,0.7), 0 8px 12px rgba(2,6,23,0.6);
+}
+

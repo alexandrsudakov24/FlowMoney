@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import styles from './ExpenseForm.module.css';
+import styles from '../styles/components/ExpenseForm.module.css';
 import type { Expense } from '../services/storageService';
 
 type FormData = {
@@ -30,6 +30,15 @@ export default function ExpenseForm({ defaultValues, onSubmit }: { defaultValues
             setValue('type', (defaultValues as FormData).type!);
         }
     }, [defaultValues, setValue]);
+
+    // Clear category when switching to income
+    useEffect(() => {
+        if (type === 'income') {
+            setValue('category', '');
+        } else {
+            setValue('category', defaultValues?.category as string || 'Food');
+        }
+    }, [type, setValue, defaultValues]);
 
     return (
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>

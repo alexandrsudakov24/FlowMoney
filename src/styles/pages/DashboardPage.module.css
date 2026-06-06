@@ -1,0 +1,108 @@
+/* Dashboard Page Styles */
+.dashboard {
+    animation: fadeIn 0.4s ease-in;
+}
+
+.title {
+    margin: 0 0 24px 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.summary {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.card {
+    flex: 1;
+    min-width: 250px;
+    background: var(--card);
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.cardTitle {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cardValue {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0;
+}
+
+.chartsSection {
+    margin-top: 24px;
+}
+
+.chartsTitle {
+    margin: 0 0 16px 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.recentTitle {
+    margin: 24px 0 16px 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 900px) {
+    .summary {
+        flex-direction: column;
+    }
+
+    .card {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .title {
+        font-size: 24px;
+    }
+
+    .chartsTitle {
+        font-size: 24px;
+    }
+
+    .recentTitle {
+        font-size: 24px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+}
+

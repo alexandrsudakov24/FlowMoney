@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import styles from './Navbar.module.css';
+import styles from '../styles/components/Navbar.module.css';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -27,6 +27,7 @@ export default function Navbar() {
                     </>
                 ) : (
                     <>
+                        <span className={styles.avatar} aria-hidden="true" />
                         <span style={{ marginLeft: 8 }}>Hi, {user?.name}</span>
                         <button className="btn" onClick={handleLogout} style={{ marginLeft: 8 }}>
                             Logout

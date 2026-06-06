@@ -1,0 +1,67 @@
+.navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding: 10px 16px;
+  background: var(--card);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 12px;
+  z-index: 120;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:800;
+  font-size:18px;
+  color: var(--accent);
+}
+
+.brand::before{
+  content: '';
+  width:36px;
+  height:36px;
+  border-radius:10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  display:inline-block;
+  box-shadow: 0 6px 18px rgba(99,102,241,0.12);
+}
+
+.navLinks{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.navLinks a{
+  text-decoration:none;
+  color:var(--text);
+  font-weight:600;
+  padding:6px 10px;
+  background: transparent;
+  border-radius: 6px;
+  transition: color 0.12s ease, background 0.12s ease;
+}
+
+.navLinks a:hover{
+  background: rgba(99,102,241,0.06);
+  color: var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+
+/* small avatar next to user name */
+.avatar{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  display:inline-block;
+}
+
+@media (max-width: 720px){
+  .navLinks{ display:none; }
+}
+

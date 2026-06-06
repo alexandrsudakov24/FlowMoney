@@ -1,11 +1,11 @@
 .form{
   display:grid;
   gap: 12px;
-  max-width:500px;
+  max-width:520px;
   background:var(--card);
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-md);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
   border: 1px solid var(--border);
 }
 
@@ -18,11 +18,13 @@
 }
 
 .input, .select{
-  padding: 10px 12px;
+  padding: 12px 14px;
   border:1px solid var(--border);
-  border-radius:8px;
-  margin-top:6px;
+  border-radius:6px;
+  margin-top:8px;
   font-size:14px;
+  background: transparent;
+  color: var(--text);
 }
 
 .toggle{
@@ -33,7 +35,7 @@
 
 .toggleButton{
   padding:8px 12px;
-  border-radius:8px;
+  border-radius:6px;
   border:1px solid var(--border);
   background:transparent;
   cursor:pointer;
@@ -44,13 +46,14 @@
   background: linear-gradient(135deg, var(--accent), var(--accent-dark));
   color: white;
   border-color: transparent;
+  box-shadow: var(--shadow-sm);
 }
 
 .formActions{
   display:flex;
   gap:12px;
   justify-content:flex-end;
-  margin-top:8px;
+  margin-top:12px;
 }
 
 .button{
@@ -61,6 +64,7 @@
   border-radius:8px;
   cursor:pointer;
   font-weight:600;
+  box-shadow: var(--shadow-sm);
 }
 
 .button.secondary{
@@ -68,4 +72,3 @@
   border:1px solid var(--border);
   color:var(--text);
 }
-

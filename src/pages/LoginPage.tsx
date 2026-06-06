@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import styles from '../styles/pages/LoginPage.module.css';
 
 export default function LoginPage() {
     const { login } = useAuth();
@@ -22,23 +23,25 @@ export default function LoginPage() {
     };
 
     return (
-        <div>
-            <h2>Login</h2>
-            <form onSubmit={submit} style={{ maxWidth: 420 }}>
-                <div>
-                    <label>Email</label>
-                    <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required />
-                </div>
-                <div>
-                    <label>Password</label>
-                    <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required />
-                </div>
-                {error && <div style={{ color: 'red' }}>{error}</div>}
-                <div style={{ marginTop: 10 }}>
-                    <button className="btn" type="submit">Login</button>
-                    <Link to="/register" style={{ marginLeft: 8 }}>Register</Link>
-                </div>
-            </form>
+        <div className={styles.page}>
+            <div className={styles.container}>
+                <h2 className={styles.title}>Login</h2>
+                <form onSubmit={submit} className={styles.form}>
+                    <div className={styles.formGroup}>
+                        <label>Email</label>
+                        <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" required />
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label>Password</label>
+                        <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required />
+                    </div>
+                    {error && <div className={styles.error}>{error}</div>}
+                    <div className={styles.actions}>
+                        <button type="submit">Login</button>
+                        <Link to="/register">Register</Link>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 }

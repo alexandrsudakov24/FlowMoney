@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import { useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import type {JSX} from "react";
 
 export default function App() {
     const { isAuthenticated } = useAuth();
