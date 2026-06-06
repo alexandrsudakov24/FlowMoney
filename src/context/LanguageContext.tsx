@@ -34,12 +34,16 @@ const translations = {
         'total_income': 'Total Income',
         'total_expenses': 'Total Expenses',
         'net_balance': 'Net Balance',
+        'net': 'Net',
         'hi': 'Hi',
         'recent_transactions': 'Recent Transactions',
+        'analytics': 'Analytics',
         'category': 'Category',
         'amount': 'Amount',
+        'amount_placeholder': 'Enter amount',
         'date': 'Date',
         'notes': 'Notes',
+        'note_placeholder': 'Add a note (optional)',
         'add': 'Add',
         'edit': 'Edit',
         'delete': 'Delete',
@@ -51,6 +55,19 @@ const translations = {
         'select_language': 'Select Language',
         'already_have_account': 'Already have an account? Login',
         'create_account': 'Create Account',
+        'no_transactions': 'No transactions yet',
+        'no_transactions_desc': 'Start tracking by adding a new transaction',
+        'no_note': 'No note',
+        'delete_confirm': 'Are you sure you want to delete this transaction?',
+        'cat_food': 'Food',
+        'cat_transport': 'Transport',
+        'cat_home': 'Home',
+        'cat_shopping': 'Shopping',
+        'cat_health': 'Health',
+        'cat_other': 'Other',
+        'add_transaction_desc': 'Add an expense or income to track your finances',
+        'edit_transaction': 'Edit Transaction',
+        'edit_transaction_desc': 'Update your transaction details',
     },
     ru: {
         'dashboard': 'Панель управления',
@@ -74,12 +91,16 @@ const translations = {
         'total_income': 'Всего доходов',
         'total_expenses': 'Всего расходов',
         'net_balance': 'Чистый баланс',
+        'net': 'Итого',
         'hi': 'Привет',
         'recent_transactions': 'Последние операции',
+        'analytics': 'Аналитика',
         'category': 'Категория',
         'amount': 'Сумма',
+        'amount_placeholder': 'Введите сумму',
         'date': 'Дата',
-        'notes': 'Примечания',
+        'notes': 'Заметка',
+        'note_placeholder': 'Добавить заметку (необязательно)',
         'add': 'Добавить',
         'edit': 'Редактировать',
         'delete': 'Удалить',
@@ -91,6 +112,19 @@ const translations = {
         'select_language': 'Выберите язык',
         'already_have_account': 'Уже есть аккаунт? Вход',
         'create_account': 'Создать аккаунт',
+        'no_transactions': 'Нет операций',
+        'no_transactions_desc': 'Добавьте первую операцию для отслеживания',
+        'no_note': 'Без заметки',
+        'delete_confirm': 'Вы уверены, что хотите удалить эту операцию?',
+        'cat_food': 'Еда',
+        'cat_transport': 'Транспорт',
+        'cat_home': 'Дом',
+        'cat_shopping': 'Покупки',
+        'cat_health': 'Здоровье',
+        'cat_other': 'Другое',
+        'add_transaction_desc': 'Добавьте расход или доход для учёта финансов',
+        'edit_transaction': 'Редактировать операцию',
+        'edit_transaction_desc': 'Обновите данные операции',
     },
     he: {
         'dashboard': 'לוח מחוונים',
@@ -114,12 +148,16 @@ const translations = {
         'total_income': 'סה"כ הכנסות',
         'total_expenses': 'סה"כ הוצאות',
         'net_balance': 'יתרה נקייה',
+        'net': 'נטו',
         'hi': 'שלום',
         'recent_transactions': 'עסקאות אחרונות',
+        'analytics': 'אנליטיקה',
         'category': 'קטגוריה',
         'amount': 'סכום',
+        'amount_placeholder': 'הכנס סכום',
         'date': 'תאריך',
-        'notes': 'הערות',
+        'notes': 'הערה',
+        'note_placeholder': 'הוסף הערה (אופציונלי)',
         'add': 'הוסף',
         'edit': 'ערוך',
         'delete': 'מחק',
@@ -131,6 +169,19 @@ const translations = {
         'select_language': 'בחר שפה',
         'already_have_account': 'כבר יש לך חשבון? כניסה',
         'create_account': 'צור חשבון',
+        'no_transactions': 'אין עסקאות עדיין',
+        'no_transactions_desc': 'התחל לעקוב על ידי הוספת עסקה חדשה',
+        'no_note': 'ללא הערה',
+        'delete_confirm': 'האם אתה בטוח שברצונך למחוק עסקה זו?',
+        'cat_food': 'אוכל',
+        'cat_transport': 'תחבורה',
+        'cat_home': 'בית',
+        'cat_shopping': 'קניות',
+        'cat_health': 'בריאות',
+        'cat_other': 'אחר',
+        'add_transaction_desc': 'הוסף הוצאה או הכנסה למעקב פיננסי',
+        'edit_transaction': 'ערוך עסקה',
+        'edit_transaction_desc': 'עדכן את פרטי העסקה',
     }
 };
 
@@ -142,9 +193,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     useEffect(() => {
         localStorage.setItem('language', language);
-        // Set HTML lang attribute for accessibility and RTL support
         document.documentElement.lang = language;
-        // Set dir attribute for Hebrew (RTL language)
         if (language === 'he') {
             document.documentElement.dir = 'rtl';
         } else {
@@ -175,6 +224,3 @@ export const useLanguage = () => {
     }
     return context;
 };
-
-
-
