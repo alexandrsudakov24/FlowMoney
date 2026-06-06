@@ -12,8 +12,10 @@ import type {JSX} from "react";
 
 export default function App() {
     const { isAuthenticated } = useAuth();
+    console.log('App: rendered, isAuthenticated:', isAuthenticated);
 
     const RequireAuth = ({ children }: { children: JSX.Element }) => {
+        console.log('RequireAuth: checking, isAuthenticated:', isAuthenticated);
         if (!isAuthenticated) return <StartPage />;
         return children;
     };

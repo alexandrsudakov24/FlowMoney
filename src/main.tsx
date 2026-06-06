@@ -7,6 +7,10 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import './styles/index.css';
+// импорт утилиты миграции в режиме разработки — она выставит window.migrateLocalExpensesToFirestore
+if (import.meta.env.DEV) {
+    import('./utils/migrateLocalToFirestore');
+}
 
 createRoot(document.getElementById('root')!).render(
     <React.StrictMode>

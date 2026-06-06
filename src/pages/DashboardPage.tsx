@@ -3,9 +3,10 @@ import ExpenseList from '../components/ExpenseList';
 import Charts from '../components/Charts';
 import styles from '../styles/pages/DashboardPage.module.css';
 
-// @ts-ignore
+
 export default function DashboardPage() {
     const { expenses } = useApp();
+    console.log('DashboardPage: rendered, expenses count:', expenses.length);
 
     const totalIncome = expenses.reduce((sum, e) => sum + (e.type === 'income' ? Number(e.amount || 0) : 0), 0);
     const totalExpenses = expenses.reduce((sum, e) => sum + (e.type === 'expense' ? Number(e.amount || 0) : 0), 0);
