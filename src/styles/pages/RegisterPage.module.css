@@ -59,6 +59,29 @@
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
+.select {
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text);
+    background: transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.select:hover {
+    border-color: var(--accent);
+}
+
+.select:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--card);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
 .error {
     color: var(--danger);
     font-size: 14px;
