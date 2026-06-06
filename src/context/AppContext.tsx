@@ -7,7 +7,7 @@ import type { Expense } from '../services/storageService';
 type AppContextType = {
     expenses: Expense[];
     addExpense: (e: Expense) => void;
-    updateExpense: (id: string | undefined, data: Partial<Expense>) => void;
+    updateExpense: (id: string, data: Partial<Expense>) => void;
     deleteExpense: (id: string) => void;
     clearAll: () => void;
 };

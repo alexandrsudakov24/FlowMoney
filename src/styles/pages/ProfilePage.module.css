@@ -1,0 +1,85 @@
+/* Profile Page Styles */
+.page {
+    animation: fadeIn 0.4s ease-in;
+}
+
+.title {
+    margin: 0 0 24px 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.card {
+    background: var(--card);
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+    max-width: 600px;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.cardTitle {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.cardDescription {
+    margin: 0 0 12px 0;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.cardList {
+    margin: 0 0 12px 0;
+    color: var(--muted);
+    padding-left: 20px;
+}
+
+.cardList li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 640px) {
+    .title {
+        font-size: 24px;
+    }
+
+    .card {
+        max-width: 100%;
+        padding: 16px;
+    }
+
+    .cardTitle {
+        font-size: 15px;
+    }
+
+    .cardDescription {
+        font-size: 14px;
+    }
+
+    .cardList {
+        font-size: 14px;
+    }
+}
+
