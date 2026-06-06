@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext.tsx';
+import { useLanguage } from '../context/LanguageContext';
 import ExpenseForm from '../components/ExpenseForm';
 import styles from '../styles/pages/AddExpensePage.module.css';
 
@@ -13,6 +14,7 @@ type FormData = {
 
 export default function AddExpensePage() {
     const { addExpense } = useApp();
+    const { t } = useLanguage();
     const navigate = useNavigate();
 
     const handleSubmit = (data: FormData) => {
@@ -27,10 +29,8 @@ export default function AddExpensePage() {
 
     return (
         <div className={styles.page}>
-            <h2 className={styles.title}>Add Transaction</h2>
-            <p className={styles.description}>
-                Add an expense or income to track your finances
-            </p>
+            <h2 className={styles.title}>{t('add_transaction')}</h2>
+            <p className={styles.description}>{t('add_transaction_desc')}</p>
             <ExpenseForm onSubmit={handleSubmit} defaultValues={undefined} />
         </div>
     );

@@ -1,20 +1,34 @@
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext.tsx';
+import { useLanguage } from '../context/LanguageContext';
 import styles from '../styles/components/ExpenseList.module.css';
 
 export default function ExpenseList({ expenses }: { expenses: any[] }) {
     const { deleteExpense } = useApp();
+    const { t } = useLanguage();
 
     if (!expenses || expenses.length === 0) {
         return (
             <div className={styles.emptyState}>
-                <h3>No transactions yet</h3>
-                <p>Start tracking by adding a new transaction</p>
+                <h3>{t('no_transactions')}</h3>
+                <p>{t('no_transactions_desc')}</p>
             </div>
         );
     }
 
     const sorted = [...expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    const getCategoryLabel = (category: string) => {
+        const map: Record<string, string> = {
+            'Food': t('cat_food'),
+            'Transport': t('cat_transport'),
+            'Home': t('cat_home'),
+            'Shopping': t('cat_shopping'),
+            'Health': t('cat_health'),
+            'Other': t('cat_other'),
+        };
+        return map[category] || category;
+    };
 
     return (
         <div>
@@ -22,8 +36,10 @@ export default function ExpenseList({ expenses }: { expenses: any[] }) {
                 {sorted.map((e) => (
                     <li key={e.id} className={styles.expenseItem}>
                         <div className={styles.left}>
-                            <div className={styles.category}>{e.type === 'income' ? 'Income' : e.category}</div>
-                            <div className={styles.note}>{e.note || 'No note'}</div>
+                            <div className={styles.category}>
+                                {e.type === 'income' ? t('income') : getCategoryLabel(e.category)}
+                            </div>
+                            <div className={styles.note}>{e.note || t('no_note')}</div>
                         </div>
                         <div className={styles.right}>
                             <div className={styles.amount} style={{ color: e.type === 'income' ? 'var(--success)' : 'var(--accent)' }}>
@@ -31,10 +47,10 @@ export default function ExpenseList({ expenses }: { expenses: any[] }) {
                             </div>
                             <div className={styles.date}>{new Date(e.date).toLocaleDateString()}</div>
                             <div className={styles.actions}>
-                                <Link to={`/edit/${e.id}`} className="btn">Edit</Link>
+                                <Link to={`/edit/${e.id}`} className="btn">{t('edit')}</Link>
                                 <button className="btn danger" onClick={() => {
-                                    if (confirm('Are you sure you want to delete this transaction?')) deleteExpense(e.id);
-                                }}>Delete</button>
+                                    if (confirm(t('delete_confirm'))) deleteExpense(e.id);
+                                }}>{t('delete')}</button>
                             </div>
                         </div>
                     </li>
