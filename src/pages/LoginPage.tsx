@@ -15,10 +15,16 @@ export default function LoginPage() {
     const submit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+        console.log('LoginPage: submit called, email:', email);
         try {
+            console.log('LoginPage: calling login...');
             await login({ email, password });
+            console.log('LoginPage: login returned successfully');
+            console.log('LoginPage: navigating to /');
             navigate('/');
+            console.log('LoginPage: navigate called');
         } catch (err: unknown) {
+            console.error('LoginPage: login error:', err);
             const message = err instanceof Error ? err.message : String(err);
             setError(message || 'Login failed');
         }

@@ -1,6 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
+import { auth, db } from '../firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as fbSignOut, onAuthStateChanged, updateProfile, signInAnonymously, EmailAuthProvider, linkWithCredential } from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 export type User = {
     id: string;
@@ -17,94 +20,132 @@ type AuthContextType = {
     isAuthenticated: boolean;
     register: (data: RegisterData) => Promise<User>;
     login: (data: LoginData) => Promise<User>;
-    logout: () => void;
+    logout: () => Promise<void>;
 };
-
-const USERS_KEY = 'flowmoney_users_v1';
-const CURRENT_KEY = 'flowmoney_current_user_v1';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const readUsers = (): Array<{ id: string; name: string; email: string; password: string; language?: 'en' | 'ru' | 'he' }> => {
-    try {
-        const raw = localStorage.getItem(USERS_KEY);
-        if (!raw) return [];
-        return JSON.parse(raw);
-    } catch {
-        return [];
-    }
-};
-
-const writeUsers = (users: Array<{ id: string; name: string; email: string; password: string; language?: 'en' | 'ru' | 'he' }>) => {
-    try {
-        localStorage.setItem(USERS_KEY, JSON.stringify(users));
-    } catch {
-        // ignore
-    }
-};
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [user, setUser] = useState<User | null>(() => {
-        try {
-            const raw = localStorage.getItem(CURRENT_KEY);
-            if (!raw) return null;
-            return JSON.parse(raw) as User;
-        } catch {
-            return null;
-        }
-    });
+    const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
-        try {
-            if (user) localStorage.setItem(CURRENT_KEY, JSON.stringify(user));
-            else localStorage.removeItem(CURRENT_KEY);
-        } catch {
-            // ignore
-        }
-    }, [user]);
+        // Ensure anonymous auth for guests so app can persist data to Firestore even before explicit login
+        (async () => {
+            try {
+                if (!auth.currentUser) {
+                    await signInAnonymously(auth);
+                    console.log('AuthContext: signed in anonymously');
+                }
+            } catch (anonErr) {
+                console.warn('AuthContext: anonymous sign-in failed', anonErr);
+            }
+        })();
+        const unsub = onAuthStateChanged(auth, async (fbUser) => {
+            if (fbUser) {
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', fbUser.uid));
+                    const language = userDoc.exists() ? (userDoc.data()?.language as string | undefined) : undefined;
+                    setUser({
+                        id: fbUser.uid,
+                        name: fbUser.displayName || fbUser.email || '',
+                        email: fbUser.email || '',
+                        language,
+                    });
+                } catch (e: unknown) {
+                    console.warn('failed to load auth profile from firestore', e);
+                    setUser({
+                        id: fbUser.uid,
+                        name: fbUser.displayName || fbUser.email || '',
+                        email: fbUser.email || '',
+                    });
+                }
+            } else {
+                setUser(null);
+            }
+        });
+        return () => unsub();
+    }, []);
 
     const register = async (data: RegisterData) => {
-        const users = readUsers();
-        if (users.find((u) => u.email.toLowerCase() === data.email.toLowerCase())) {
-            return Promise.reject(new Error('User with this email already exists'));
+        // If current user is anonymous, link the anonymous account to the provided email/password
+        if (auth.currentUser && (auth.currentUser as any).isAnonymous) {
+            try {
+                const credential = EmailAuthProvider.credential(data.email, data.password);
+                const linked = await linkWithCredential(auth.currentUser, credential);
+                // set display name
+                await updateProfile(linked.user, { displayName: data.name });
+                // save extra profile data in Firestore
+                await setDoc(doc(db, 'users', linked.user.uid), {
+                    name: data.name,
+                    email: data.email,
+                    language: data.language || 'en',
+                });
+                const publicUser: User = {
+                    id: linked.user.uid,
+                    name: data.name,
+                    email: data.email,
+                    language: data.language || 'en',
+                };
+                setUser(publicUser);
+                return publicUser;
+            } catch (linkErr) {
+                console.warn('Failed to link anonymous account, falling back to createUser:', linkErr);
+                // fallthrough to create new account
+            }
         }
-        const id = Date.now().toString();
-        const newUser = {
-            id,
+        const cred = await createUserWithEmailAndPassword(auth, data.email, data.password);
+        // set display name
+        await updateProfile(cred.user, { displayName: data.name });
+        // save extra profile data in Firestore
+        await setDoc(doc(db, 'users', cred.user.uid), {
             name: data.name,
             email: data.email,
-            password: data.password,
-            language: data.language || 'en'
-        };
-        const next = [...users, newUser];
-        writeUsers(next);
+            language: data.language || 'en',
+        });
         const publicUser: User = {
-            id,
+            id: cred.user.uid,
             name: data.name,
             email: data.email,
-            language: data.language || 'en'
+            language: data.language || 'en',
         };
         setUser(publicUser);
-        return Promise.resolve(publicUser);
+        return publicUser;
     };
 
     const login = async (data: LoginData) => {
-        const users = readUsers();
-        const found = users.find(
-            (u) => u.email.toLowerCase() === data.email.toLowerCase() && u.password === data.password,
-        );
-        if (!found) return Promise.reject(new Error('Invalid credentials'));
-        const publicUser: User = {
-            id: found.id,
-            name: found.name,
-            email: found.email,
-            language: found.language || 'en'
-        };
-        setUser(publicUser);
-        return Promise.resolve(publicUser);
+        try {
+            console.log('AuthContext.login: starting, email:', data.email);
+            console.log('AuthContext.login: auth object:', auth);
+            const cred = await signInWithEmailAndPassword(auth, data.email, data.password);
+            console.log('signInWithEmailAndPassword success, uid:', cred.user.uid);
+            // onAuthStateChanged listener will update state — but return resolved user for callers
+            let language: string | undefined = undefined;
+            try {
+                const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
+                language = userDoc.exists() ? (userDoc.data()?.language as string | undefined) : undefined;
+                console.log('profile loaded, language:', language);
+            } catch (profileErr) {
+                console.warn('failed to load profile from firestore:', profileErr instanceof Error ? { message: profileErr.message, code: (profileErr as any).code } : profileErr);
+                // continue without profile data if it fails
+            }
+            const publicUser: User = {
+                id: cred.user.uid,
+                name: cred.user.displayName || cred.user.email || '',
+                email: cred.user.email || '',
+                language,
+            };
+            setUser(publicUser);
+            return publicUser;
+        } catch (err) {
+            const errMsg = err instanceof Error ? err.message : String(err);
+            const errCode = err instanceof Error && 'code' in err ? (err as any).code : 'UNKNOWN';
+            console.error('AuthContext.login FAILED:', { message: errMsg, code: errCode, fullError: err });
+            throw err;
+        }
     };
 
-    const logout = () => {
+    const logout = async () => {
+        await fbSignOut(auth);
         setUser(null);
     };
 
