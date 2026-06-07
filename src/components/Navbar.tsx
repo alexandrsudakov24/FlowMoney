@@ -24,7 +24,10 @@ export default function Navbar() {
         <>
             {/* Desktop Header (>= 768px) - FULL NAVBAR */}
             <header className={`${styles.navbar} ${styles.desktopNav}`}>
-                <Link to="/" className={styles.brand}>FlowMoney</Link>
+                <Link to="/" className={styles.brand}>
+                    <span className={styles.logo} aria-hidden="true" role="img" aria-label="FlowMoney logo" />
+                    FlowMoney
+                </Link>
                 <nav className={styles.navLinks}>
                     {isAuthenticatedPage && (
                         <>
@@ -57,7 +60,10 @@ export default function Navbar() {
 
             {/* Mobile Header (< 768px) - MINIMAL HEADER */}
             <header className={`${styles.navbar} ${styles.mobileHeader}`}>
-                <Link to="/" className={styles.brand}>FlowMoney</Link>
+                <Link to="/" className={styles.brand}>
+                    <span className={styles.logo} aria-hidden="true" role="img" aria-label="FlowMoney logo" />
+                    FlowMoney
+                </Link>
                 <button
                     aria-label="Settings"
                     onClick={() => setIsSettingsOpen(true)}
