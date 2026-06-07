@@ -2,11 +2,7 @@ import { auth, db } from '../firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import type { Expense } from '../services/storageService';
 
-/**
- * Миграция расходов из localStorage (ключ 'expenses_data_v1') в Firestore
- * Подключите скрипт в dev-сборке и вызовите window.migrateLocalExpensesToFirestore() из консоли
- * Возвращает количество успешно мигрированных документов.
- */
+
 export async function migrateLocalExpensesToFirestore(): Promise<number> {
   try {
     const raw = localStorage.getItem('expenses_data_v1');
