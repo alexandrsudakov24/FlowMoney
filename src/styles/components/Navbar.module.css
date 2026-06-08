@@ -152,6 +152,9 @@
     top: 0;
     z-index: 120;
     border-bottom: 1px solid var(--border);
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    height: 60px;
   }
 
   .mobileHeader .logo {
@@ -166,7 +169,7 @@
   /* Mobile bottom navigation */
   .mobileNav {
     display: flex;
-    width: 100%;
+    width: 100vw;
     position: fixed;
     bottom: 0;
     left: 0;
@@ -180,6 +183,8 @@
     align-items: center;
     padding: 8px 0;
     gap: 0;
+    margin-left: calc(-50vw + 50%);
+    height: 60px;
   }
 
   .navItem {
