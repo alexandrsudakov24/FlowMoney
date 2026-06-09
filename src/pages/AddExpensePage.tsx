@@ -18,14 +18,18 @@ export default function AddExpensePage() {
     const navigate = useNavigate();
 
     const handleSubmit = (data: FormData) => {
+        const safeAmount = Math.round(Number(data.amount) * 100) / 100;
+
         addExpense({
             id: crypto.randomUUID(),
             ...data,
-            amount: Number(data.amount),
+            amount: safeAmount,
             category: data.category || 'Other',
         });
+
         navigate('/');
     };
+
 
     return (
         <div className={styles.page}>
