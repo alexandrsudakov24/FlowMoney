@@ -2,9 +2,10 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(2px);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
   z-index: 9998;
+  animation: fadeOverlay 0.2s ease;
 }
 
 
@@ -15,12 +16,12 @@
   transform: translate(-50%, -50%);
   background: var(--card);
   padding: 22px;
-  border-radius: 16px;
+  border-radius: 18px;
   width: 92%;
   max-width: 380px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.25);
   z-index: 9999;
-  animation: fadeIn 0.22s ease;
+  animation: popIn 0.22s ease;
 }
 
 
@@ -31,12 +32,24 @@
   margin-bottom: 18px;
 }
 
+.header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
 .closeBtn {
   background: transparent;
   border: none;
   font-size: 22px;
   cursor: pointer;
   color: var(--text);
+  opacity: 0.7;
+  transition: 0.15s;
+}
+
+.closeBtn:hover {
+  opacity: 1;
 }
 
 
@@ -53,12 +66,18 @@
 }
 
 .select {
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--card);
   color: var(--text);
   font-size: 15px;
+  transition: 0.15s;
+}
+
+.select:focus {
+  border-color: var(--accent);
+  outline: none;
 }
 
 
@@ -76,6 +95,7 @@
   cursor: pointer;
   font-weight: 600;
   font-size: 15px;
+  transition: 0.15s;
 }
 
 .primary {
@@ -83,19 +103,32 @@
   color: white;
 }
 
+.primary:hover {
+  opacity: 0.9;
+}
+
 .secondary {
   background: var(--muted-bg);
   color: var(--text);
 }
 
+.secondary:hover {
+  opacity: 0.85;
+}
 
-@keyframes fadeIn {
+
+@keyframes popIn {
   from {
     opacity: 0;
-    transform: translate(-50%, -48%);
+    transform: translate(-50%, -46%) scale(0.95);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) scale(1);
   }
+}
+
+@keyframes fadeOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
