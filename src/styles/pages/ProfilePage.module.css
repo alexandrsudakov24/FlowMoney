@@ -83,3 +83,21 @@
     }
 }
 
+/* 🔥 Logout button — универсальная, для всех устройств */
+.logoutButton {
+    width: 100%;
+    margin-top: 24px;
+    padding: 12px;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.logoutButton:hover {
+    background: #dc2626;
+}
