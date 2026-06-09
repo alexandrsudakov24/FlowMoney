@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import styles from '../styles/components/Navbar.module.css';
 import { useAuth } from '../context/AuthContext';
@@ -7,27 +7,23 @@ import SettingsModal from './SettingsModal';
 import Avatar from './Avatar';
 
 export default function Navbar() {
-    const { isAuthenticated, user, logout } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const { t } = useLanguage();
-    const navigate = useNavigate();
     const location = useLocation();
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-    const handleLogout = () => {
-        logout();
-        navigate('/start');
-    };
-
-    const isAuthenticatedPage = isAuthenticated && !['/start', '/login', '/register'].includes(location.pathname);
+    const isAuthenticatedPage =
+        isAuthenticated && !['/start', '/login', '/register'].includes(location.pathname);
 
     return (
         <>
-            {/* Desktop Header (>= 768px) - FULL NAVBAR */}
+            {/* Desktop Header */}
             <header className={`${styles.navbar} ${styles.desktopNav}`}>
                 <Link to="/" className={styles.brand}>
-                    <span className={styles.logo} aria-hidden="true" role="img" aria-label="FlowMoney logo" />
+                    <span className={styles.logo} aria-hidden="true" />
                     FlowMoney
                 </Link>
+
                 <nav className={styles.navLinks}>
                     {isAuthenticatedPage && (
                         <>
@@ -35,18 +31,19 @@ export default function Navbar() {
                             <Link to="/add">{t('add_transaction')}</Link>
                             <Link to="/profile">{t('profile')}</Link>
                             <Avatar name={user?.name || ''} photoURL={user?.photoURL} size="medium" />
-                            <span style={{ marginLeft: 8 }}>{t('hi')}, {user?.name}</span>
-                            <button className="btn" onClick={handleLogout} style={{ marginLeft: 8 }}>
-                                {t('logout')}
-                            </button>
+                            <span style={{ marginLeft: 8 }}>
+                                {t('hi')}, {user?.name}
+                            </span>
                         </>
                     )}
+
                     {!isAuthenticated && (
                         <>
                             <Link to="/login">{t('login')}</Link>
                             <Link to="/register">{t('register')}</Link>
                         </>
                     )}
+
                     <button
                         aria-label="Settings"
                         onClick={() => setIsSettingsOpen(true)}
@@ -58,12 +55,13 @@ export default function Navbar() {
                 </nav>
             </header>
 
-            {/* Mobile Header (< 768px) - MINIMAL HEADER */}
+            {/* Mobile Header */}
             <header className={`${styles.navbar} ${styles.mobileHeader}`}>
                 <Link to="/" className={styles.brand}>
-                    <span className={styles.logo} aria-hidden="true" role="img" aria-label="FlowMoney logo" />
+                    <span className={styles.logo} aria-hidden="true" />
                     FlowMoney
                 </Link>
+
                 <button
                     aria-label="Settings"
                     onClick={() => setIsSettingsOpen(true)}
@@ -74,30 +72,21 @@ export default function Navbar() {
                 </button>
             </header>
 
-            {/* Mobile Bottom Navigation (< 768px) - ONLY SHOW WHEN AUTHENTICATED */}
+            {/* Mobile Bottom Navigation */}
             {isAuthenticatedPage && (
                 <nav className={`${styles.mobileNav} ${styles.bottomNav}`}>
-                    <Link to="/" className={styles.navItem} aria-label="Dashboard">
+                    <Link to="/" className={styles.navItem}>
                         <span>{t('dashboard')}</span>
                     </Link>
-                    <Link to="/add" className={styles.navItem} aria-label="Add Transaction">
+                    <Link to="/add" className={styles.navItem}>
                         <span>{t('add')}</span>
                     </Link>
-                    <Link to="/profile" className={styles.navItem} aria-label="Profile">
+                    <Link to="/profile" className={styles.navItem}>
                         <span>{t('profile')}</span>
                     </Link>
-                    <button
-                        className={styles.navItem}
-                        onClick={handleLogout}
-                        aria-label="Logout"
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                    >
-                        <span>{t('logout')}</span>
-                    </button>
                 </nav>
             )}
 
-            {/* Settings Modal */}
             <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
         </>
     );
