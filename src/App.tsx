@@ -8,17 +8,15 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import { useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
-import type {JSX} from "react";
+import type { JSX } from 'react';
+
+const RequireAuth = ({ children }: { children: JSX.Element }) => {
+    const { isAuthenticated } = useAuth();
+    if (!isAuthenticated) return <StartPage />;
+    return children;
+};
 
 export default function App() {
-    const { isAuthenticated } = useAuth();
-    console.log('App: rendered, isAuthenticated:', isAuthenticated);
-
-    const RequireAuth = ({ children }: { children: JSX.Element }) => {
-        console.log('RequireAuth: checking, isAuthenticated:', isAuthenticated);
-        if (!isAuthenticated) return <StartPage />;
-        return children;
-    };
     return (
         <div className="app">
             <Navbar />

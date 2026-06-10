@@ -4,14 +4,14 @@ import type { ReactNode } from 'react';
 import type { Expense } from '../services/storageService';
 import { useAuth } from './AuthContext';
 import { db } from '../firebase';
-import { collection, onSnapshot, addDoc, doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, doc, deleteDoc, updateDoc, getDocs } from 'firebase/firestore';
 
 type AppContextType = {
     expenses: Expense[];
     addExpense: (e: Expense) => void;
     updateExpense: (id: string, data: Partial<Expense>) => void;
     deleteExpense: (id: string) => void;
-    clearAll: () => void;
+    clearAll: () => Promise<void>;
 
     currency: string;
     changeCurrency: (cur: string) => void;
@@ -87,16 +87,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const clearAll = () => {
+    const clearAll = async () => {
         if (isAuthenticated && user) {
             const col = collection(db, 'users', user.id, 'expenses');
-            onSnapshot(col, (snap) => {
-                snap.docs.forEach((d) => {
-                    deleteDoc(doc(db, 'users', user.id, 'expenses', d.id)).catch(
-                        (err) => console.error('Failed to delete expense', err)
-                    );
-                });
-            });
+            const snap = await getDocs(col);
+            await Promise.all(snap.docs.map((d) => deleteDoc(d.ref))).catch(
+                (err) => console.error('Failed to clear expenses', err)
+            );
         }
     };
 
