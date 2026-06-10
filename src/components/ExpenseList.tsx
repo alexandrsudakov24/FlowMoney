@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
-import { useApp } from '../context/AppContext.tsx';
+import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import { currencySymbols } from '../utils/currencySymbols';
+import type { Expense } from '../services/storageService';
 import styles from '../styles/components/ExpenseList.module.css';
 
-export default function ExpenseList({ expenses }: { expenses: any[] }) {
+export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
     const { deleteExpense, currency } = useApp();
     const { t } = useLanguage();
 

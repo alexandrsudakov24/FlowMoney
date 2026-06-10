@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useApp } from "../context/AppContext";
+import { useLanguage } from "../context/LanguageContext";
 import ThemeModal from "../components/ThemeModal";
 import LanguageModal from "../components/LanguageModal";
 import CurrencyModal from "../components/CurrencyModal";
@@ -9,6 +10,7 @@ import styles from "../styles/pages/ProfilePage.module.css";
 export default function ProfilePage() {
     const { user, logout } = useAuth();
     const { expenses, currency } = useApp();
+    const { t } = useLanguage();
 
     const [themeOpen, setThemeOpen] = useState(false);
     const [languageOpen, setLanguageOpen] = useState(false);
@@ -48,49 +50,49 @@ export default function ProfilePage() {
 
             {/* Stats */}
             <div className={styles.block}>
-                <h3 className={styles.blockTitle}>Stats</h3>
+                <h3 className={styles.blockTitle}>{t('stats')}</h3>
 
                 <div className={styles.statRow}>
-                    <span>Transactions</span>
+                    <span>{t('transactions')}</span>
                     <strong>{expenses.length}</strong>
                 </div>
 
                 <div className={styles.statRow}>
-                    <span>Total Expenses</span>
+                    <span>{t('total_expenses')}</span>
                     <strong>{currency}{totalExpenses.toFixed(2)}</strong>
                 </div>
 
                 <div className={styles.statRow}>
-                    <span>Total Income</span>
+                    <span>{t('total_income')}</span>
                     <strong>{currency}{totalIncome.toFixed(2)}</strong>
                 </div>
 
                 <div className={styles.statRow}>
-                    <span>Top Category</span>
+                    <span>{t('top_category')}</span>
                     <strong>{topCategory}</strong>
                 </div>
             </div>
 
             {/* Settings */}
             <div className={styles.block}>
-                <h3 className={styles.blockTitle}>Settings</h3>
+                <h3 className={styles.blockTitle}>{t('settings')}</h3>
 
                 <div className={styles.settingRow}>
-                    <span>Theme</span>
+                    <span>{t('theme')}</span>
                     <button className={styles.changeBtn} onClick={() => setThemeOpen(true)}>
-                        Change
+                        {t('change')}
                     </button>
                 </div>
 
                 <div className={styles.settingRow}>
-                    <span>Language</span>
+                    <span>{t('language')}</span>
                     <button className={styles.changeBtn} onClick={() => setLanguageOpen(true)}>
-                        Change
+                        {t('change')}
                     </button>
                 </div>
 
                 <div className={styles.settingRow}>
-                    <span>Currency</span>
+                    <span>{t('currency')}</span>
                     <button className={styles.changeBtn} onClick={() => setCurrencyOpen(true)}>
                         {currency}
                     </button>
@@ -99,13 +101,13 @@ export default function ProfilePage() {
 
             {/* Export */}
             <div className={styles.block}>
-                <h3 className={styles.blockTitle}>Data Export</h3>
-                <button className={styles.exportBtn}>Export to JSON</button>
+                <h3 className={styles.blockTitle}>{t('data_export')}</h3>
+                <button className={styles.exportBtn}>{t('export_json')}</button>
             </div>
 
             {/* Logout */}
             <button className={styles.logoutBtn} onClick={logout}>
-                Logout
+                {t('logout')}
             </button>
 
             {/* Modals */}

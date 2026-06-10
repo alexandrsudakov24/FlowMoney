@@ -1,4 +1,4 @@
-import { useApp } from '../context/AppContext.tsx';
+import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import ExpenseList from '../components/ExpenseList';
 import Charts from '../components/Charts';
