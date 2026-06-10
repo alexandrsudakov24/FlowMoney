@@ -1,9 +1,7 @@
-
 .page {
     animation: fadeIn 0.4s ease-in;
     padding: 8px 24px 0 24px;
 }
-
 
 .title {
     margin: 0 0 20px 0;
@@ -18,116 +16,12 @@
     font-size: 16px;
 }
 
-
-.typeSwitch {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
-}
-
-.typeBtn {
-    flex: 1;
-    padding: 14px;
-    border-radius: var(--radius-lg);
-    font-size: 16px;
-    font-weight: 600;
-    border: 1px solid var(--border);
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease, color 0.2s ease;
-}
-
-
-.typeBtn:not(.active) {
-    background: #4f46e5 !important;
-    color: white !important;
-}
-
-.typeBtn.active {
-    background: #22c55e !important;
-    color: white !important;
-}
-
-.typeBtn:hover {
-    transform: translateY(-2px);
-}
-
-.label {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    font-size: 14px;
-    color: var(--text);
-    margin-bottom: 16px;
-}
-
-.input,
-.select {
-    padding: 14px;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-    background: var(--bg-secondary);
-    color: var(--text);
-    font-size: 16px;
-}
-
-/* ====== Кнопка сохранить ====== */
-.formActions {
-    margin-top: 24px;
-}
-
-.button {
-    width: 100%;
-    padding: 16px;
-
-
-    background: #22c55e !important;
-    color: white !important;
-
-    border: none !important;
-    border-radius: var(--radius-lg);
-    font-size: 18px;
-    font-weight: 700;
-    cursor: pointer;
-
-    transition: background 0.2s ease, transform 0.1s ease;
-}
-
-.button:hover {
-    background: #16a34a !important;
-}
-
-.button:active {
-    transform: scale(0.97);
-}
-
-
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
-
 
 @media (max-width: 640px) {
-    .title {
-        font-size: 24px;
-    }
-
-    .description {
-        font-size: 14px;
-    }
-
-    .typeBtn {
-        padding: 12px;
-    }
-
-    .input,
-    .select {
-        padding: 12px;
-    }
+    .title       { font-size: 24px; }
+    .description { font-size: 14px; }
 }

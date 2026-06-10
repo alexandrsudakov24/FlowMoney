@@ -277,12 +277,13 @@ button.secondary:hover {
     transform: translateY(0);
 }
 .btn.danger {
-    color: var(--danger);
-    border-color: var(--danger);
+    background: var(--danger);
+    color: #fff;
+    border: none;
 }
 .btn.danger:hover {
-    background: #fef2f2;
-    border-color: var(--danger);
+    opacity: 0.88;
+    background: var(--danger);
 }
 /* ============================================
     EMPTY STATE

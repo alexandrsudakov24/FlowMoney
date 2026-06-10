@@ -36,9 +36,10 @@
 .block {
     background: var(--bg-secondary);
     padding: 16px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     margin-bottom: 20px;
     box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
 }
 
 .blockTitle {
@@ -64,25 +65,32 @@
 .settingRow {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 12px 0;
+    border-bottom: 1px solid var(--border);
 }
 
-/* ====== Кнопки (универсальные) ====== */
+.settingRow:last-child {
+    border-bottom: none;
+}
+
+/* ====== Кнопки ====== */
 .changeBtn,
 .exportBtn {
-    background: #4f46e5; /* тёмный фиолетовый — всегда читается */
+    background: var(--accent);
     color: #ffffff;
-    padding: 10px 16px;
-    border-radius: 8px;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
     border: none;
     font-weight: 600;
+    font-size: 14px;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
+    transition: opacity 0.2s ease, transform 0.1s ease;
 }
 
 .changeBtn:hover,
 .exportBtn:hover {
-    background: #4338ca;
+    opacity: 0.88;
 }
 
 .changeBtn:active,
@@ -94,66 +102,26 @@
 .exportBtn {
     width: 100%;
     margin-top: 8px;
-}
-
-/* ====== Ссылки ====== */
-.links {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-}
-
-.linkBtn {
-    background: none;
-    border: none;
-    color: var(--primary);
-    font-size: 14px;
-    cursor: pointer;
+    padding: 12px;
 }
 
 /* ====== Logout ====== */
 .logoutBtn {
     width: 100%;
-    background: #ef4444;
+    background: var(--danger);
     color: white;
     padding: 14px;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     border: none;
     font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
+    transition: opacity 0.2s ease, transform 0.1s ease;
 }
 
 .logoutBtn:hover {
-    background: #dc2626;
+    opacity: 0.88;
 }
 
 .logoutBtn:active {
     transform: scale(0.97);
-}
-
-/* ====== Тёмная тема ====== */
-[data-theme="dark"] .block {
-    background: #1f1f1f;
-}
-
-[data-theme="dark"] .statRow {
-    border-color: #333;
-}
-
-/* ====== Кнопки выбора языка в модалке ====== */
-.select {
-    background: var(--bg-secondary);
-    color: var(--text);
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: background 0.2s ease, color 0.2s ease;
-}
-
-.select:hover {
-    background: #4f46e5;
-    color: white;
 }
