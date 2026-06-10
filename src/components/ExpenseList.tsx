@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext.tsx';
 import { useLanguage } from '../context/LanguageContext';
+import { currencySymbols } from '../utils/currencySymbols';
 import styles from '../styles/components/ExpenseList.module.css';
 
 export default function ExpenseList({ expenses }: { expenses: any[] }) {
-    const { deleteExpense } = useApp();
+    const { deleteExpense, currency } = useApp();
     const { t } = useLanguage();
 
     if (!expenses || expenses.length === 0) {
@@ -16,7 +17,9 @@ export default function ExpenseList({ expenses }: { expenses: any[] }) {
         );
     }
 
-    const sorted = [...expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const sorted = [...expenses].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
 
     const getCategoryLabel = (category: string) => {
         const map: Record<string, string> = {
@@ -30,31 +33,71 @@ export default function ExpenseList({ expenses }: { expenses: any[] }) {
         return map[category] || category;
     };
 
+    const formatDate = (dateStr: string) => {
+        const d = new Date(dateStr);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        return `${day}.${month}.${year}`;
+    };
+
     return (
         <div>
             <ul className={styles.expenseList}>
-                {sorted.map((e) => (
-                    <li key={e.id} className={styles.expenseItem}>
-                        <div className={styles.left}>
-                            <div className={styles.category}>
-                                {e.type === 'income' ? t('income') : getCategoryLabel(e.category)}
+                {sorted.map((e) => {
+                    const sign = e.type === 'income' ? '+' : '-';
+                    const amount = Number(e.amount).toFixed(2);
+                    const symbol = currencySymbols[currency];
+
+                    return (
+                        <li key={e.id} className={styles.expenseItem}>
+                            <div className={styles.left}>
+                                <div className={styles.category}>
+                                    {e.type === 'income'
+                                        ? t('income')
+                                        : getCategoryLabel(e.category)}
+                                </div>
+                                <div className={styles.note}>
+                                    {e.note || t('no_note')}
+                                </div>
                             </div>
-                            <div className={styles.note}>{e.note || t('no_note')}</div>
-                        </div>
-                        <div className={styles.right}>
-                            <div className={styles.amount} style={{ color: e.type === 'income' ? 'var(--success)' : 'var(--accent)' }}>
-                                {e.type === 'income' ? '+' : '-'}${Number(e.amount).toFixed(2)}
+
+                            <div className={styles.right}>
+                                <div
+                                    className={styles.amount}
+                                    style={{
+                                        color:
+                                            e.type === 'income'
+                                                ? 'var(--success)'
+                                                : 'var(--accent)',
+                                    }}
+                                >
+                                    {sign}
+                                    {amount} {symbol}
+                                </div>
+
+                                <div className={styles.date}>
+                                    {formatDate(e.date)}
+                                </div>
+
+                                <div className={styles.actions}>
+                                    <Link to={`/edit/${e.id}`} className="btn">
+                                        {t('edit')}
+                                    </Link>
+                                    <button
+                                        className="btn danger"
+                                        onClick={() => {
+                                            if (confirm(t('delete_confirm')))
+                                                deleteExpense(e.id);
+                                        }}
+                                    >
+                                        {t('delete')}
+                                    </button>
+                                </div>
                             </div>
-                            <div className={styles.date}>{new Date(e.date).toLocaleDateString()}</div>
-                            <div className={styles.actions}>
-                                <Link to={`/edit/${e.id}`} className="btn">{t('edit')}</Link>
-                                <button className="btn danger" onClick={() => {
-                                    if (confirm(t('delete_confirm'))) deleteExpense(e.id);
-                                }}>{t('delete')}</button>
-                            </div>
-                        </div>
-                    </li>
-                ))}
+                        </li>
+                    );
+                })}
             </ul>
         </div>
     );
