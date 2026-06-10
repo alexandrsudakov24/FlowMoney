@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useApp } from '../context/AppContext.tsx';
+import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import ExpenseForm from '../components/ExpenseForm';
 import styles from '../styles/pages/AddExpensePage.module.css';
