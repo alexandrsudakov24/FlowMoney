@@ -1,16 +1,13 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useState } from 'react';
 import styles from '../styles/components/Navbar.module.css';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import SettingsModal from './SettingsModal';
 import Avatar from './Avatar';
 
 export default function Navbar() {
     const { isAuthenticated, user } = useAuth();
     const { t } = useLanguage();
     const location = useLocation();
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const isAuthenticatedPage =
         isAuthenticated && !['/start', '/login', '/register'].includes(location.pathname);
@@ -43,15 +40,6 @@ export default function Navbar() {
                             <Link to="/register">{t('register')}</Link>
                         </>
                     )}
-
-                    <button
-                        aria-label="Settings"
-                        onClick={() => setIsSettingsOpen(true)}
-                        className={styles.settingsBtn}
-                        title={t('settings')}
-                    >
-                        ⚙
-                    </button>
                 </nav>
             </header>
 
@@ -61,18 +49,8 @@ export default function Navbar() {
                     <span className={styles.logo} aria-hidden="true" />
                     FlowMoney
                 </Link>
-
-                <button
-                    aria-label="Settings"
-                    onClick={() => setIsSettingsOpen(true)}
-                    className={styles.settingsBtn}
-                    title={t('settings')}
-                >
-                    ⚙
-                </button>
             </header>
 
-            {/* Mobile Bottom Navigation */}
             {isAuthenticatedPage && (
                 <nav className={`${styles.mobileNav} ${styles.bottomNav}`}>
                     <Link to="/" className={styles.navItem}>
@@ -86,8 +64,6 @@ export default function Navbar() {
                     </Link>
                 </nav>
             )}
-
-            <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
         </>
     );
 }

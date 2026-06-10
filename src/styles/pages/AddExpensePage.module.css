@@ -1,21 +1,109 @@
-/* Add/Edit Expense Page Styles */
+/* ====== Анимация страницы ====== */
 .page {
     animation: fadeIn 0.4s ease-in;
+    padding: 8px 24px 0 24px; /* уменьшенный верхний + боковые как Dashboard */
 }
 
+/* ====== Заголовок ====== */
 .title {
-    margin: 0 0 24px 0;
+    margin: 0 0 20px 0;
     font-size: 28px;
     font-weight: 700;
     color: var(--text);
 }
 
+/* ====== Описание ====== */
 .description {
     color: var(--muted);
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     font-size: 16px;
 }
 
+/* ====== Переключатель типа транзакции ====== */
+.typeSwitch {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.typeBtn {
+    flex: 1;
+    padding: 14px;
+    border-radius: var(--radius-lg);
+    font-size: 16px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease, color 0.2s ease;
+}
+
+/* НЕ выбранная кнопка — фиолетовая */
+.typeBtn:not(.active) {
+    background: #4f46e5 !important;
+    color: white !important;
+}
+
+/* ВЫБРАННАЯ кнопка — зелёная */
+.typeBtn.active {
+    background: #22c55e !important;
+    color: white !important;
+}
+
+.typeBtn:hover {
+    transform: translateY(-2px);
+}
+
+/* ====== Поля формы ====== */
+.label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 16px;
+}
+
+.input,
+.select {
+    padding: 14px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+    color: var(--text);
+    font-size: 16px;
+}
+
+/* ====== Кнопка сохранить ====== */
+.formActions {
+    margin-top: 24px;
+}
+
+.button {
+    width: 100%;
+    padding: 16px;
+
+    /* зелёная кнопка */
+    background: #22c55e !important;
+    color: white !important;
+
+    border: none !important;
+    border-radius: var(--radius-lg);
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.button:hover {
+    background: #16a34a !important;
+}
+
+.button:active {
+    transform: scale(0.97);
+}
+
+/* ====== Анимация ====== */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -27,6 +115,7 @@
     }
 }
 
+/* ====== Адаптив ====== */
 @media (max-width: 640px) {
     .title {
         font-size: 24px;
@@ -35,5 +124,13 @@
     .description {
         font-size: 14px;
     }
-}
 
+    .typeBtn {
+        padding: 12px;
+    }
+
+    .input,
+    .select {
+        padding: 12px;
+    }
+}

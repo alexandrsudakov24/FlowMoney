@@ -32,10 +32,12 @@ export default function AddExpensePage() {
 
 
     return (
-        <div className={styles.page}>
-            <h2 className={styles.title}>{t('add_transaction')}</h2>
-            <p className={styles.description}>{t('add_transaction_desc')}</p>
-            <ExpenseForm onSubmit={handleSubmit} defaultValues={undefined} />
+        <div className="container">
+            <div className={styles.page}>
+                <h2 className={styles.title}>{t('add_transaction')}</h2>
+                <p className={styles.description}>{t('add_transaction_desc')}</p>
+                <ExpenseForm onSubmit={handleSubmit} defaultValues={undefined} />
+            </div>
         </div>
     );
 }

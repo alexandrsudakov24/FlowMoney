@@ -1,74 +1,105 @@
-.form{
-  display:grid;
+/* ====== Форма ====== */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ====== Переключатель типа транзакции ====== */
+.toggle {
+  display: flex;
   gap: 12px;
-  max-width:520px;
-  background:var(--card);
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
+  margin-bottom: 10px;
 }
 
-.label{
-  display:flex;
-  flex-direction:column;
-  font-size:14px;
-  color:var(--text);
-  font-weight:600;
+.toggleButton {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease, color 0.2s ease;
 }
 
-.input, .select{
-  padding: 12px 14px;
-  border:1px solid var(--border);
-  border-radius:6px;
-  margin-top:8px;
-  font-size:14px;
-  background: transparent;
+/* НЕ выбранная кнопка — фиолетовая */
+.toggleButton:not(.active) {
+  background: #4f46e5 !important;
+  color: white !important;
+}
+
+/* ВЫБРАННАЯ кнопка — зелёная */
+.toggleButton.active {
+  background: #22c55e !important;
+  color: white !important;
+}
+
+/* Hover эффект */
+.toggleButton:hover {
+  transform: scale(0.97);
+}
+
+/* ====== Поля формы ====== */
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
   color: var(--text);
 }
 
-.toggle{
-  display:flex;
-  gap:8px;
-  margin-bottom:8px;
+.input,
+.select {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text);
+  font-size: 16px;
 }
 
-.toggleButton{
-  padding:8px 12px;
-  border-radius:6px;
-  border:1px solid var(--border);
-  background:transparent;
-  cursor:pointer;
-  font-weight:600;
+/* ====== Кнопка сохранить ====== */
+.formActions {
+  margin-top: 10px;
 }
 
-.toggleButton.active{
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  color: white;
-  border-color: transparent;
-  box-shadow: var(--shadow-sm);
+.button {
+  width: 100%;
+  padding: 14px;
+
+  /* 🔥 ЗЕЛЁНАЯ КНОПКА SAVE */
+  background: #22c55e !important;
+  color: white !important;
+
+  border: none !important;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+
+  transition: background 0.2s ease, transform 0.1s ease;
 }
 
-.formActions{
-  display:flex;
-  gap:12px;
-  justify-content:flex-end;
-  margin-top:12px;
+.button:hover {
+  background: #16a34a !important; /* темнее при наведении */
 }
 
-.button{
-  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-  color:white;
-  padding: 10px 16px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:600;
-  box-shadow: var(--shadow-sm);
+.button:active {
+  transform: scale(0.97);
 }
 
-.button.secondary{
-  background:transparent;
-  border:1px solid var(--border);
-  color:var(--text);
+/* ====== Тёмная тема ====== */
+[data-theme="dark"] .input,
+[data-theme="dark"] .select {
+  background: #1f1f1f;
+  border-color: #333;
+}
+
+[data-theme="dark"] .toggleButton:not(.active) {
+  background: #4f46e5 !important;
+}
+
+[data-theme="dark"] .toggleButton.active {
+  background: #22c55e !important;
 }
