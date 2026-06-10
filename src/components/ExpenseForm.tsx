@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import styles from '../styles/components/ExpenseForm.module.css';
-import type { Expense } from '../services/storageService';
+import type { Expense } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useApp } from '../context/AppContext';
 import { currencySymbols } from '../utils/currencySymbols';
