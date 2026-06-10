@@ -17,7 +17,7 @@ export default function Navbar() {
             {/* Desktop Header */}
             <header className={`${styles.navbar} ${styles.desktopNav}`}>
                 <Link to="/" className={styles.brand}>
-                    <span className={styles.logo} aria-hidden="true" />
+                    <img src="/icon.png" className={styles.logo} alt="" />
                     FlowMoney
                 </Link>
 
@@ -46,7 +46,7 @@ export default function Navbar() {
             {/* Mobile Header */}
             <header className={`${styles.navbar} ${styles.mobileHeader}`}>
                 <Link to="/" className={styles.brand}>
-                    <span className={styles.logo} aria-hidden="true" />
+                    <img src="/icon.png" className={styles.logo} alt="" />
                     FlowMoney
                 </Link>
             </header>
