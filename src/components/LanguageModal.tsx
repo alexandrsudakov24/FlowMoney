@@ -7,7 +7,7 @@ interface LanguageModalProps {
 }
 
 export default function LanguageModal({ isOpen, onClose }: LanguageModalProps) {
-    const { language, setLanguage, t } = useLanguage();
+    const { setLanguage, t } = useLanguage();
 
     if (!isOpen) return null;
 
