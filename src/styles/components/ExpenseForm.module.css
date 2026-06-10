@@ -15,7 +15,7 @@
 .toggleButton {
   flex: 1;
   padding: 12px;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   font-size: 16px;
   font-weight: 600;
   border: none;
@@ -23,21 +23,21 @@
   transition: background 0.2s ease, transform 0.1s ease, color 0.2s ease;
 }
 
-/* НЕ выбранная кнопка — фиолетовая */
+/* Неактивная кнопка — использует акцентный цвет */
 .toggleButton:not(.active) {
-  background: #4f46e5 !important;
-  color: white !important;
+  background: var(--accent);
+  color: white;
 }
 
-/* ВЫБРАННАЯ кнопка — зелёная */
+/* Активная кнопка — зелёная (успех/подтверждение) */
 .toggleButton.active {
-  background: #22c55e !important;
-  color: white !important;
+  background: var(--success);
+  color: white;
 }
 
-/* Hover эффект */
 .toggleButton:hover {
   transform: scale(0.97);
+  opacity: 0.9;
 }
 
 /* ====== Поля формы ====== */
@@ -52,11 +52,20 @@
 .input,
 .select {
   padding: 12px;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   background: var(--bg-secondary);
   color: var(--text);
   font-size: 16px;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.1);
 }
 
 /* ====== Кнопка сохранить ====== */
@@ -67,39 +76,20 @@
 .button {
   width: 100%;
   padding: 14px;
-
-  /* 🔥 ЗЕЛЁНАЯ КНОПКА SAVE */
-  background: #22c55e !important;
-  color: white !important;
-
-  border: none !important;
-  border-radius: 12px;
+  background: var(--success);
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
-
   transition: background 0.2s ease, transform 0.1s ease;
 }
 
 .button:hover {
-  background: #16a34a !important; /* темнее при наведении */
+  opacity: 0.88;
 }
 
 .button:active {
   transform: scale(0.97);
-}
-
-/* ====== Тёмная тема ====== */
-[data-theme="dark"] .input,
-[data-theme="dark"] .select {
-  background: #1f1f1f;
-  border-color: #333;
-}
-
-[data-theme="dark"] .toggleButton:not(.active) {
-  background: #4f46e5 !important;
-}
-
-[data-theme="dark"] .toggleButton.active {
-  background: #22c55e !important;
 }

@@ -17,17 +17,20 @@
     /* Backwards-compatible tokens used throughout the app */
     --bg: var(--md-background);
     --bg-solid: #f8fafc;
+    --bg-secondary: #eef1f7;
     --card: var(--md-surface);
     --text: var(--md-on-surface);
     --text-light: var(--md-on-surface-muted);
+    --text-secondary: var(--md-on-surface-muted);
     --muted: var(--md-on-surface-muted);
+    --muted-bg: rgba(16,24,40,0.06);
     --accent: var(--md-primary);
     --accent-light: var(--md-primary-light);
     --accent-dark: var(--md-primary-variant);
     --success: #10b981;
-    --danger: #b00020;
+    --danger: #ef4444;
     --warning: #f59e0b;
-    --border: rgba(16,24,40,0.06);
+    --border: rgba(16,24,40,0.08);
 
     /* Material-like elevation shadows */
     --shadow-sm: 0 1px 3px rgba(16,24,40,0.08), 0 1px 2px rgba(16,24,40,0.06);
@@ -64,14 +67,17 @@
 
     /* Backwards-compatible mappings */
     --bg: var(--md-background);
+    --bg-secondary: #111c2e;
     --card: var(--md-surface);
     --text: var(--md-on-surface);
     --text-light: var(--md-on-surface-muted);
+    --text-secondary: var(--md-on-surface-muted);
     --muted: var(--md-on-surface-muted);
+    --muted-bg: rgba(255,255,255,0.06);
     --accent: var(--md-primary);
     --accent-light: var(--md-primary-light);
     --accent-dark: var(--md-primary-variant);
-    --border: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.08);
 
     --shadow-sm: 0 1px 3px rgba(2,6,23,0.6), 0 1px 2px rgba(2,6,23,0.5);
     --shadow-md: 0 6px 18px rgba(2,6,23,0.6), 0 2px 4px rgba(2,6,23,0.5);
