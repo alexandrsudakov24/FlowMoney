@@ -1,103 +1,159 @@
-/* Profile Page Styles */
-.page {
-    animation: fadeIn 0.4s ease-in;
-}
-
-.title {
-    margin: 0 0 24px 0;
-    font-size: 28px;
-    font-weight: 700;
+/* ====== Основной контейнер ====== */
+.container {
+    padding: 24px;
+    padding-bottom: 100px;
     color: var(--text);
 }
 
-.card {
-    background: var(--card);
-    padding: 20px;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--border);
-    transition: all 0.3s ease;
-    max-width: 600px;
+/* ====== Профиль ====== */
+.profileSection {
+    text-align: center;
+    margin-bottom: 32px;
 }
 
-.card:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-2px);
+.avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 12px;
 }
 
-.cardTitle {
-    margin: 0 0 16px 0;
+.name {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 4px 0;
+    color: var(--text);
+}
+
+.email {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+/* ====== Карточки ====== */
+.block {
+    background: var(--bg-secondary);
+    padding: 16px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+.blockTitle {
     font-size: 16px;
     font-weight: 700;
-    color: var(--text);
+    margin-bottom: 12px;
 }
 
-.cardDescription {
-    margin: 0 0 12px 0;
-    color: var(--muted);
-    line-height: 1.6;
+/* ====== Строки статистики ====== */
+.statRow {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    font-size: 15px;
+    border-bottom: 1px solid var(--border);
 }
 
-.cardList {
-    margin: 0 0 12px 0;
-    color: var(--muted);
-    padding-left: 20px;
+.statRow:last-child {
+    border-bottom: none;
 }
 
-.cardList li {
-    margin-bottom: 8px;
-    line-height: 1.6;
+/* ====== Строки настроек ====== */
+.settingRow {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@media (max-width: 640px) {
-    .title {
-        font-size: 24px;
-    }
-
-    .card {
-        max-width: 100%;
-        padding: 16px;
-    }
-
-    .cardTitle {
-        font-size: 15px;
-    }
-
-    .cardDescription {
-        font-size: 14px;
-    }
-
-    .cardList {
-        font-size: 14px;
-    }
-}
-
-/* 🔥 Logout button — универсальная, для всех устройств */
-.logoutButton {
-    width: 100%;
-    margin-top: 24px;
-    padding: 12px;
-    background: #ef4444;
-    color: white;
-    border: none;
+/* ====== Кнопки (универсальные) ====== */
+.changeBtn,
+.exportBtn {
+    background: #4f46e5; /* тёмный фиолетовый — всегда читается */
+    color: #ffffff;
+    padding: 10px 16px;
     border-radius: 8px;
-    font-size: 16px;
+    border: none;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, transform 0.1s ease;
 }
 
-.logoutButton:hover {
+.changeBtn:hover,
+.exportBtn:hover {
+    background: #4338ca;
+}
+
+.changeBtn:active,
+.exportBtn:active {
+    transform: scale(0.97);
+}
+
+/* ====== Экспорт ====== */
+.exportBtn {
+    width: 100%;
+    margin-top: 8px;
+}
+
+/* ====== Ссылки ====== */
+.links {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.linkBtn {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* ====== Logout ====== */
+.logoutBtn {
+    width: 100%;
+    background: #ef4444;
+    color: white;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.logoutBtn:hover {
     background: #dc2626;
+}
+
+.logoutBtn:active {
+    transform: scale(0.97);
+}
+
+/* ====== Тёмная тема ====== */
+[data-theme="dark"] .block {
+    background: #1f1f1f;
+}
+
+[data-theme="dark"] .statRow {
+    border-color: #333;
+}
+
+/* ====== Кнопки выбора языка в модалке ====== */
+.select {
+    background: var(--bg-secondary);
+    color: var(--text);
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.select:hover {
+    background: #4f46e5;
+    color: white;
 }
