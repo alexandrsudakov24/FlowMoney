@@ -2,10 +2,13 @@ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
 import { useMemo } from 'react';
 import styles from '../styles/components/Charts.module.css';
 import type { Expense } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 export default function Charts({ expenses }: { expenses: Expense[] }) {
+    const { t } = useLanguage();
+
     const byCategory = useMemo(() => {
         const map: Record<string, number> = {};
         expenses.forEach((e) => {
@@ -36,8 +39,8 @@ export default function Charts({ expenses }: { expenses: Expense[] }) {
     return (
         <div className={styles.charts}>
             <div className={styles.chartCard}>
-                <h3>By Category (Expenses)</h3>
-                {byCategory.length === 0 ? <p>No expense data</p> : (
+                <h3>{t('chart_by_category')}</h3>
+                {byCategory.length === 0 ? <p>{t('no_expense_data')}</p> : (
                     <ResponsiveContainer width="100%" height={250}>
                         <PieChart>
                             <Pie data={byCategory} dataKey="value" nameKey="name" outerRadius={80} label>
@@ -51,16 +54,16 @@ export default function Charts({ expenses }: { expenses: Expense[] }) {
             </div>
 
             <div className={styles.chartCard}>
-                <h3>Income vs Expenses by Date</h3>
-                {byDate.length === 0 ? <p>No data</p> : (
+                <h3>{t('chart_income_vs_expenses')}</h3>
+                {byDate.length === 0 ? <p>{t('no_data')}</p> : (
                     <ResponsiveContainer width="100%" height={250}>
                         <BarChart data={byDate}>
                             <XAxis dataKey="date" />
                             <YAxis />
                             <Tooltip />
                             <Legend />
-                            <Bar dataKey="expense" fill="#ef4444" name="Expenses" />
-                            <Bar dataKey="income" fill="#10b981" name="Income" />
+                            <Bar dataKey="expense" fill="#ef4444" name={t('expense')} />
+                            <Bar dataKey="income" fill="#10b981" name={t('income')} />
                         </BarChart>
                     </ResponsiveContainer>
                 )}

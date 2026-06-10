@@ -78,6 +78,16 @@ const translations = {
         'export_json': 'Export to JSON',
         'change': 'Change',
         'currency': 'Currency',
+        'welcome_title': 'Welcome to FlowMoney',
+        'welcome_lead': 'Track your expenses, visualize spending and reach your goals.',
+        'go_to_dashboard': 'Go to Dashboard',
+        'chart_by_category': 'By Category',
+        'chart_income_vs_expenses': 'Income vs Expenses',
+        'no_expense_data': 'No expense data',
+        'no_data': 'No data',
+        'current_currency': 'Current currency',
+        'current_theme': 'Current theme',
+        'toggle_theme': 'Toggle Theme',
     },
     ru: {
         'dashboard': 'Панель управления',
@@ -145,6 +155,16 @@ const translations = {
         'export_json': 'Экспортировать в JSON',
         'change': 'Изменить',
         'currency': 'Валюта',
+        'welcome_title': 'Добро пожаловать в FlowMoney',
+        'welcome_lead': 'Отслеживайте расходы, анализируйте траты и достигайте финансовых целей.',
+        'go_to_dashboard': 'Перейти к панели',
+        'chart_by_category': 'По категориям',
+        'chart_income_vs_expenses': 'Доходы и расходы',
+        'no_expense_data': 'Нет данных о расходах',
+        'no_data': 'Нет данных',
+        'current_currency': 'Текущая валюта',
+        'current_theme': 'Текущая тема',
+        'toggle_theme': 'Сменить тему',
     },
     he: {
         'dashboard': 'לוח מחוונים',
@@ -212,6 +232,16 @@ const translations = {
         'export_json': 'ייצוא ל-JSON',
         'change': 'שנה',
         'currency': 'מטבע',
+        'welcome_title': 'ברוכים הבאים ל-FlowMoney',
+        'welcome_lead': 'עקוב אחר הוצאותיך, הצג את ההוצאות ועמוד ביעדים.',
+        'go_to_dashboard': 'עבור ללוח המחוונים',
+        'chart_by_category': 'לפי קטגוריה',
+        'chart_income_vs_expenses': 'הכנסות מול הוצאות',
+        'no_expense_data': 'אין נתוני הוצאות',
+        'no_data': 'אין נתונים',
+        'current_currency': 'מטבע נוכחי',
+        'current_theme': 'ערכת נושא נוכחית',
+        'toggle_theme': 'החלף ערכת נושא',
     }
 };
 
@@ -224,11 +254,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     useEffect(() => {
         localStorage.setItem('language', language);
         document.documentElement.lang = language;
-        if (language === 'he') {
-            document.documentElement.dir = 'rtl';
-        } else {
-            document.documentElement.dir = 'ltr';
-        }
+        document.documentElement.dir = language === 'he' ? 'rtl' : 'ltr';
     }, [language]);
 
     const setLanguage = (lang: Language) => {

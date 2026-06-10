@@ -1,5 +1,6 @@
 import styles from "../styles/components/SettingsModal.module.css";
 import { useApp } from "../context/AppContext";
+import { useLanguage } from "../context/LanguageContext";
 
 interface CurrencyModalProps {
     isOpen: boolean;
@@ -8,6 +9,7 @@ interface CurrencyModalProps {
 
 export default function CurrencyModal({ isOpen, onClose }: CurrencyModalProps) {
     const { currency, changeCurrency } = useApp();
+    const { t } = useLanguage();
 
     if (!isOpen) return null;
 
@@ -19,12 +21,12 @@ export default function CurrencyModal({ isOpen, onClose }: CurrencyModalProps) {
 
             <div className={styles.modal}>
                 <div className={styles.header}>
-                    <h2>Currency</h2>
+                    <h2>{t('currency')}</h2>
                     <button className={styles.closeBtn} onClick={onClose}>✕</button>
                 </div>
 
                 <div className={styles.content}>
-                    <p>Current currency: <strong>{currency}</strong></p>
+                    <p>{t('current_currency')}: <strong>{currency}</strong></p>
 
                     <div className={styles.setting}>
                         <select
@@ -43,7 +45,7 @@ export default function CurrencyModal({ isOpen, onClose }: CurrencyModalProps) {
 
                 <div className={styles.footer}>
                     <button className={`${styles.btn} ${styles.secondary}`} onClick={onClose}>
-                        Close
+                        {t('close')}
                     </button>
                 </div>
             </div>

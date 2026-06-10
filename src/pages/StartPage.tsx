@@ -1,25 +1,26 @@
-// StartPage - simple landing
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import styles from '../styles/pages/StartPage.module.css';
 
 export default function StartPage() {
     const { user } = useAuth();
+    const { t } = useLanguage();
 
     return (
         <section className={styles.hero}>
             <div className={styles.overlay}>
                 <div className={styles.content}>
-                    <h1>Welcome to FlowMoney</h1>
-                    <p className={styles.lead}>Track your expenses, visualize spending and reach your goals.</p>
+                    <h1>{t('welcome_title')}</h1>
+                    <p className={styles.lead}>{t('welcome_lead')}</p>
 
                     <div className={styles.actions}>
                         {user ? (
-                            <p>Hello, {user.name} — go to your <Link to="/">Dashboard</Link>.</p>
+                            <p>{t('hi')}, {user.name} &mdash; <Link to="/">{t('go_to_dashboard')}</Link>.</p>
                         ) : (
                             <>
-                                <Link to="/register">Create account</Link>
-                                <Link to="/login">Login</Link>
+                                <Link to="/register">{t('create_account')}</Link>
+                                <Link to="/login">{t('login')}</Link>
                             </>
                         )}
                     </div>
@@ -28,5 +29,3 @@ export default function StartPage() {
         </section>
     );
 }
-
-

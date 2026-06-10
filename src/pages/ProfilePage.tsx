@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useApp } from "../context/AppContext";
 import { useLanguage } from "../context/LanguageContext";
+import { currencySymbols } from "../utils/currencySymbols";
 import ThemeModal from "../components/ThemeModal";
 import LanguageModal from "../components/LanguageModal";
 import CurrencyModal from "../components/CurrencyModal";
@@ -24,6 +25,19 @@ export default function ProfilePage() {
         .filter(e => e.type === "income")
         .reduce((sum, e) => sum + Number(e.amount || 0), 0);
 
+    const symbol = currencySymbols[currency] ?? currency;
+
+    const handleExport = () => {
+        const json = JSON.stringify(expenses, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `flowmoney-export-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
     const topCategory = (() => {
         const map: Record<string, number> = {};
         expenses.forEach(e => {
@@ -36,61 +50,50 @@ export default function ProfilePage() {
 
     return (
         <div className={styles.container}>
-            {/* Profile */}
             <div className={styles.profileSection}>
                 <img
                     src={user?.photoURL || "/icon.png"}
                     alt="Avatar"
                     className={styles.avatar}
                 />
-
                 <h2 className={styles.name}>{user?.name}</h2>
                 <p className={styles.email}>{user?.email}</p>
             </div>
 
-            {/* Stats */}
             <div className={styles.block}>
                 <h3 className={styles.blockTitle}>{t('stats')}</h3>
-
                 <div className={styles.statRow}>
                     <span>{t('transactions')}</span>
                     <strong>{expenses.length}</strong>
                 </div>
-
                 <div className={styles.statRow}>
                     <span>{t('total_expenses')}</span>
-                    <strong>{currency}{totalExpenses.toFixed(2)}</strong>
+                    <strong>{symbol}{totalExpenses.toFixed(2)}</strong>
                 </div>
-
                 <div className={styles.statRow}>
                     <span>{t('total_income')}</span>
-                    <strong>{currency}{totalIncome.toFixed(2)}</strong>
+                    <strong>{symbol}{totalIncome.toFixed(2)}</strong>
                 </div>
-
                 <div className={styles.statRow}>
                     <span>{t('top_category')}</span>
                     <strong>{topCategory}</strong>
                 </div>
             </div>
 
-            {/* Settings */}
             <div className={styles.block}>
                 <h3 className={styles.blockTitle}>{t('settings')}</h3>
-
                 <div className={styles.settingRow}>
                     <span>{t('theme')}</span>
                     <button className={styles.changeBtn} onClick={() => setThemeOpen(true)}>
                         {t('change')}
                     </button>
                 </div>
-
                 <div className={styles.settingRow}>
                     <span>{t('language')}</span>
                     <button className={styles.changeBtn} onClick={() => setLanguageOpen(true)}>
                         {t('change')}
                     </button>
                 </div>
-
                 <div className={styles.settingRow}>
                     <span>{t('currency')}</span>
                     <button className={styles.changeBtn} onClick={() => setCurrencyOpen(true)}>
@@ -99,18 +102,17 @@ export default function ProfilePage() {
                 </div>
             </div>
 
-            {/* Export */}
             <div className={styles.block}>
                 <h3 className={styles.blockTitle}>{t('data_export')}</h3>
-                <button className={styles.exportBtn}>{t('export_json')}</button>
+                <button className={styles.exportBtn} onClick={handleExport}>
+                    {t('export_json')}
+                </button>
             </div>
 
-            {/* Logout */}
             <button className={styles.logoutBtn} onClick={logout}>
                 {t('logout')}
             </button>
 
-            {/* Modals */}
             <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
             <LanguageModal isOpen={languageOpen} onClose={() => setLanguageOpen(false)} />
             <CurrencyModal isOpen={currencyOpen} onClose={() => setCurrencyOpen(false)} />
