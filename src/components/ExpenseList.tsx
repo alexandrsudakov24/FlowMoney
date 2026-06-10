@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import { currencySymbols } from '../utils/currencySymbols';
-import type { Expense } from '../services/storageService';
+import type { Expense } from '../types';
 import styles from '../styles/components/ExpenseList.module.css';
 
 export default function ExpenseList({ expenses }: { expenses: Expense[] }) {

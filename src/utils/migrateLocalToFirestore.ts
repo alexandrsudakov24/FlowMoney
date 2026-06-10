@@ -1,6 +1,6 @@
 import { auth, db } from '../firebase';
 import { collection, addDoc } from 'firebase/firestore';
-import type { Expense } from '../services/storageService';
+import type { Expense } from '../types';
 
 
 export async function migrateLocalExpensesToFirestore(): Promise<number> {

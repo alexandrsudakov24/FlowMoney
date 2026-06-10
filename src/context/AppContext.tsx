@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { Expense } from '../services/storageService';
+import type { Expense } from '../types';
 import { useAuth } from './AuthContext';
 import { db } from '../firebase';
 import { collection, onSnapshot, addDoc, doc, deleteDoc, updateDoc, getDocs } from 'firebase/firestore';
