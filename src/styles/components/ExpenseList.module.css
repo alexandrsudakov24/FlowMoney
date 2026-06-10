@@ -63,10 +63,12 @@
 .amount {
   font-weight: 700;
   font-size: 18px;
-  color: var(--accent);
   white-space: nowrap;
   text-align: right;
 }
+
+.amountIncome  { color: var(--success); }
+.amountExpense { color: var(--accent); }
 
 /* Кнопки */
 .actions {

@@ -28,7 +28,7 @@ export default function Navbar() {
                             <Link to="/add">{t('add_transaction')}</Link>
                             <Link to="/profile">{t('profile')}</Link>
                             <Avatar name={user?.name || ''} photoURL={user?.photoURL} size="medium" />
-                            <span style={{ marginLeft: 8 }}>
+                            <span className={styles.greeting}>
                                 {t('hi')}, {user?.name}
                             </span>
                         </>

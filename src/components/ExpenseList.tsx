@@ -65,13 +65,7 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
 
                             <div className={styles.right}>
                                 <div
-                                    className={styles.amount}
-                                    style={{
-                                        color:
-                                            e.type === 'income'
-                                                ? 'var(--success)'
-                                                : 'var(--accent)',
-                                    }}
+                                    className={`${styles.amount} ${e.type === 'income' ? styles.amountIncome : styles.amountExpense}`}
                                 >
                                     {sign}
                                     {amount} {symbol}
