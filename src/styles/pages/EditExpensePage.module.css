@@ -4,7 +4,7 @@
 
 .title {
     margin: 0 0 24px 0;
-    font-size: 28px;
+    font-size: var(--font-size-2xl);
     font-weight: 700;
     color: var(--text);
 }
@@ -12,7 +12,7 @@
 .description {
     color: var(--muted);
     margin-bottom: 24px;
-    font-size: 16px;
+    font-size: var(--font-size-md);
 }
 
 @keyframes fadeIn {
@@ -22,5 +22,5 @@
 
 @media (max-width: 640px) {
     .title       { font-size: 24px; }
-    .description { font-size: 14px; }
+    .description { font-size: var(--font-size-sm); }
 }

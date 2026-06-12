@@ -1,11 +1,10 @@
-/* Dashboard Page Styles */
 .dashboard {
     animation: fadeIn 0.4s ease-in;
 }
 
 .title {
     margin: 0 0 24px 0;
-    font-size: 28px;
+    font-size: var(--font-size-2xl);
     font-weight: 700;
     color: var(--text);
 }
@@ -35,7 +34,7 @@
 
 .cardTitle {
     margin: 0 0 8px 0;
-    font-size: 14px;
+    font-size: var(--font-size-xs);
     font-weight: 600;
     color: var(--muted);
     text-transform: uppercase;
@@ -43,7 +42,7 @@
 }
 
 .cardValue {
-    font-size: 28px;
+    font-size: var(--font-size-2xl);
     font-weight: 700;
     color: var(--accent);
     margin: 0;
@@ -55,14 +54,14 @@
 
 .chartsTitle {
     margin: 0 0 16px 0;
-    font-size: 28px;
+    font-size: var(--font-size-lg);
     font-weight: 700;
     color: var(--text);
 }
 
 .recentTitle {
     margin: 24px 0 16px 0;
-    font-size: 28px;
+    font-size: var(--font-size-lg);
     font-weight: 700;
     color: var(--text);
 }
@@ -93,16 +92,12 @@
         font-size: 24px;
     }
 
-    .chartsTitle {
-        font-size: 24px;
-    }
-
+    .chartsTitle,
     .recentTitle {
-        font-size: 24px;
+        font-size: var(--font-size-md);
     }
 
     .card {
         padding: 16px;
     }
 }
-
