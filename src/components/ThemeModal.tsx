@@ -1,5 +1,6 @@
 import styles from "../styles/components/SettingsModal.module.css";
 import { useTheme } from "../context/ThemeContext";
+import type { Theme } from "../context/ThemeContext";
 import { useLanguage } from "../context/LanguageContext";
 
 interface ThemeModalProps {
@@ -7,14 +8,16 @@ interface ThemeModalProps {
     onClose: () => void;
 }
 
+const THEME_OPTIONS: Theme[] = ['light', 'dark', 'auto'];
+
 export default function ThemeModal({ isOpen, onClose }: ThemeModalProps) {
-    const { theme, toggle } = useTheme();
+    const { theme, setTheme } = useTheme();
     const { t } = useLanguage();
 
     if (!isOpen) return null;
 
-    const handleToggle = () => {
-        toggle();
+    const handleSelect = (t: Theme) => {
+        setTheme(t);
         onClose();
     };
 
@@ -29,13 +32,18 @@ export default function ThemeModal({ isOpen, onClose }: ThemeModalProps) {
                 </div>
 
                 <div className={styles.content}>
-                    <p>{t('current_theme')}: <strong>{t(theme)}</strong></p>
-                </div>
-
-                <div className={styles.footer}>
-                    <button className={`${styles.btn} ${styles.primary}`} onClick={handleToggle}>
-                        {t('toggle_theme')}
-                    </button>
+                    <div className={styles.setting}>
+                        {THEME_OPTIONS.map((opt) => (
+                            <button
+                                key={opt}
+                                className={`${styles.btn} ${theme === opt ? styles.primary : styles.secondary}`}
+                                onClick={() => handleSelect(opt)}
+                                style={{ marginBottom: 8 }}
+                            >
+                                {t(opt)}
+                            </button>
+                        ))}
+                    </div>
                 </div>
             </div>
         </>
