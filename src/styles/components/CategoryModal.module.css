@@ -1,0 +1,101 @@
+.addRow {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.addBtn {
+    padding: 8px 16px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    transition: opacity 0.12s;
+}
+
+.addBtn:hover {
+    opacity: 0.88;
+}
+
+.error {
+    font-size: 13px;
+    color: var(--danger);
+    margin: 0 0 8px;
+}
+
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: var(--muted-bg);
+    border-radius: 8px;
+}
+
+.name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.count {
+    font-size: 12px;
+    color: var(--text-secondary);
+    background: rgba(99, 102, 241, 0.1);
+    padding: 2px 8px;
+    border-radius: 99px;
+}
+
+.removeBtn {
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: opacity 0.12s;
+    line-height: 1;
+}
+
+.removeBtn:not(:disabled):hover {
+    opacity: 0.7;
+}
+
+.removeBtn:disabled {
+    color: var(--text-secondary);
+    cursor: default;
+    opacity: 0.35;
+}
