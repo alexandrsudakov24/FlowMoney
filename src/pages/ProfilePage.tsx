@@ -6,6 +6,7 @@ import { currencySymbols } from "../utils/currencySymbols";
 import ThemeModal from "../components/ThemeModal";
 import LanguageModal from "../components/LanguageModal";
 import CurrencyModal from "../components/CurrencyModal";
+import CategoryModal from "../components/CategoryModal";
 import styles from "../styles/pages/ProfilePage.module.css";
 
 export default function ProfilePage() {
@@ -16,6 +17,7 @@ export default function ProfilePage() {
     const [themeOpen, setThemeOpen] = useState(false);
     const [languageOpen, setLanguageOpen] = useState(false);
     const [currencyOpen, setCurrencyOpen] = useState(false);
+    const [categoriesOpen, setCategoriesOpen] = useState(false);
 
     const totalExpenses = expenses
         .filter(e => e.type === "expense")
@@ -100,6 +102,12 @@ export default function ProfilePage() {
                         {currency}
                     </button>
                 </div>
+                <div className={styles.settingRow}>
+                    <span>{t('categories')}</span>
+                    <button className={styles.changeBtn} onClick={() => setCategoriesOpen(true)}>
+                        {t('change')}
+                    </button>
+                </div>
             </div>
 
             <div className={styles.block}>
@@ -116,6 +124,7 @@ export default function ProfilePage() {
             <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
             <LanguageModal isOpen={languageOpen} onClose={() => setLanguageOpen(false)} />
             <CurrencyModal isOpen={currencyOpen} onClose={() => setCurrencyOpen(false)} />
+            <CategoryModal isOpen={categoriesOpen} onClose={() => setCategoriesOpen(false)} />
         </div>
     );
 }
