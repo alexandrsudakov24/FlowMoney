@@ -4,14 +4,11 @@
   align-items: center;
   padding: 10px 16px;
   background: var(--card);
-
-  /* FIX: full width, no radius, no offset */
   width: 100%;
   max-width: 100%;
   left: 0;
   border-radius: 0;
   top: 0;
-
   box-shadow: var(--shadow-md);
   position: sticky;
   z-index: 120;
@@ -22,7 +19,7 @@
   align-items: center;
   gap: 10px;
   font-weight: 800;
-  font-size: 18px;
+  font-size: var(--font-size-lg);
   color: var(--accent);
   text-decoration: none;
 }
@@ -30,7 +27,7 @@
 .logo {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   flex-shrink: 0;
   display: block;
   object-fit: cover;
@@ -46,9 +43,10 @@
   text-decoration: none;
   color: var(--text);
   font-weight: 600;
+  font-size: var(--font-size-sm);
   padding: 6px 10px;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   transition: color 0.12s ease, background 0.12s ease;
 }
 
@@ -77,9 +75,9 @@
   border: 1px solid var(--border);
   color: var(--text);
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-weight: 600;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   cursor: pointer;
   transition: all 0.12s ease;
   box-shadow: var(--shadow-sm);
@@ -96,9 +94,9 @@
   border: 1px solid var(--border);
   color: var(--text);
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-weight: 600;
-  font-size: 16px;
+  font-size: var(--font-size-md);
   cursor: pointer;
   transition: all 0.12s ease;
   box-shadow: var(--shadow-sm);
@@ -115,9 +113,6 @@
   box-shadow: var(--shadow-md);
 }
 
-/* ========================================
-   DESKTOP NAVIGATION (>= 768px)
-   ======================================== */
 .desktopNav {
   display: flex;
 }
@@ -130,15 +125,11 @@
   display: none;
 }
 
-/* ========================================
-   MOBILE NAVIGATION (< 768px)
-   ======================================== */
 @media (max-width: 767px) {
   .desktopNav {
     display: none;
   }
 
-  /* Mobile header: minimal, only brand + theme button */
   .mobileHeader {
     display: flex;
     justify-content: space-between;
@@ -151,12 +142,9 @@
     top: 0;
     z-index: 120;
     border-bottom: 1px solid var(--border);
-
-    /* FIX: full width, no scroll */
     width: 100%;
     left: 0;
     margin-left: 0;
-
     height: 60px;
   }
 
@@ -166,18 +154,14 @@
   }
 
   .mobileHeader .brand {
-    font-size: 16px;
+    font-size: var(--font-size-md);
   }
 
-  /* Mobile bottom navigation */
   .mobileNav {
     display: flex;
-
-    /* FIX: full width, no scroll */
     width: 100%;
     left: 0;
     margin-left: 0;
-
     position: fixed;
     bottom: 0;
     background: var(--card);
@@ -200,8 +184,8 @@
     text-decoration: none;
     color: var(--text);
     font-weight: 600;
-    font-size: 12px;
-    border-radius: 8px;
+    font-size: var(--font-size-xs);
+    border-radius: var(--radius-md);
     transition: all 0.2s ease;
     gap: 4px;
     background: transparent;

@@ -6,21 +6,19 @@
   gap: 12px;
 }
 
-/* Карточка транзакции */
 .expenseItem {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   padding: 14px 16px;
   background: var(--card);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border);
   gap: 12px;
   flex-wrap: wrap;
 }
 
-/* Левая часть */
 .left {
   display: flex;
   flex-direction: column;
@@ -30,28 +28,27 @@
 
 .category {
   font-weight: 600;
-  font-size: 15px;
+  font-size: var(--font-size-sm);
   color: var(--text);
   display: inline-block;
   padding: 6px 10px;
   background: rgba(99, 102, 241, 0.08);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   margin-bottom: 4px;
 }
 
 .note {
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   color: var(--muted);
   min-height: 18px;
 }
 
 .date {
-  font-size: 13px;
+  font-size: var(--font-size-xs);
   color: var(--muted);
   white-space: nowrap;
 }
 
-/* Правая часть */
 .right {
   display: flex;
   flex-direction: column;
@@ -62,7 +59,7 @@
 
 .amount {
   font-weight: 700;
-  font-size: 18px;
+  font-size: var(--font-size-lg);
   white-space: nowrap;
   text-align: right;
 }
@@ -70,7 +67,6 @@
 .amountIncome  { color: var(--success); }
 .amountExpense { color: var(--accent); }
 
-/* Кнопки */
 .actions {
   display: flex;
   gap: 8px;
@@ -81,26 +77,24 @@
 .actions button {
   width: 110px;
   padding: 8px 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   border: none;
   cursor: pointer;
   font-weight: 600;
   white-space: nowrap;
   text-align: center;
-  font-size: 15px;
+  font-size: var(--font-size-sm);
 }
 
-/* Пустой список */
 .emptyState {
   text-align: center;
   padding: 48px 20px;
   background: var(--card);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-md);
 }
 
-/* 📱 Адаптация под iPhone SE и маленькие экраны */
 @media (max-width: 360px) {
   .expenseItem {
     padding: 10px 12px;
@@ -108,22 +102,22 @@
   }
 
   .category {
-    font-size: 13px;
+    font-size: var(--font-size-xs);
     padding: 4px 8px;
   }
 
   .amount {
-    font-size: 16px;
+    font-size: var(--font-size-md);
     min-width: 70px;
   }
 
   .date {
-    font-size: 12px;
+    font-size: var(--font-size-xs);
   }
 
   .actions button {
     width: 90px;
     padding: 7px 8px;
-    font-size: 14px;
+    font-size: var(--font-size-xs);
   }
 }
