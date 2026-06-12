@@ -93,6 +93,7 @@ const translations = {
         'category_exists': 'Category already exists',
         'category_in_use': 'Category is used in transactions',
         'category_default': 'Default category cannot be deleted',
+        'update_app': 'Update App',
     },
     ru: {
         'dashboard': 'Панель управления',
@@ -175,6 +176,7 @@ const translations = {
         'category_exists': 'Категория уже существует',
         'category_in_use': 'Категория используется в операциях',
         'category_default': 'Базовую категорию нельзя удалить',
+        'update_app': 'Обновить приложение',
     },
     he: {
         'dashboard': 'לוח מחוונים',
@@ -257,6 +259,7 @@ const translations = {
         'category_exists': 'הקטגוריה כבר קיימת',
         'category_in_use': 'הקטגוריה בשימוש בעסקאות',
         'category_default': 'לא ניתן למחוק קטגוריה ברירת מחדל',
+        'update_app': 'עדכן אפליקציה',
     }
 };
 
