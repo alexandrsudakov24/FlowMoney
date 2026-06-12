@@ -4,7 +4,12 @@ import type { ReactNode } from 'react';
 import type { Expense } from '../types';
 import { useAuth } from './AuthContext';
 import { db } from '../firebase';
-import { collection, onSnapshot, addDoc, doc, deleteDoc, updateDoc, getDocs } from 'firebase/firestore';
+import {
+    collection, onSnapshot, addDoc, doc,
+    deleteDoc, updateDoc, getDocs, setDoc
+} from 'firebase/firestore';
+
+const DEFAULT_CATEGORIES = ['Food', 'Transport', 'Home', 'Shopping', 'Health', 'Other'];
 
 type AppContextType = {
     expenses: Expense[];
@@ -15,12 +20,17 @@ type AppContextType = {
 
     currency: string;
     changeCurrency: (cur: string) => void;
+
+    categories: string[];
+    addCategory: (name: string) => Promise<void>;
+    removeCategory: (name: string) => Promise<boolean>;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
     const [expenses, setExpenses] = useState<Expense[]>([]);
+    const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
     const { user, isAuthenticated } = useAuth();
 
     // -----------------------------
@@ -41,7 +51,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         if (isAuthenticated && user) {
             const col = collection(db, 'users', user.id, 'expenses');
-
             const unsub = onSnapshot(col, (snap) => {
                 const next: Expense[] = snap.docs.map((d) => ({
                     id: d.id,
@@ -49,11 +58,28 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
                 }));
                 setExpenses(next);
             });
-
             return () => unsub();
         }
-
         setExpenses([]);
+    }, [isAuthenticated, user]);
+
+    // -----------------------------
+    // Load categories from Firestore
+    // -----------------------------
+    useEffect(() => {
+        if (!isAuthenticated || !user) {
+            setCategories(DEFAULT_CATEGORIES);
+            return;
+        }
+        const ref = doc(db, 'users', user.id, 'settings', 'categories');
+        const unsub = onSnapshot(ref, (snap) => {
+            if (snap.exists()) {
+                setCategories(snap.data().list ?? DEFAULT_CATEGORIES);
+            } else {
+                setCategories(DEFAULT_CATEGORIES);
+            }
+        });
+        return () => unsub();
     }, [isAuthenticated, user]);
 
     // -----------------------------
@@ -97,6 +123,33 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    // -----------------------------
+    // Category operations
+    // -----------------------------
+    const addCategory = async (name: string): Promise<void> => {
+        if (!isAuthenticated || !user) return;
+        const trimmed = name.trim();
+        if (!trimmed || categories.includes(trimmed)) return;
+        const next = [...categories, trimmed];
+        await setDoc(
+            doc(db, 'users', user.id, 'settings', 'categories'),
+            { list: next }
+        ).catch((err) => console.error('Failed to add category', err));
+    };
+
+    const removeCategory = async (name: string): Promise<boolean> => {
+        if (!isAuthenticated || !user) return false;
+        if (DEFAULT_CATEGORIES.includes(name)) return false;
+        const inUse = expenses.some(e => e.category === name);
+        if (inUse) return false;
+        const next = categories.filter(c => c !== name);
+        await setDoc(
+            doc(db, 'users', user.id, 'settings', 'categories'),
+            { list: next }
+        ).catch((err) => console.error('Failed to remove category', err));
+        return true;
+    };
+
     return (
         <AppContext.Provider
             value={{
@@ -106,7 +159,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
                 deleteExpense,
                 clearAll,
                 currency,
-                changeCurrency
+                changeCurrency,
+                categories,
+                addCategory,
+                removeCategory,
             }}
         >
             {children}
