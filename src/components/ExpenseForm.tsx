@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import styles from '../styles/components/ExpenseForm.module.css';
 import type { Expense } from '../types';
@@ -15,14 +15,14 @@ type FormData = {
 };
 
 export default function ExpenseForm({
-                                        defaultValues,
-                                        onSubmit
-                                    }: {
+    defaultValues,
+    onSubmit
+}: {
     defaultValues?: Partial<FormData> | Partial<Expense>;
     onSubmit: (data: FormData) => void;
 }) {
     const { t } = useLanguage();
-    const { currency } = useApp();
+    const { currency, expenses, categories } = useApp();
 
     const { register, handleSubmit, setValue, watch } = useForm<FormData>({
         defaultValues: (defaultValues as Partial<FormData>) || {
@@ -35,6 +35,7 @@ export default function ExpenseForm({
     });
 
     const type = watch('type');
+    const selectedCategory = watch('category');
 
     useEffect(() => {
         if (defaultValues && 'type' in (defaultValues as object)) {
@@ -46,9 +47,26 @@ export default function ExpenseForm({
         if (type === 'income') {
             setValue('category', '');
         } else {
-            setValue('category', defaultValues?.category as string || 'Food');
+            setValue('category', defaultValues?.category as string || categories[0] || 'Food');
         }
-    }, [type, setValue, defaultValues]);
+    }, [type, setValue, defaultValues, categories]);
+
+    // Top-3 categories by usage frequency
+    const topCategories = useMemo(() => {
+        const map: Record<string, number> = {};
+        expenses.forEach(e => {
+            if (e.type === 'expense') map[e.category] = (map[e.category] || 0) + 1;
+        });
+        return [...categories]
+            .sort((a, b) => (map[b] || 0) - (map[a] || 0))
+            .slice(0, 3);
+    }, [expenses, categories]);
+
+    const getCatLabel = (cat: string) => {
+        const key = `cat_${cat.toLowerCase()}`;
+        const translated = t(key);
+        return translated !== key ? translated : cat;
+    };
 
     return (
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
@@ -69,11 +87,8 @@ export default function ExpenseForm({
                 </button>
             </div>
 
-            {/* AMOUNT FIELD WITH CURRENCY SYMBOL */}
             <label className={styles.label}>
-                <span>
-                    {t('amount')} ({currencySymbols[currency]})
-                </span>
+                <span>{t('amount')} ({currencySymbols[currency]})</span>
                 <input
                     className={styles.input}
                     type="number"
@@ -86,13 +101,28 @@ export default function ExpenseForm({
             {type === 'expense' && (
                 <label className={styles.label}>
                     <span>{t('category')}</span>
+
+                    {topCategories.length > 0 && (
+                        <div className={styles.chips}>
+                            {topCategories.map(cat => (
+                                <button
+                                    key={cat}
+                                    type="button"
+                                    className={`${styles.chip} ${selectedCategory === cat ? styles.chipActive : ''}`}
+                                    onClick={() => setValue('category', cat)}
+                                >
+                                    {getCatLabel(cat)}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
                     <select className={styles.select} {...register('category')}>
-                        <option value="Food">{t('cat_food')}</option>
-                        <option value="Transport">{t('cat_transport')}</option>
-                        <option value="Home">{t('cat_home')}</option>
-                        <option value="Shopping">{t('cat_shopping')}</option>
-                        <option value="Health">{t('cat_health')}</option>
-                        <option value="Other">{t('cat_other')}</option>
+                        {categories.map(cat => (
+                            <option key={cat} value={cat}>
+                                {getCatLabel(cat)}
+                            </option>
+                        ))}
                     </select>
                 </label>
             )}

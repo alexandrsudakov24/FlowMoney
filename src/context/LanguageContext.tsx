@@ -88,6 +88,11 @@ const translations = {
         'current_currency': 'Current currency',
         'current_theme': 'Current theme',
         'toggle_theme': 'Toggle Theme',
+        'categories': 'Categories',
+        'add_category': 'New category name',
+        'category_exists': 'Category already exists',
+        'category_in_use': 'Category is used in transactions',
+        'category_default': 'Default category cannot be deleted',
     },
     ru: {
         'dashboard': 'Панель управления',
@@ -165,6 +170,11 @@ const translations = {
         'current_currency': 'Текущая валюта',
         'current_theme': 'Текущая тема',
         'toggle_theme': 'Сменить тему',
+        'categories': 'Категории',
+        'add_category': 'Название новой категории',
+        'category_exists': 'Категория уже существует',
+        'category_in_use': 'Категория используется в операциях',
+        'category_default': 'Базовую категорию нельзя удалить',
     },
     he: {
         'dashboard': 'לוח מחוונים',
@@ -242,6 +252,11 @@ const translations = {
         'current_currency': 'מטבע נוכחי',
         'current_theme': 'ערכת נושא נוכחית',
         'toggle_theme': 'החלף ערכת נושא',
+        'categories': 'קטגוריות',
+        'add_category': 'שם קטגוריה חדשה',
+        'category_exists': 'הקטגוריה כבר קיימת',
+        'category_in_use': 'הקטגוריה בשימוש בעסקאות',
+        'category_default': 'לא ניתן למחוק קטגוריה ברירת מחדל',
     }
 };
 

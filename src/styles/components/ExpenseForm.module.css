@@ -23,13 +23,11 @@
   transition: background 0.2s ease, transform 0.1s ease, color 0.2s ease;
 }
 
-/* Неактивная кнопка — использует акцентный цвет */
 .toggleButton:not(.active) {
   background: var(--accent);
   color: white;
 }
 
-/* Активная кнопка — зелёная (успех/подтверждение) */
 .toggleButton.active {
   background: var(--success);
   color: white;
@@ -66,6 +64,36 @@
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.1);
+}
+
+/* ====== Быстрые чипы категорий ====== */
+.chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  padding: 6px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--muted-bg);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chipActive {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
 }
 
 /* ====== Кнопка сохранить ====== */
