@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Expense } from '../types';
 import { useAuth } from './AuthContext';
+import { useFamily } from './FamilyContext';
 import { db } from '../firebase';
 import {
     collection, onSnapshot, addDoc, doc,
@@ -17,10 +18,8 @@ type AppContextType = {
     updateExpense: (id: string, data: Partial<Expense>) => void;
     deleteExpense: (id: string) => void;
     clearAll: () => Promise<void>;
-
     currency: string;
     changeCurrency: (cur: string) => void;
-
     categories: string[];
     addCategory: (name: string) => Promise<void>;
     removeCategory: (name: string) => Promise<boolean>;
@@ -32,25 +31,27 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
     const { user, isAuthenticated } = useAuth();
+    const { family } = useFamily();
 
-    // -----------------------------
-    //  Currency state
-    // -----------------------------
     const [currency, setCurrency] = useState(
-        localStorage.getItem("currency") || "USD"
+        localStorage.getItem('currency') || 'USD'
     );
 
     const changeCurrency = (cur: string) => {
         setCurrency(cur);
-        localStorage.setItem("currency", cur);
+        localStorage.setItem('currency', cur);
     };
 
-    // -----------------------------
-    // Load expenses from Firestore
-    // -----------------------------
+    const getExpensesCol = () => {
+        if (family) return collection(db, 'families', family.id, 'expenses');
+        return collection(db, 'users', user!.id, 'expenses');
+    };
+
     useEffect(() => {
         if (isAuthenticated && user) {
-            const col = collection(db, 'users', user.id, 'expenses');
+            const col = family
+                ? collection(db, 'families', family.id, 'expenses')
+                : collection(db, 'users', user.id, 'expenses');
             const unsub = onSnapshot(col, (snap) => {
                 const next: Expense[] = snap.docs.map((d) => ({
                     id: d.id,
@@ -61,11 +62,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             return () => unsub();
         }
         setExpenses([]);
-    }, [isAuthenticated, user]);
+    }, [isAuthenticated, user, family]);
 
-    // -----------------------------
-    // Load categories from Firestore
-    // -----------------------------
     useEffect(() => {
         if (!isAuthenticated || !user) {
             setCategories(DEFAULT_CATEGORIES);
@@ -82,50 +80,46 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         return () => unsub();
     }, [isAuthenticated, user]);
 
-    // -----------------------------
-    // CRUD operations
-    // -----------------------------
     const addExpense = (expense: Expense) => {
         if (isAuthenticated && user) {
-            const col = collection(db, 'users', user.id, 'expenses');
+            const col = getExpensesCol();
             const { id, ...payload } = expense as any;
-            addDoc(col, payload).catch((err) =>
-                console.error('Failed to add expense to Firestore', err)
+            const data = family
+                ? { ...payload, addedBy: { uid: user.id, name: user.name } }
+                : payload;
+            addDoc(col, data).catch((err) =>
+                console.error('Failed to add expense', err)
             );
         }
     };
 
     const updateExpense = (id: string, updatedData: Partial<Expense>) => {
         if (isAuthenticated && user) {
-            const ref = doc(db, 'users', user.id, 'expenses', id);
+            const ref = doc(getExpensesCol(), id);
             updateDoc(ref, updatedData as any).catch((err) =>
-                console.error('Failed to update expense in Firestore', err)
+                console.error('Failed to update expense', err)
             );
         }
     };
 
     const deleteExpense = (id: string) => {
         if (isAuthenticated && user) {
-            const ref = doc(db, 'users', user.id, 'expenses', id);
+            const ref = doc(getExpensesCol(), id);
             deleteDoc(ref).catch((err) =>
-                console.error('Failed to delete expense in Firestore', err)
+                console.error('Failed to delete expense', err)
             );
         }
     };
 
     const clearAll = async () => {
         if (isAuthenticated && user) {
-            const col = collection(db, 'users', user.id, 'expenses');
-            const snap = await getDocs(col);
+            const snap = await getDocs(getExpensesCol());
             await Promise.all(snap.docs.map((d) => deleteDoc(d.ref))).catch(
                 (err) => console.error('Failed to clear expenses', err)
             );
         }
     };
 
-    // -----------------------------
-    // Category operations
-    // -----------------------------
     const addCategory = async (name: string): Promise<void> => {
         if (!isAuthenticated || !user) return;
         const trimmed = name.trim();
@@ -153,16 +147,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     return (
         <AppContext.Provider
             value={{
-                expenses,
-                addExpense,
-                updateExpense,
-                deleteExpense,
-                clearAll,
-                currency,
-                changeCurrency,
-                categories,
-                addCategory,
-                removeCategory,
+                expenses, addExpense, updateExpense, deleteExpense, clearAll,
+                currency, changeCurrency,
+                categories, addCategory, removeCategory,
             }}
         >
             {children}

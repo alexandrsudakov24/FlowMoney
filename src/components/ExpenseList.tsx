@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useFamily } from '../context/FamilyContext';
 import { currencySymbols } from '../utils/currencySymbols';
 import type { Expense } from '../types';
 import styles from '../styles/components/ExpenseList.module.css';
@@ -8,6 +9,7 @@ import styles from '../styles/components/ExpenseList.module.css';
 export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
     const { deleteExpense, currency } = useApp();
     const { t } = useLanguage();
+    const { family } = useFamily();
 
     if (!expenses || expenses.length === 0) {
         return (
@@ -61,14 +63,18 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
                                 <div className={styles.note}>
                                     {e.note || t('no_note')}
                                 </div>
+                                {family && e.addedBy && (
+                                    <div className={styles.addedBy}>
+                                        {t('added_by')} {e.addedBy.name}
+                                    </div>
+                                )}
                             </div>
 
                             <div className={styles.right}>
                                 <div
                                     className={`${styles.amount} ${e.type === 'income' ? styles.amountIncome : styles.amountExpense}`}
                                 >
-                                    {sign}
-                                    {amount} {symbol}
+                                    {sign}{amount} {symbol}
                                 </div>
 
                                 <div className={styles.date}>

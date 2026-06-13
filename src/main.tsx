@@ -6,8 +6,8 @@ import { AppProvider } from './context/AppContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { FamilyProvider } from './context/FamilyContext';
 import './styles/index.css';
-// импорт утилиты миграции в режиме разработки — она выставит window.migrateLocalExpensesToFirestore
 if (import.meta.env.DEV) {
     import('./utils/migrateLocalToFirestore');
 }
@@ -18,13 +18,14 @@ createRoot(document.getElementById('root')!).render(
             <LanguageProvider>
                 <ThemeProvider>
                     <AuthProvider>
-                        <AppProvider>
-                            <App />
-                        </AppProvider>
+                        <FamilyProvider>
+                            <AppProvider>
+                                <App />
+                            </AppProvider>
+                        </FamilyProvider>
                     </AuthProvider>
                 </ThemeProvider>
             </LanguageProvider>
         </BrowserRouter>
     </React.StrictMode>
 );
-
