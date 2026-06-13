@@ -92,6 +92,11 @@
   color: #fff;
 }
 
+.chipActive:hover {
+  color: #fff;
+  opacity: 0.9;
+}
+
 .formActions {
   margin-top: 10px;
 }
@@ -110,9 +115,4 @@
 }
 
 .button:hover {
-  opacity: 0.88;
-}
-
-.button:active {
-  transform: scale(0.97);
-}
+  opacity: 
