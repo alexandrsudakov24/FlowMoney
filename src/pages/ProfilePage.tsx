@@ -1,30 +1,34 @@
-import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { useApp } from "../context/AppContext";
-import { useLanguage } from "../context/LanguageContext";
-import { currencySymbols } from "../utils/currencySymbols";
-import ThemeModal from "../components/ThemeModal";
-import LanguageModal from "../components/LanguageModal";
-import CurrencyModal from "../components/CurrencyModal";
-import CategoryModal from "../components/CategoryModal";
-import styles from "../styles/pages/ProfilePage.module.css";
+import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useApp } from '../context/AppContext';
+import { useLanguage } from '../context/LanguageContext';
+import { useFamily } from '../context/FamilyContext';
+import { currencySymbols } from '../utils/currencySymbols';
+import ThemeModal from '../components/ThemeModal';
+import LanguageModal from '../components/LanguageModal';
+import CurrencyModal from '../components/CurrencyModal';
+import CategoryModal from '../components/CategoryModal';
+import FamilyModal from '../components/FamilyModal';
+import styles from '../styles/pages/ProfilePage.module.css';
 
 export default function ProfilePage() {
     const { user, logout } = useAuth();
     const { expenses, currency } = useApp();
     const { t } = useLanguage();
+    const { family, invitations } = useFamily();
 
     const [themeOpen, setThemeOpen] = useState(false);
     const [languageOpen, setLanguageOpen] = useState(false);
     const [currencyOpen, setCurrencyOpen] = useState(false);
     const [categoriesOpen, setCategoriesOpen] = useState(false);
+    const [familyOpen, setFamilyOpen] = useState(false);
 
     const totalExpenses = expenses
-        .filter(e => e.type === "expense")
+        .filter(e => e.type === 'expense')
         .reduce((sum, e) => sum + Number(e.amount || 0), 0);
 
     const totalIncome = expenses
-        .filter(e => e.type === "income")
+        .filter(e => e.type === 'income')
         .reduce((sum, e) => sum + Number(e.amount || 0), 0);
 
     const symbol = currencySymbols[currency] ?? currency;
@@ -51,18 +55,20 @@ export default function ProfilePage() {
     const topCategory = (() => {
         const map: Record<string, number> = {};
         expenses.forEach(e => {
-            if (e.type === "expense") {
+            if (e.type === 'expense') {
                 map[e.category] = (map[e.category] || 0) + Number(e.amount || 0);
             }
         });
-        return Object.entries(map).sort((a, b) => b[1] - a[1])[0]?.[0] || "—";
+        return Object.entries(map).sort((a, b) => b[1] - a[1])[0]?.[0] || '—';
     })();
+
+    const hasAccount = !!user?.email;
 
     return (
         <div className={styles.container}>
             <div className={styles.profileSection}>
                 <img
-                    src={user?.photoURL || "/icon.png"}
+                    src={user?.photoURL || '/icon.png'}
                     alt="Avatar"
                     className={styles.avatar}
                 />
@@ -89,6 +95,23 @@ export default function ProfilePage() {
                     <strong>{topCategory}</strong>
                 </div>
             </div>
+
+            {hasAccount && (
+                <div className={styles.block}>
+                    <h3 className={styles.blockTitle}>{t('family')}</h3>
+                    <div className={styles.settingRow}>
+                        <div>
+                            <span>{family ? family.name : t('no_family')}</span>
+                            {!family && invitations.length > 0 && (
+                                <span className={styles.invitationBadge}>{invitations.length}</span>
+                            )}
+                        </div>
+                        <button className={styles.changeBtn} onClick={() => setFamilyOpen(true)}>
+                            {t('change')}
+                        </button>
+                    </div>
+                </div>
+            )}
 
             <div className={styles.block}>
                 <h3 className={styles.blockTitle}>{t('settings')}</h3>
@@ -140,6 +163,7 @@ export default function ProfilePage() {
             <LanguageModal isOpen={languageOpen} onClose={() => setLanguageOpen(false)} />
             <CurrencyModal isOpen={currencyOpen} onClose={() => setCurrencyOpen(false)} />
             <CategoryModal isOpen={categoriesOpen} onClose={() => setCategoriesOpen(false)} />
+            <FamilyModal isOpen={familyOpen} onClose={() => setFamilyOpen(false)} />
         </div>
     );
 }

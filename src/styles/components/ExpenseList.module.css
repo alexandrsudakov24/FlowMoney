@@ -43,6 +43,13 @@
   min-height: 18px;
 }
 
+.addedBy {
+  font-size: var(--font-size-xs);
+  color: var(--accent);
+  margin-top: 2px;
+  opacity: 0.75;
+}
+
 .date {
   font-size: var(--font-size-xs);
   color: var(--muted);
