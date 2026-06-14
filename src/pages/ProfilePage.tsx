@@ -164,6 +164,12 @@ export default function ProfilePage() {
             <CurrencyModal isOpen={currencyOpen} onClose={() => setCurrencyOpen(false)} />
             <CategoryModal isOpen={categoriesOpen} onClose={() => setCategoriesOpen(false)} />
             <FamilyModal isOpen={familyOpen} onClose={() => setFamilyOpen(false)} />
+
+            {user?.email === 'alexandrsudakov24@gmail.com' && (
+                <a href="/admin" className={styles.adminBtn}>
+                    {t('admin_panel')}
+                </a>
+            )}
         </div>
     );
 }

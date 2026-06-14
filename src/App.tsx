@@ -33,10 +33,9 @@ export default function App() {
                     <Route path="/add" element={<RequireAuth><AddExpensePage /></RequireAuth>} />
                     <Route path="/edit/:id" element={<RequireAuth><EditExpensePage /></RequireAuth>} />
                     <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
-                    <Route path="/admin" element={<RequireAdmin><AdminPage /></RequireAdmin>} />
-                    <Route path="/start" element={<StartPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/admin" element={<RequireAdmin><AdminPage /></RequireAdmin>} />
                 </Routes>
             </main>
         </div>
