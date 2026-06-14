@@ -40,6 +40,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
+    const [isAnonymous, setIsAnonymous] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -53,6 +54,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         })();
         const unsub = onAuthStateChanged(auth, async (fbUser) => {
             if (fbUser) {
+                setIsAnonymous(fbUser.isAnonymous);
+                if (fbUser.isAnonymous) {
+                    // keep a minimal user record so AppContext has a uid for Firestore
+                    setUser({ id: fbUser.uid, name: '', email: '' });
+                    return;
+                }
                 try {
                     const userDoc = await getDoc(doc(db, 'users', fbUser.uid));
                     const language = userDoc.exists() ? (userDoc.data()?.language as 'en' | 'ru' | 'he' | undefined) : undefined;
@@ -73,13 +80,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 }
             } else {
                 setUser(null);
+                setIsAnonymous(false);
             }
         });
         return () => unsub();
     }, []);
 
     const register = async (data: RegisterData) => {
-        if (auth.currentUser && (auth.currentUser as any).isAnonymous) {
+        if (auth.currentUser?.isAnonymous) {
             try {
                 const credential = EmailAuthProvider.credential(data.email, data.password);
                 const linked = await linkWithCredential(auth.currentUser, credential);
@@ -95,6 +103,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     email: data.email,
                     language: data.language || 'en',
                 };
+                setIsAnonymous(false);
                 setUser(publicUser);
                 return publicUser;
             } catch (linkErr) {
@@ -147,7 +156,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const provider = new GoogleAuthProvider();
 
             // если текущий юзер анонимный — линкуем аккаунт Google к нему
-            if (auth.currentUser && (auth.currentUser as any).isAnonymous) {
+            if (auth.currentUser?.isAnonymous) {
                 try {
                     const { linkWithPopup } = await import('firebase/auth');
                     const linked = await linkWithPopup(auth.currentUser, provider);
@@ -168,6 +177,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         email: fbUser.email || '',
                         photoURL: fbUser.photoURL || undefined,
                     };
+                    setIsAnonymous(false);
                     setUser(publicUser);
                     return publicUser;
                 } catch (linkErr) {
@@ -210,10 +220,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const logout = async () => {
         await fbSignOut(auth);
         setUser(null);
+        setIsAnonymous(false);
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated: !!user, register, login, loginWithGoogle, logout }}>
+        <AuthContext.Provider value={{ user, isAuthenticated: !!user && !isAnonymous, register, login, loginWithGoogle, logout }}>
             {children}
         </AuthContext.Provider>
     );
