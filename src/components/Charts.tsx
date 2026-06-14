@@ -48,7 +48,7 @@ export default function Charts({ expenses }: { expenses: Expense[] }) {
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
-                            <Tooltip formatter={(value: number) => value.toFixed(2)} />
+                            <Tooltip formatter={(value) => Number(value).toFixed(2)} />
                             <Legend />
                         </PieChart>
                     </ResponsiveContainer>
