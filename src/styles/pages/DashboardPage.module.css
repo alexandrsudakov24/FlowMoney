@@ -64,6 +64,28 @@
     font-size: var(--font-size-lg);
     font-weight: 700;
     color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.countBadge {
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    color: var(--muted);
+    background: var(--muted-bg);
+    padding: 2px 8px;
+    border-radius: 99px;
+}
+
+.noResults {
+    text-align: center;
+    padding: 48px 20px;
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: var(--font-size-md);
 }
 
 @keyframes fadeIn {

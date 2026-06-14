@@ -126,6 +126,11 @@ const translations = {
         'no_users': 'No users found',
         'user_deleted': 'User deleted',
         'registered': 'Registered',
+        'filter_all_time': 'All time',
+        'filter_search_placeholder': 'Search by note or category…',
+        'filter_type_all': 'All',
+        'filter_no_results': 'No transactions match your filters',
+        'filter_results_count': 'Showing {n} of {total}',
     },
     ru: {
         'dashboard': 'Панель управления',
@@ -241,6 +246,11 @@ const translations = {
         'no_users': 'Пользователей не найдено',
         'user_deleted': 'Пользователь удалён',
         'registered': 'Зарегистрирован',
+        'filter_all_time': 'За всё время',
+        'filter_search_placeholder': 'Поиск по заметке или категории…',
+        'filter_type_all': 'Все',
+        'filter_no_results': 'Нет операций по выбранным фильтрам',
+        'filter_results_count': 'Показано {n} из {total}',
     },
     he: {
         'dashboard': 'לוח מחוונים',
@@ -341,7 +351,6 @@ const translations = {
         'accept': 'קבל',
         'decline': 'דחה',
         'invited_by': 'הוזמן על ידי',
-        'invite_success': 'ההזמנה נשלחה!',
         'invite_error_already_member': 'אדם זה כבר חבר',
         'invite_error_already_invited': 'ההזמנה כבר נשלחה',
         'added_by': 'על ידי',
@@ -356,6 +365,11 @@ const translations = {
         'no_users': 'לא נמצאו משתמשים',
         'user_deleted': 'המשתמש נמחק',
         'registered': 'נרשם',
+        'filter_all_time': 'כל הזמן',
+        'filter_search_placeholder': 'חפש לפי הערה או קטגוריה...',
+        'filter_type_all': 'הכל',
+        'filter_no_results': 'אין עסקאות התואמות לפילטרים',
+        'filter_results_count': 'מציג {n} מתוך {total}',
     }
 };
 
