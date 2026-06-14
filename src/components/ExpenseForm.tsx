@@ -92,6 +92,7 @@ export default function ExpenseForm({
                 <input
                     className={styles.input}
                     type="number"
+                    inputMode="decimal"
                     step="0.01"
                     placeholder={`0.00 ${currencySymbols[currency]}`}
                     {...register('amount')}
