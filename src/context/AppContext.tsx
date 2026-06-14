@@ -14,6 +14,7 @@ const DEFAULT_CATEGORIES = ['Food', 'Transport', 'Home', 'Shopping', 'Health', '
 
 type AppContextType = {
     expenses: Expense[];
+    loading: boolean;
     addExpense: (e: Expense) => void;
     updateExpense: (id: string, data: Partial<Expense>) => void;
     deleteExpense: (id: string) => void;
@@ -29,6 +30,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
     const [expenses, setExpenses] = useState<Expense[]>([]);
+    const [loading, setLoading] = useState(false);
     const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
     const { user, isAuthenticated } = useAuth();
     const { family } = useFamily();
@@ -49,6 +51,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         if (isAuthenticated && user) {
+            setLoading(true);
             const col = family
                 ? collection(db, 'families', family.id, 'expenses')
                 : collection(db, 'users', user.id, 'expenses');
@@ -58,10 +61,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
                     ...(d.data() as any)
                 }));
                 setExpenses(next);
+                setLoading(false);
             });
             return () => unsub();
         }
         setExpenses([]);
+        setLoading(false);
     }, [isAuthenticated, user, family]);
 
     useEffect(() => {
@@ -147,7 +152,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     return (
         <AppContext.Provider
             value={{
-                expenses, addExpense, updateExpense, deleteExpense, clearAll,
+                expenses, loading, addExpense, updateExpense, deleteExpense, clearAll,
                 currency, changeCurrency,
                 categories, addCategory, removeCategory,
             }}

@@ -4,12 +4,13 @@ import { useLanguage } from '../context/LanguageContext';
 import ExpenseList from '../components/ExpenseList';
 import Charts from '../components/Charts';
 import ExpenseFilters from '../components/ExpenseFilters';
+import Spinner from '../components/Spinner';
 import type { FilterState } from '../components/ExpenseFilters';
 import { currencySymbols } from '../utils/currencySymbols';
 import styles from '../styles/pages/DashboardPage.module.css';
 
 export default function DashboardPage() {
-    const { expenses, currency } = useApp();
+    const { expenses, loading, currency } = useApp();
     const { t } = useLanguage();
 
     const [filters, setFilters] = useState<FilterState>({
@@ -48,6 +49,10 @@ export default function DashboardPage() {
         filters.month !== '' || filters.search !== '' || filters.type !== 'all';
 
     const symbol = currencySymbols[currency];
+
+    if (loading) {
+        return <Spinner size="lg" />;
+    }
 
     return (
         <div className={styles.dashboard}>
@@ -103,10 +108,10 @@ export default function DashboardPage() {
             )}
 
             {expenses.length > 0 && filteredExpenses.length === 0 ? (
-                <div className={styles.noResults}>{t('filter_no_results')}</div>
-            ) : (
+                <div className={styles.noResults}>{t('filter_no_results')}</div>            ) : (
                 <ExpenseList expenses={filteredExpenses} />
             )}
         </div>
     );
 }
+
