@@ -134,17 +134,3 @@
     transform: scale(0.97);
 }
 
-.invitationBadge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: var(--danger);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 700;
-    margin-left: 6px;
-    vertical-align: middle;
-}

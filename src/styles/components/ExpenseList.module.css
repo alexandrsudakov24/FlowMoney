@@ -72,7 +72,7 @@
 }
 
 .amountIncome  { color: var(--success); }
-.amountExpense { color: var(--accent); }
+.amountExpense { color: var(--danger); }
 
 .actions {
   display: flex;

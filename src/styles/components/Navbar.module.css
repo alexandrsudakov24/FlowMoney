@@ -182,24 +182,24 @@
     justify-content: center;
     padding: 8px 12px;
     text-decoration: none;
-    color: var(--text);
-    font-weight: 600;
-    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
     border-radius: var(--radius-md);
-    transition: all 0.2s ease;
-    gap: 4px;
+    transition: color 0.18s ease;
     background: transparent;
     border: none;
     cursor: pointer;
   }
 
   .navItem:hover {
-    background: rgba(99, 102, 241, 0.06);
     color: var(--accent);
   }
 
-  .navItem span {
-    display: inline-block;
+  .navItemActive {
+    color: var(--accent);
+  }
+
+  .navItemActive svg {
+    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 40%, transparent));
   }
 
   .bottomNav {

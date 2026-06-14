@@ -4,6 +4,30 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import Avatar from './Avatar';
 
+const IconDashboard = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7" rx="1" />
+        <rect x="14" y="3" width="7" height="7" rx="1" />
+        <rect x="14" y="14" width="7" height="7" rx="1" />
+        <rect x="3" y="14" width="7" height="7" rx="1" />
+    </svg>
+);
+
+const IconAdd = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="9" />
+        <line x1="12" y1="8" x2="12" y2="16" />
+        <line x1="8" y1="12" x2="16" y2="12" />
+    </svg>
+);
+
+const IconProfile = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="8" r="4" />
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+    </svg>
+);
+
 export default function Navbar() {
     const { isAuthenticated, user } = useAuth();
     const { t } = useLanguage();
@@ -11,6 +35,9 @@ export default function Navbar() {
 
     const isAuthenticatedPage =
         isAuthenticated && !['/start', '/login', '/register'].includes(location.pathname);
+
+    const isActive = (path: string) =>
+        path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
     return (
         <>
@@ -53,14 +80,14 @@ export default function Navbar() {
 
             {isAuthenticatedPage && (
                 <nav className={`${styles.mobileNav} ${styles.bottomNav}`}>
-                    <Link to="/" className={styles.navItem}>
-                        <span>{t('dashboard')}</span>
+                    <Link to="/" className={`${styles.navItem} ${isActive('/') ? styles.navItemActive : ''}`}>
+                        <IconDashboard />
                     </Link>
-                    <Link to="/add" className={styles.navItem}>
-                        <span>{t('add')}</span>
+                    <Link to="/add" className={`${styles.navItem} ${isActive('/add') ? styles.navItemActive : ''}`}>
+                        <IconAdd />
                     </Link>
-                    <Link to="/profile" className={styles.navItem}>
-                        <span>{t('profile')}</span>
+                    <Link to="/profile" className={`${styles.navItem} ${isActive('/profile') ? styles.navItemActive : ''}`}>
+                        <IconProfile />
                     </Link>
                 </nav>
             )}

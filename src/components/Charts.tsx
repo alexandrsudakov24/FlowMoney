@@ -43,11 +43,13 @@ export default function Charts({ expenses }: { expenses: Expense[] }) {
                 {byCategory.length === 0 ? <p>{t('no_expense_data')}</p> : (
                     <ResponsiveContainer width="100%" height={250}>
                         <PieChart>
-                            <Pie data={byCategory} dataKey="value" nameKey="name" outerRadius={80} label>
+                            <Pie data={byCategory} dataKey="value" nameKey="name" outerRadius={80}>
                                 {byCategory.map((_entry, index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Pie>
+                            <Tooltip formatter={(value: number) => value.toFixed(2)} />
+                            <Legend />
                         </PieChart>
                     </ResponsiveContainer>
                 )}
