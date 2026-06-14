@@ -32,3 +32,8 @@ dist-ssr
 # Claude agent files
 .agents/
 skills-lock.json
+
+# Environment variables
+.env
+.env.*
+!.env.example
