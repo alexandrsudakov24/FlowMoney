@@ -65,20 +65,23 @@
 
 .chips {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .chip {
-  padding: 6px 14px;
-  border-radius: 99px;
-  border: 1px solid var(--border);
-  background: var(--muted-bg);
+  flex: 1;
+  min-width: 80px;
+  padding: 10px 16px;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border);
+  background: var(--bg-secondary);
   color: var(--text);
-  font-size: var(--font-size-xs);
-  font-weight: 500;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
+  text-align: center;
 }
 
 .chip:hover {
