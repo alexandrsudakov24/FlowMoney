@@ -128,3 +128,9 @@
     font-size: var(--font-size-xs);
   }
 }
+
+.addedBy {
+    font-size: var(--font-size-xs);
+    color: var(--accent);
+    opacity: 0.75;
+}
