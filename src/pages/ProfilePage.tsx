@@ -59,7 +59,10 @@ export default function ProfilePage() {
                 map[e.category] = (map[e.category] || 0) + Number(e.amount || 0);
             }
         });
-        return Object.entries(map).sort((a, b) => b[1] - a[1])[0]?.[0] || '—';
+        const raw = Object.entries(map).sort((a, b) => b[1] - a[1])[0]?.[0];
+        if (!raw) return '—';
+        const key = `cat_${raw.toLowerCase()}`;
+        return t(key) !== key ? t(key) : raw;
     })();
 
     const hasAccount = !!user?.email;
