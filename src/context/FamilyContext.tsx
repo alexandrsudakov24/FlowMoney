@@ -113,14 +113,13 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
             return { success: false, error: 'already_member' };
         }
 
-        // Check for existing pending invitation (query by familyId, filter client-side)
+        // Single-field query to avoid composite index; filter client-side
         const existingQ = query(
             collection(db, 'invitations'),
-            where('familyId', '==', family.id),
             where('invitedEmail', '==', trimmedEmail)
         );
         const existing = await getDocs(existingQ);
-        if (existing.docs.some(d => d.data().status === 'pending')) {
+        if (existing.docs.some(d => d.data().familyId === family.id && d.data().status === 'pending')) {
             return { success: false, error: 'already_invited' };
         }
 
