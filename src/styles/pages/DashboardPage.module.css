@@ -1,5 +1,12 @@
 .dashboard {
     animation: fadeIn 0.4s ease-in;
+    padding: 0 16px;
+}
+
+@media (min-width: 768px) {
+    .dashboard {
+        padding: 0;
+    }
 }
 
 .title {
