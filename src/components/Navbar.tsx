@@ -61,13 +61,7 @@ export default function Navbar() {
                         </>
                     )}
 
-                    {!isAuthenticated && (
-                        <>
-                            <Link to="/login">{t('login')}</Link>
-                            <Link to="/register">{t('register')}</Link>
-                        </>
-                    )}
-                </nav>
+                      </nav>
             </header>
 
             {/* Mobile Header */}
@@ -78,16 +72,29 @@ export default function Navbar() {
                 </Link>
             </header>
 
+            {/* Mobile Bottom Nav */}
             {isAuthenticatedPage && (
-                <nav className={`${styles.mobileNav} ${styles.bottomNav}`}>
-                    <Link to="/" className={`${styles.navItem} ${isActive('/') ? styles.navItemActive : ''}`}>
+                <nav className={styles.mobileNav}>
+                    <Link
+                        to="/"
+                        className={`${styles.navItem} ${isActive('/') ? styles.navItemActive : ''}`}
+                    >
                         <IconDashboard />
+                        <span className={styles.navLabel}>{t('dashboard')}</span>
                     </Link>
-                    <Link to="/add" className={`${styles.navItem} ${isActive('/add') ? styles.navItemActive : ''}`}>
+                    <Link
+                        to="/add"
+                        className={`${styles.navItem} ${isActive('/add') ? styles.navItemActive : ''}`}
+                    >
                         <IconAdd />
+                        <span className={styles.navLabel}>{t('add')}</span>
                     </Link>
-                    <Link to="/profile" className={`${styles.navItem} ${isActive('/profile') ? styles.navItemActive : ''}`}>
+                    <Link
+                        to="/profile"
+                        className={`${styles.navItem} ${isActive('/profile') ? styles.navItemActive : ''}`}
+                    >
                         <IconProfile />
+                        <span className={styles.navLabel}>{t('profile')}</span>
                     </Link>
                 </nav>
             )}

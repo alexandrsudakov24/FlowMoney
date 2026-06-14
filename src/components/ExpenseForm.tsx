@@ -145,6 +145,7 @@ export default function ExpenseForm({
 
             <div className={styles.formActions}>
                 <button className={styles.button} type="submit">{t('save')}</button>
+    
             </div>
         </form>
     );

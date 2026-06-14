@@ -71,5 +71,5 @@ export default function Charts({ expenses }: { expenses: Expense[] }) {
                 )}
             </div>
         </div>
-    );
+       );
 }

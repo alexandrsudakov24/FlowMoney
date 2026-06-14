@@ -192,17 +192,15 @@
 
   .navItem:hover {
     color: var(--accent);
-  }
+    }
 
   .navItemActive {
     color: var(--accent);
   }
 
-  .navItemActive svg {
-    filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 40%, transparent));
-  }
-
-  .bottomNav {
-    display: flex;
+  .navLabel {
+    font-size: 10px;
+    margin-top: 3px;
+    font-weight: 500;
   }
 }
