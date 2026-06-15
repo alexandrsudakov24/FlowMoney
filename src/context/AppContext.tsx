@@ -11,6 +11,7 @@ import {
 } from 'firebase/firestore';
 
 const DEFAULT_CATEGORIES = ['Food', 'Transport', 'Home', 'Shopping', 'Health', 'Other'];
+export const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Dividends', 'Gift', 'Other'];
 
 type AppContextType = {
     expenses: Expense[];
@@ -164,6 +165,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
 export const useApp = () => {
     const ctx = useContext(AppContext);
-    if (!ctx) throw new Error('useApp must be used within AppProvider');
+        if (!ctx) throw new Error('useApp must be used within AppProvider');
     return ctx;
 };

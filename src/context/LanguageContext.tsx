@@ -65,6 +65,10 @@ const translations = {
         'cat_shopping': 'Shopping',
         'cat_health': 'Health',
         'cat_other': 'Other',
+        'cat_salary': 'Salary',
+        'cat_freelance': 'Freelance',
+        'cat_dividends': 'Dividends',
+        'cat_gift': 'Gift',
         'add_transaction_desc': 'Add an expense or income to track your finances',
         'edit_transaction': 'Edit Transaction',
         'edit_transaction_desc': 'Update your transaction details',
@@ -185,6 +189,10 @@ const translations = {
         'cat_shopping': 'Покупки',
         'cat_health': 'Здоровье',
         'cat_other': 'Другое',
+        'cat_salary': 'Зарплата',
+        'cat_freelance': 'Фриланс',
+        'cat_dividends': 'Дивиденды',
+        'cat_gift': 'Подарок',
         'add_transaction_desc': 'Добавьте расход или доход для учёта финансов',
         'edit_transaction': 'Редактировать операцию',
         'edit_transaction_desc': 'Обновите данные операции',
@@ -305,6 +313,10 @@ const translations = {
         'cat_shopping': 'קניות',
         'cat_health': 'בריאות',
         'cat_other': 'אחר',
+        'cat_salary': 'משכורת',
+        'cat_freelance': 'פרילנס',
+        'cat_dividends': 'דיבידנדים',
+        'cat_gift': 'מתנה',
         'add_transaction_desc': 'הוסף הוצאה או הכנסה למעקב פיננסי',
         'edit_transaction': 'ערוך עסקה',
         'edit_transaction_desc': 'עדכן את פרטי העסקה',
@@ -390,7 +402,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     };
 
     const t = (key: string): string => {
-        return (translations[language] as Record<string, string>)[key] || key;
+        return (translations[language] as Record<string, string>)[key] ?? key;
     };
 
     return (
@@ -400,11 +412,8 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useLanguage = () => {
-    const context = useContext(LanguageContext);
-    if (!context) {
-        throw new Error('useLanguage must be used within LanguageProvider');
-    }
-    return context;
+    const ctx = useContext(LanguageContext);
+    if (!ctx) throw new Error('useLanguage must be used within LanguageProvider');
+    return ctx;
 };

@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import styles from '../styles/components/ExpenseForm.module.css';
 import type { Expense } from '../types';
 import { useLanguage } from '../context/LanguageContext';
-import { useApp } from '../context/AppContext';
+import { useApp, INCOME_CATEGORIES } from '../context/AppContext';
 import { currencySymbols } from '../utils/currencySymbols';
 
 type FormData = {
@@ -45,14 +45,14 @@ export default function ExpenseForm({
 
     useEffect(() => {
         if (type === 'income') {
-            setValue('category', '');
+            setValue('category', defaultValues?.category as string || INCOME_CATEGORIES[0]);
         } else {
             setValue('category', defaultValues?.category as string || categories[0] || 'Food');
         }
     }, [type, setValue, defaultValues, categories]);
 
-    // Top-3 categories by usage frequency
-    const topCategories = useMemo(() => {
+    // Top-3 expense categories by usage frequency
+    const topExpenseCategories = useMemo(() => {
         const map: Record<string, number> = {};
         expenses.forEach(e => {
             if (e.type === 'expense') map[e.category] = (map[e.category] || 0) + 1;
@@ -61,6 +61,17 @@ export default function ExpenseForm({
             .sort((a, b) => (map[b] || 0) - (map[a] || 0))
             .slice(0, 3);
     }, [expenses, categories]);
+
+    // Top-3 income categories by usage frequency
+    const topIncomeCategories = useMemo(() => {
+        const map: Record<string, number> = {};
+        expenses.forEach(e => {
+            if (e.type === 'income') map[e.category] = (map[e.category] || 0) + 1;
+        });
+        return [...INCOME_CATEGORIES]
+            .sort((a, b) => (map[b] || 0) - (map[a] || 0))
+            .slice(0, 3);
+    }, [expenses]);
 
     const getCatLabel = (cat: string) => {
         const key = `cat_${cat.toLowerCase()}`;
@@ -99,13 +110,34 @@ export default function ExpenseForm({
                 />
             </label>
 
-            {type === 'expense' && (
-                <label className={styles.label}>
-                    <span>{t('category')}</span>
-
-                    {topCategories.length > 0 && (
+            <label className={styles.label}>
+                <span>{t('category')}</span>
+                {type === 'expense' ? (
+                    <>
+                        {topExpenseCategories.length > 0 && (
+                            <div className={styles.chips}>
+                                {topExpenseCategories.map(cat => (
+                                    <button
+                                        key={cat}
+                                        type="button"
+                                        className={`${styles.chip} ${selectedCategory === cat ? styles.chipActive : ''}`}
+                                        onClick={() => setValue('category', cat)}
+                                    >
+                                        {getCatLabel(cat)}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                        <select className={styles.select} {...register('category')}>
+                            {categories.map(cat => (
+                                <option key={cat} value={cat}>{getCatLabel(cat)}</option>
+                            ))}
+                        </select>
+                    </>
+                ) : (
+                    <>
                         <div className={styles.chips}>
-                            {topCategories.map(cat => (
+                            {topIncomeCategories.map(cat => (
                                 <button
                                     key={cat}
                                     type="button"
@@ -116,17 +148,14 @@ export default function ExpenseForm({
                                 </button>
                             ))}
                         </div>
-                    )}
-
-                    <select className={styles.select} {...register('category')}>
-                        {categories.map(cat => (
-                            <option key={cat} value={cat}>
-                                {getCatLabel(cat)}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-            )}
+                        <select className={styles.select} {...register('category')}>
+                            {INCOME_CATEGORIES.map(cat => (
+                                <option key={cat} value={cat}>{getCatLabel(cat)}</option>
+                            ))}
+                        </select>
+                    </>
+                )}
+            </label>
 
             <label className={styles.label}>
                 <span>{t('date')}</span>
@@ -145,7 +174,6 @@ export default function ExpenseForm({
 
             <div className={styles.formActions}>
                 <button className={styles.button} type="submit">{t('save')}</button>
-    
             </div>
         </form>
     );
