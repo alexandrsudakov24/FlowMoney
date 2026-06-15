@@ -135,7 +135,6 @@ const translations = {
         'filter_type_all': 'All',
         'filter_no_results': 'No transactions match your filters',
         'filter_results_count': 'Showing {n} of {total}',
-        'load_more': 'Load more',
     },
     ru: {
         'dashboard': 'Панель управления',

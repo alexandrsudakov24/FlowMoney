@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -6,10 +7,13 @@ import { currencySymbols } from '../utils/currencySymbols';
 import type { Expense } from '../types';
 import styles from '../styles/components/ExpenseList.module.css';
 
+const PAGE_SIZE = 20;
+
 export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
     const { deleteExpense, currency } = useApp();
     const { t } = useLanguage();
     const { family } = useFamily();
+    const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
     if (!expenses || expenses.length === 0) {
         return (
@@ -24,16 +28,13 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
         (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
-    const getCategoryLabel = (category: string) => {
-        const map: Record<string, string> = {
-            'Food': t('cat_food'),
-            'Transport': t('cat_transport'),
-            'Home': t('cat_home'),
-            'Shopping': t('cat_shopping'),
-            'Health': t('cat_health'),
-            'Other': t('cat_other'),
-        };
-        return map[category] || category;
+    const visible = sorted.slice(0, visibleCount);
+    const hasMore = visibleCount < sorted.length;
+
+    const getCatLabel = (cat: string) => {
+        const key = `cat_${cat.toLowerCase()}`;
+        const translated = t(key);
+        return translated !== key ? translated : cat;
     };
 
     const formatDate = (dateStr: string) => {
@@ -47,7 +48,7 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
     return (
         <div>
             <ul className={styles.expenseList}>
-                {sorted.map((e) => {
+                {visible.map((e) => {
                     const sign = e.type === 'income' ? '+' : '-';
                     const amount = Number(e.amount).toFixed(2);
                     const symbol = currencySymbols[currency];
@@ -56,9 +57,7 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
                         <li key={e.id} className={styles.expenseItem}>
                             <div className={styles.left}>
                                 <div className={styles.category}>
-                                    {e.type === 'income'
-                                        ? t('income')
-                                        : getCategoryLabel(e.category)}
+                                    {getCatLabel(e.category)}
                                 </div>
                                 <div className={styles.note}>
                                     {e.note || t('no_note')}
@@ -100,6 +99,15 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
                     );
                 })}
             </ul>
+
+            {hasMore && (
+                <button
+                    className={styles.loadMore}
+                    onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
+                >
+                    {t('load_more')} ({sorted.length - visibleCount})
+                </button>
+            )}
         </div>
     );
 }

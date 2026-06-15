@@ -134,3 +134,24 @@
     color: var(--accent);
     opacity: 0.75;
 }
+
+.loadMore {
+    display: block;
+    width: 100%;
+    margin-top: 16px;
+    padding: 12px;
+    background: var(--bg-secondary);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.loadMore:hover {
+    background: var(--card);
+    border-color: var(--accent);
+    color: var(--accent);
+}
