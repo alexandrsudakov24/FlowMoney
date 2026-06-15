@@ -260,6 +260,7 @@ const translations = {
         'filter_type_all': 'Все',
         'filter_no_results': 'Нет операций по выбранным фильтрам',
         'filter_results_count': 'Показано {n} из {total}',
+        'load_more': 'Показать ещё',
     },
     he: {
         'dashboard': 'לוח מחוונים',
@@ -383,6 +384,7 @@ const translations = {
         'filter_type_all': 'הכל',
         'filter_no_results': 'אין עסקאות התואמות לפילטרים',
         'filter_results_count': 'מציג {n} מתוך {total}',
+        'load_more': 'הצג עוד',
     }
 };
 
