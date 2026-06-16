@@ -40,12 +40,15 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
         }
 
         setFamilyLoading(true);
+        let cancelled = false;
         let familyUnsub: (() => void) | null = null;
 
         getDoc(doc(db, 'users', user!.id)).then((userSnap) => {
+            if (cancelled) return;
             const familyId = userSnap.exists() ? userSnap.data()?.familyId : null;
             if (familyId) {
                 familyUnsub = onSnapshot(doc(db, 'families', familyId), (snap) => {
+                    if (cancelled) return;
                     if (snap.exists()) {
                         setFamily({ id: snap.id, ...(snap.data() as Omit<Family, 'id'>) });
                     } else {
@@ -58,11 +61,13 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
                 setFamilyLoading(false);
             }
         }).catch(() => {
+            if (cancelled) return;
             setFamily(null);
             setFamilyLoading(false);
         });
 
         return () => {
+            cancelled = true;
             if (familyUnsub) familyUnsub();
         };
     }, [isAuthenticated, user]);
