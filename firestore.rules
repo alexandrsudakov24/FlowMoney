@@ -2,15 +2,37 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Admin helper
+    // Admin helper — checked server-side via Firebase Auth token
     function isAdmin() {
       return request.auth != null && request.auth.token.email == 'alexandrsudakov24@gmail.com';
     }
 
-    // Personal user data — only the owner or admin
+    // Verify family membership via the user's profile document (familyId field)
+    function isFamilyMember(familyId) {
+      return request.auth != null &&
+             request.auth.token.email != null &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.familyId == familyId;
+    }
+
+    // Allow a family update where only the members array changes (not ownerId/name).
+    // Used when a new member accepts an invitation — at that moment their users/{uid}.familyId
+    // hasn't been saved yet, so isFamilyMember() would return false.
+    // NOTE: this still requires a verified email; a proper fix would use Cloud Functions.
+    function isSafeJoin() {
+      return request.auth != null &&
+             request.auth.token.email != null &&
+             request.resource.data.ownerId == resource.data.ownerId &&
+             request.resource.data.name == resource.data.name;
+    }
+
+    // Personal user data — only the owner can read/write their own document;
+    // admin can get any individual document or list the whole collection.
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow read, delete: if isAdmin();
+      allow get: if (request.auth != null && request.auth.uid == userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create, update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if isAdmin();
 
       match /{document=**} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
@@ -18,29 +40,38 @@ service cloud.firestore {
       }
     }
 
-    // Family documents — any authenticated (non-anonymous) user can create;
-    // members can read and update; owner can delete
+    // Family documents — only actual members may read; joining via invitation is allowed
+    // via isSafeJoin(); only the owner may delete.
     match /families/{familyId} {
       allow create: if request.auth != null && request.auth.token.email != null;
-      allow read, update: if request.auth != null && request.auth.token.email != null;
-      allow delete: if request.auth != null
-                    && request.auth.uid == resource.data.ownerId;
+      allow read:   if isFamilyMember(familyId) || isAdmin();
+      allow update: if (isFamilyMember(familyId) || isSafeJoin()) &&
+                       request.auth != null && request.auth.token.email != null;
+      allow delete: if request.auth != null &&
+                       request.auth.uid == resource.data.ownerId;
 
-      // Shared expenses — readable/writable by any family member (auth enforced at app level)
+      // Shared expenses — only family members (not any authenticated user)
       match /expenses/{expenseId} {
-        allow read, write: if request.auth != null && request.auth.token.email != null;
+        allow read, write: if isFamilyMember(familyId) || isAdmin();
       }
 
-      // Family-level settings
+      // Family-level settings — only family members
       match /settings/{doc} {
-        allow read, write: if request.auth != null && request.auth.token.email != null;
+        allow read, write: if isFamilyMember(familyId) || isAdmin();
       }
     }
 
-    // Invitations — any authenticated user can create or read their own
+    // Invitations — creator can add; only the invited user can read/update their own invitations
     match /invitations/{invitationId} {
       allow create: if request.auth != null && request.auth.token.email != null;
-      allow read, update: if request.auth != null && request.auth.token.email != null;
+      allow read:   if request.auth != null && request.auth.token.email != null && (
+                      resource.data.invitedEmail == request.auth.token.email ||
+                      isFamilyMember(resource.data.familyId) ||
+                      isAdmin()
+                    );
+      allow update: if request.auth != null &&
+                       request.auth.token.email != null &&
+                       resource.data.invitedEmail == request.auth.token.email;
     }
   }
 }

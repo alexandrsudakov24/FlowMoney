@@ -9,6 +9,7 @@ import LanguageModal from '../components/LanguageModal';
 import CurrencyModal from '../components/CurrencyModal';
 import CategoryModal from '../components/CategoryModal';
 import FamilyModal from '../components/FamilyModal';
+import { ADMIN_EMAIL } from './AdminPage';
 import styles from '../styles/pages/ProfilePage.module.css';
 
 export default function ProfilePage() {
@@ -158,7 +159,7 @@ export default function ProfilePage() {
                 </button>
             </div>
 
-            {user?.email === 'alexandrsudakov24@gmail.com' && (
+            {user?.email === ADMIN_EMAIL && (
                 <a href="/admin" className={styles.adminBtn}>
                     {t('admin_panel')}
                 </a>
