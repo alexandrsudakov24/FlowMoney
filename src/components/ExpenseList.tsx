@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -17,6 +17,11 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
     const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
     const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
+    const sorted = useMemo(
+        () => [...expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+        [expenses]
+    );
+
     if (!expenses || expenses.length === 0) {
         return (
             <div className={styles.emptyState}>
@@ -25,10 +30,6 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
             </div>
         );
     }
-
-    const sorted = [...expenses].sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
 
     const visible = sorted.slice(0, visibleCount);
     const hasMore = visibleCount < sorted.length;
