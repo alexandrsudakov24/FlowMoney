@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useFamily } from '../context/FamilyContext';
 import { useLanguage } from '../context/LanguageContext';
+import ConfirmModal from './ConfirmModal';
 import styles from '../styles/components/FamilyModal.module.css';
 
 interface Props {
@@ -130,35 +131,24 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
                             )}
                         </div>
 
-                        {confirmLeave ? (
-                            <div className={styles.confirmRow}>
-                                <span className={styles.confirmText}>{t('leave_family_confirm')}</span>
-                                <div className={styles.confirmActions}>
-                                    <button
-                                        className={styles.cancelBtn}
-                                        onClick={() => setConfirmLeave(false)}
-                                        disabled={leaving}
-                                    >
-                                        {t('cancel')}
-                                    </button>
-                                    <button
-                                        className={styles.leaveBtn}
-                                        onClick={handleLeave}
-                                        disabled={leaving}
-                                    >
-                                        {leaving ? '…' : t('leave_family')}
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <button
-                                className={styles.leaveBtn}
-                                onClick={() => setConfirmLeave(true)}
-                                disabled={leaving}
-                            >
-                                {t('leave_family')}
-                            </button>
-                        )}
+                        <button
+                            className={styles.leaveBtn}
+                            onClick={() => setConfirmLeave(true)}
+                            disabled={leaving}
+                        >
+                            {t('leave_family')}
+                        </button>
+
+                        <ConfirmModal
+                            isOpen={confirmLeave}
+                            onClose={() => setConfirmLeave(false)}
+                            onConfirm={handleLeave}
+                            title={t('leave_family')}
+                            message={t('leave_family_confirm')}
+                            confirmLabel={t('leave_family')}
+                            variant="warning"
+                            loading={leaving}
+                        />
                     </div>
                 ) : (
                     /* ─── NO FAMILY ─── */

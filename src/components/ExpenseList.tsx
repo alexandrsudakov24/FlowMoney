@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useFamily } from '../context/FamilyContext';
 import { currencySymbols } from '../utils/currencySymbols';
 import type { Expense } from '../types';
+import ConfirmModal from './ConfirmModal';
 import styles from '../styles/components/ExpenseList.module.css';
 
 const PAGE_SIZE = 20;
@@ -39,12 +40,14 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
     };
 
     const formatDate = (dateStr: string) => {
-        const d = new Date(dateStr);
+        const d = new Date(dateStr + 'T00:00:00');
         const day = String(d.getDate()).padStart(2, '0');
         const month = String(d.getMonth() + 1).padStart(2, '0');
         const year = d.getFullYear();
         return `${day}.${month}.${year}`;
     };
+
+    const confirmingExpense = confirmingId ? sorted.find(e => e.id === confirmingId) : null;
 
     return (
         <div>
@@ -52,7 +55,7 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
                 {visible.map((e) => {
                     const sign = e.type === 'income' ? '+' : '-';
                     const amount = Number(e.amount).toFixed(2);
-                    const symbol = currencySymbols[currency];
+                    const symbol = currencySymbols[currency] ?? currency;
 
                     return (
                         <li key={e.id} className={styles.expenseItem}>
@@ -82,37 +85,15 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
                                 </div>
 
                                 <div className={styles.actions}>
-                                    {confirmingId === e.id ? (
-                                        <>
-                                            <button
-                                                className="btn"
-                                                onClick={() => setConfirmingId(null)}
-                                            >
-                                                {t('cancel')}
-                                            </button>
-                                            <button
-                                                className="btn danger"
-                                                onClick={() => {
-                                                    deleteExpense(e.id);
-                                                    setConfirmingId(null);
-                                                }}
-                                            >
-                                                {t('delete')}
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Link to={`/edit/${e.id}`} className="btn">
-                                                {t('edit')}
-                                            </Link>
-                                            <button
-                                                className="btn danger"
-                                                onClick={() => setConfirmingId(e.id)}
-                                            >
-                                                {t('delete')}
-                                            </button>
-                                        </>
-                                    )}
+                                    <Link to={`/edit/${e.id}`} className="btn">
+                                        {t('edit')}
+                                    </Link>
+                                    <button
+                                        className="btn danger"
+                                        onClick={() => setConfirmingId(e.id)}
+                                    >
+                                        {t('delete')}
+                                    </button>
                                 </div>
                             </div>
                         </li>
@@ -128,6 +109,23 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
                     {t('load_more')} ({sorted.length - visibleCount})
                 </button>
             )}
+
+            <ConfirmModal
+                isOpen={!!confirmingId}
+                onClose={() => setConfirmingId(null)}
+                onConfirm={() => {
+                    if (confirmingId) deleteExpense(confirmingId);
+                    setConfirmingId(null);
+                }}
+                title={t('delete')}
+                message={
+                    confirmingExpense
+                        ? `${getCatLabel(confirmingExpense.category)} · ${Number(confirmingExpense.amount).toFixed(2)} ${currencySymbols[currency] ?? currency}`
+                        : t('delete_confirm')
+                }
+                confirmLabel={t('delete')}
+                variant="danger"
+            />
         </div>
     );
 }

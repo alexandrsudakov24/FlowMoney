@@ -5,6 +5,7 @@ import { db } from '../firebase';
 import {
     collection, getDocs, deleteDoc, doc
 } from 'firebase/firestore';
+import ConfirmModal from '../components/ConfirmModal';
 import styles from '../styles/pages/AdminPage.module.css';
 
 export const ADMIN_EMAIL = 'alexandrsudakov24@gmail.com';
@@ -85,39 +86,32 @@ export default function AdminPage() {
                                     <span className={styles.tag}>family: {u.familyId.slice(0, 8)}…</span>
                                 )}
                             </div>
-                            {confirmDeleteId === u.id ? (
-                                <div className={styles.confirmRow}>
-                                    <span className={styles.confirmText}>{t('delete_user_confirm')}</span>
-                                    <div className={styles.confirmActions}>
-                                        <button
-                                            className={styles.cancelBtn}
-                                            onClick={() => setConfirmDeleteId(null)}
-                                        >
-                                            {t('cancel')}
-                                        </button>
-                                        <button
-                                            className={styles.deleteBtn}
-                                            onClick={() => handleDelete(u)}
-                                            disabled={deletingId === u.id}
-                                        >
-                                            {deletingId === u.id ? '…' : t('delete_user')}
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <button
-                                    className={styles.deleteBtn}
-                                    onClick={() => setConfirmDeleteId(u.id)}
-                                    disabled={deletingId === u.id || u.email === ADMIN_EMAIL}
-                                    title={u.email === ADMIN_EMAIL ? 'Cannot delete admin' : t('delete_user')}
-                                >
-                                    {deletingId === u.id ? '…' : t('delete_user')}
-                                </button>
-                            )}
+                            <button
+                                className={styles.deleteBtn}
+                                onClick={() => setConfirmDeleteId(u.id)}
+                                disabled={deletingId === u.id || u.email === ADMIN_EMAIL}
+                                title={u.email === ADMIN_EMAIL ? 'Cannot delete admin' : t('delete_user')}
+                            >
+                                {deletingId === u.id ? '…' : t('delete_user')}
+                            </button>
                         </li>
                     ))}
                 </ul>
             )}
+
+            <ConfirmModal
+                isOpen={!!confirmDeleteId}
+                onClose={() => setConfirmDeleteId(null)}
+                onConfirm={() => {
+                    const target = users.find(u => u.id === confirmDeleteId);
+                    if (target) handleDelete(target);
+                }}
+                title={t('delete_user')}
+                message={t('delete_user_confirm')}
+                confirmLabel={t('delete_user')}
+                variant="danger"
+                loading={!!deletingId}
+            />
         </div>
     );
 }
