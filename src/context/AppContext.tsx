@@ -70,12 +70,19 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
     }, [isAuthenticated, user, family]);
 
+    const getCategoriesRef = () =>
+        family
+            ? doc(db, 'families', family.id, 'settings', 'categories')
+            : doc(db, 'users', user!.id, 'settings', 'categories');
+
     useEffect(() => {
         if (!isAuthenticated || !user) {
             setCategories(DEFAULT_CATEGORIES);
             return;
         }
-        const ref = doc(db, 'users', user.id, 'settings', 'categories');
+        const ref = family
+            ? doc(db, 'families', family.id, 'settings', 'categories')
+            : doc(db, 'users', user.id, 'settings', 'categories');
         const unsub = onSnapshot(ref, (snap) => {
             if (snap.exists()) {
                 setCategories(snap.data().list ?? DEFAULT_CATEGORIES);
@@ -84,7 +91,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             }
         });
         return () => unsub();
-    }, [isAuthenticated, user]);
+    }, [isAuthenticated, user, family]);
 
     const addExpense = (expense: Expense) => {
         if (isAuthenticated && user) {
@@ -131,10 +138,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         const trimmed = name.trim();
         if (!trimmed || categories.includes(trimmed)) return;
         const next = [...categories, trimmed];
-        await setDoc(
-            doc(db, 'users', user.id, 'settings', 'categories'),
-            { list: next }
-        ).catch((err) => console.error('Failed to add category', err));
+        await setDoc(getCategoriesRef(), { list: next })
+            .catch((err) => console.error('Failed to add category', err));
     };
 
     const removeCategory = async (name: string): Promise<boolean> => {
@@ -143,10 +148,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         const inUse = expenses.some(e => e.category === name);
         if (inUse) return false;
         const next = categories.filter(c => c !== name);
-        await setDoc(
-            doc(db, 'users', user.id, 'settings', 'categories'),
-            { list: next }
-        ).catch((err) => console.error('Failed to remove category', err));
+        await setDoc(getCategoriesRef(), { list: next })
+            .catch((err) => console.error('Failed to remove category', err));
         return true;
     };
 
