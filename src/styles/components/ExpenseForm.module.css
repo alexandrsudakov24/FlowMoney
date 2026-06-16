@@ -63,6 +63,17 @@
   box-shadow: 0 0 0 3px rgba(98, 0, 238, 0.1);
 }
 
+.inputError {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12) !important;
+}
+
+.errorMsg {
+  font-size: var(--font-size-xs);
+  color: var(--danger);
+  margin-top: 2px;
+}
+
 .chips {
   display: flex;
   gap: 10px;

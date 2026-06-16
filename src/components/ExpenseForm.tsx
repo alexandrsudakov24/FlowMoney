@@ -24,7 +24,7 @@ export default function ExpenseForm({
     const { t } = useLanguage();
     const { currency, expenses, categories } = useApp();
 
-    const { register, handleSubmit, setValue, watch } = useForm<FormData>({
+    const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
         defaultValues: (defaultValues as Partial<FormData>) || {
             amount: '',
             category: 'Food',
@@ -101,13 +101,19 @@ export default function ExpenseForm({
             <label className={styles.label}>
                 <span>{t('amount')} ({currencySymbols[currency]})</span>
                 <input
-                    className={styles.input}
+                    className={`${styles.input} ${errors.amount ? styles.inputError : ''}`}
                     type="number"
                     inputMode="decimal"
                     step="0.01"
                     placeholder={`0.00 ${currencySymbols[currency]}`}
-                    {...register('amount')}
+                    {...register('amount', {
+                        required: true,
+                        validate: (v) => Number(v) > 0,
+                    })}
                 />
+                {errors.amount && (
+                    <span className={styles.errorMsg}>{t('amount_required')}</span>
+                )}
             </label>
 
             <label className={styles.label}>
