@@ -4,6 +4,8 @@ import type { ReactNode } from 'react';
 import type { Expense } from '../types';
 import { useAuth } from './AuthContext';
 import { useFamily } from './FamilyContext';
+import { useToast } from './ToastContext';
+import { useLanguage } from './LanguageContext';
 import { db } from '../firebase';
 import {
     collection, onSnapshot, addDoc, doc,
@@ -35,6 +37,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
     const { user, isAuthenticated } = useAuth();
     const { family } = useFamily();
+    const { showToast } = useToast();
+    const { t } = useLanguage();
 
     const [currency, setCurrency] = useState(
         localStorage.getItem('currency') || 'USD'
@@ -94,27 +98,30 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             const data = family
                 ? { ...payload, addedBy: { uid: user.id, name: user.name } }
                 : payload;
-            addDoc(col, data).catch((err) =>
-                console.error('Failed to add expense', err)
-            );
+            addDoc(col, data).catch((err) => {
+                console.error('Failed to add expense', err);
+                showToast(t('save_error'));
+            });
         }
     };
 
     const updateExpense = (id: string, updatedData: Partial<Expense>) => {
         if (isAuthenticated && user) {
             const ref = doc(getExpensesCol(), id);
-            updateDoc(ref, updatedData as UpdateData<Expense>).catch((err) =>
-                console.error('Failed to update expense', err)
-            );
+            updateDoc(ref, updatedData as UpdateData<Expense>).catch((err) => {
+                console.error('Failed to update expense', err);
+                showToast(t('save_error'));
+            });
         }
     };
 
     const deleteExpense = (id: string) => {
         if (isAuthenticated && user) {
             const ref = doc(getExpensesCol(), id);
-            deleteDoc(ref).catch((err) =>
-                console.error('Failed to delete expense', err)
-            );
+            deleteDoc(ref).catch((err) => {
+                console.error('Failed to delete expense', err);
+                showToast(t('save_error'));
+            });
         }
     };
 

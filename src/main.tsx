@@ -7,6 +7,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { FamilyProvider } from './context/FamilyContext';
+import { ToastProvider } from './context/ToastContext';
 import './styles/index.css';
 if (import.meta.env.DEV) {
     import('./utils/migrateLocalToFirestore');
@@ -19,9 +20,11 @@ createRoot(document.getElementById('root')!).render(
                 <ThemeProvider>
                     <AuthProvider>
                         <FamilyProvider>
-                            <AppProvider>
-                                <App />
-                            </AppProvider>
+                            <ToastProvider>
+                                <AppProvider>
+                                    <App />
+                                </AppProvider>
+                            </ToastProvider>
                         </FamilyProvider>
                     </AuthProvider>
                 </ThemeProvider>
