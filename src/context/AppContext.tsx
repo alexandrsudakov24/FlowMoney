@@ -53,10 +53,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         if (isAuthenticated && user) {
             setLoading(true);
-            const col = family
-                ? collection(db, 'families', family.id, 'expenses')
-                : collection(db, 'users', user.id, 'expenses');
-            const unsub = onSnapshot(col, (snap) => {
+            const unsub = onSnapshot(getExpensesCol(), (snap) => {
                 const next: Expense[] = snap.docs.map((d) => ({
                     id: d.id,
                     ...(d.data() as Omit<Expense, 'id'>)
@@ -80,10 +77,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             setCategories(DEFAULT_CATEGORIES);
             return;
         }
-        const ref = family
-            ? doc(db, 'families', family.id, 'settings', 'categories')
-            : doc(db, 'users', user.id, 'settings', 'categories');
-        const unsub = onSnapshot(ref, (snap) => {
+        const unsub = onSnapshot(getCategoriesRef(), (snap) => {
             if (snap.exists()) {
                 setCategories(snap.data().list ?? DEFAULT_CATEGORIES);
             } else {
