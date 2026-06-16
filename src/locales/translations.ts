@@ -128,6 +128,7 @@ const en: TranslationMap = {
     'filter_no_results': 'No transactions match your filters',
     'filter_results_count': 'Showing {n} of {total}',
     'load_more': 'Load more',
+    'not_found': 'Page not found',
 };
 
 const ru: TranslationMap = {
@@ -256,6 +257,7 @@ const ru: TranslationMap = {
     'filter_no_results': 'Нет операций по выбранным фильтрам',
     'filter_results_count': 'Показано {n} из {total}',
     'load_more': 'Показать ещё',
+    'not_found': 'Страница не найдена',
 };
 
 const he: TranslationMap = {
@@ -384,6 +386,7 @@ const he: TranslationMap = {
     'filter_no_results': 'אין עסקאות התואמות לפילטרים',
     'filter_results_count': 'מציג {n} מתוך {total}',
     'load_more': 'הצג עוד',
+    'not_found': 'הדף לא נמצא',
 };
 
 export const translations: Record<Language, TranslationMap> = { en, ru, he };

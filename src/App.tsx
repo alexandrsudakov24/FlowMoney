@@ -7,6 +7,7 @@ import AdminPage, { ADMIN_EMAIL } from './pages/AdminPage';
 import StartPage from './pages/StartPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import NotFoundPage from './pages/NotFoundPage';
 import { useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Spinner from './components/Spinner';
@@ -39,6 +40,7 @@ export default function App() {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/admin" element={<RequireAdmin><AdminPage /></RequireAdmin>} />
+                    <Route path="*" element={<NotFoundPage />} />
                 </Routes>
             </main>
         </div>
