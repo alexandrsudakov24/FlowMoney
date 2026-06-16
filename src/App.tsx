@@ -9,16 +9,19 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import { useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
+import Spinner from './components/Spinner';
 import type { JSX } from 'react';
 
 const RequireAuth = ({ children }: { children: JSX.Element }) => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, authReady } = useAuth();
+    if (!authReady) return <Spinner size="lg" />;
     if (!isAuthenticated) return <StartPage />;
     return children;
 };
 
 const RequireAdmin = ({ children }: { children: JSX.Element }) => {
-    const { user } = useAuth();
+    const { user, authReady } = useAuth();
+    if (!authReady) return <Spinner size="lg" />;
     if (user?.email !== ADMIN_EMAIL) return <StartPage />;
     return children;
 };

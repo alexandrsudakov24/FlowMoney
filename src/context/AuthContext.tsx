@@ -30,6 +30,7 @@ type LoginData = { email: string; password: string };
 type AuthContextType = {
     user: User | null;
     isAuthenticated: boolean;
+    authReady: boolean;
     register: (data: RegisterData) => Promise<User>;
     login: (data: LoginData) => Promise<User>;
     loginWithGoogle: () => Promise<User>;
@@ -41,6 +42,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isAnonymous, setIsAnonymous] = useState(false);
+    const [authReady, setAuthReady] = useState(false);
 
     useEffect(() => {
         (async () => {
@@ -58,6 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 if (fbUser.isAnonymous) {
                     // keep a minimal user record so AppContext has a uid for Firestore
                     setUser({ id: fbUser.uid, name: '', email: '' });
+                    setAuthReady(true);
                     return;
                 }
                 try {
@@ -82,6 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 setUser(null);
                 setIsAnonymous(false);
             }
+            setAuthReady(true);
         });
         return () => unsub();
     }, []);
@@ -224,7 +228,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated: !!user && !isAnonymous, register, login, loginWithGoogle, logout }}>
+        <AuthContext.Provider value={{ user, isAuthenticated: !!user && !isAnonymous, authReady, register, login, loginWithGoogle, logout }}>
             {children}
         </AuthContext.Provider>
     );
