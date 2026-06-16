@@ -133,3 +133,49 @@
     color: var(--danger);
     opacity: 0.3;
 }
+
+/* Inline delete confirmation */
+.confirmRow {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 12px;
+    background: rgba(239, 68, 68, 0.07);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: var(--radius-md);
+    flex-shrink: 0;
+    max-width: 200px;
+}
+
+.confirmText {
+    font-size: var(--font-size-xs);
+    color: var(--danger);
+    line-height: 1.4;
+}
+
+.confirmActions {
+    display: flex;
+    gap: 6px;
+}
+
+.cancelBtn {
+    flex: 1;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-weight: 600;
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.cancelBtn:hover {
+    background: var(--bg-secondary);
+}
+
+.confirmActions .deleteBtn {
+    flex: 1;
+}

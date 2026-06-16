@@ -14,6 +14,7 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
     const { t } = useLanguage();
     const { family } = useFamily();
     const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+    const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
     if (!expenses || expenses.length === 0) {
         return (
@@ -81,18 +82,37 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
                                 </div>
 
                                 <div className={styles.actions}>
-                                    <Link to={`/edit/${e.id}`} className="btn">
-                                        {t('edit')}
-                                    </Link>
-                                    <button
-                                        className="btn danger"
-                                        onClick={() => {
-                                            if (confirm(t('delete_confirm')))
-                                                deleteExpense(e.id);
-                                        }}
-                                    >
-                                        {t('delete')}
-                                    </button>
+                                    {confirmingId === e.id ? (
+                                        <>
+                                            <button
+                                                className="btn"
+                                                onClick={() => setConfirmingId(null)}
+                                            >
+                                                {t('cancel')}
+                                            </button>
+                                            <button
+                                                className="btn danger"
+                                                onClick={() => {
+                                                    deleteExpense(e.id);
+                                                    setConfirmingId(null);
+                                                }}
+                                            >
+                                                {t('delete')}
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Link to={`/edit/${e.id}`} className="btn">
+                                                {t('edit')}
+                                            </Link>
+                                            <button
+                                                className="btn danger"
+                                                onClick={() => setConfirmingId(e.id)}
+                                            >
+                                                {t('delete')}
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </li>

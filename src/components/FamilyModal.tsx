@@ -18,6 +18,7 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
     const [creating, setCreating] = useState(false);
     const [inviting, setInviting] = useState(false);
     const [leaving, setLeaving] = useState(false);
+    const [confirmLeave, setConfirmLeave] = useState(false);
 
     if (!isOpen) return null;
 
@@ -55,13 +56,13 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
     };
 
     const handleLeave = async () => {
-        if (!confirm(t('leave_family_confirm'))) return;
         setLeaving(true);
         try {
             await leaveFamily();
             onClose();
         } finally {
             setLeaving(false);
+            setConfirmLeave(false);
         }
     };
 
@@ -129,13 +130,35 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
                             )}
                         </div>
 
-                        <button
-                            className={styles.leaveBtn}
-                            onClick={handleLeave}
-                            disabled={leaving}
-                        >
-                            {t('leave_family')}
-                        </button>
+                        {confirmLeave ? (
+                            <div className={styles.confirmRow}>
+                                <span className={styles.confirmText}>{t('leave_family_confirm')}</span>
+                                <div className={styles.confirmActions}>
+                                    <button
+                                        className={styles.cancelBtn}
+                                        onClick={() => setConfirmLeave(false)}
+                                        disabled={leaving}
+                                    >
+                                        {t('cancel')}
+                                    </button>
+                                    <button
+                                        className={styles.leaveBtn}
+                                        onClick={handleLeave}
+                                        disabled={leaving}
+                                    >
+                                        {leaving ? '…' : t('leave_family')}
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <button
+                                className={styles.leaveBtn}
+                                onClick={() => setConfirmLeave(true)}
+                                disabled={leaving}
+                            >
+                                {t('leave_family')}
+                            </button>
+                        )}
                     </div>
                 ) : (
                     /* ─── NO FAMILY ─── */

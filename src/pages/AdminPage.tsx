@@ -24,6 +24,7 @@ export default function AdminPage() {
     const [users, setUsers] = useState<UserRecord[]>([]);
     const [loading, setLoading] = useState(true);
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
     useEffect(() => {
         getDocs(collection(db, 'users')).then((snap) => {
@@ -36,8 +37,8 @@ export default function AdminPage() {
     }, []);
 
     const handleDelete = async (target: UserRecord) => {
-        if (!confirm(t('delete_user_confirm'))) return;
         setDeletingId(target.id);
+        setConfirmDeleteId(null);
         try {
             // Delete expenses subcollection
             const expSnap = await getDocs(collection(db, 'users', target.id, 'expenses'));
@@ -84,14 +85,35 @@ export default function AdminPage() {
                                     <span className={styles.tag}>family: {u.familyId.slice(0, 8)}…</span>
                                 )}
                             </div>
-                            <button
-                                className={styles.deleteBtn}
-                                onClick={() => handleDelete(u)}
-                                disabled={deletingId === u.id || u.email === ADMIN_EMAIL}
-                                title={u.email === ADMIN_EMAIL ? 'Cannot delete admin' : t('delete_user')}
-                            >
-                                {deletingId === u.id ? '…' : t('delete_user')}
-                            </button>
+                            {confirmDeleteId === u.id ? (
+                                <div className={styles.confirmRow}>
+                                    <span className={styles.confirmText}>{t('delete_user_confirm')}</span>
+                                    <div className={styles.confirmActions}>
+                                        <button
+                                            className={styles.cancelBtn}
+                                            onClick={() => setConfirmDeleteId(null)}
+                                        >
+                                            {t('cancel')}
+                                        </button>
+                                        <button
+                                            className={styles.deleteBtn}
+                                            onClick={() => handleDelete(u)}
+                                            disabled={deletingId === u.id}
+                                        >
+                                            {deletingId === u.id ? '…' : t('delete_user')}
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <button
+                                    className={styles.deleteBtn}
+                                    onClick={() => setConfirmDeleteId(u.id)}
+                                    disabled={deletingId === u.id || u.email === ADMIN_EMAIL}
+                                    title={u.email === ADMIN_EMAIL ? 'Cannot delete admin' : t('delete_user')}
+                                >
+                                    {deletingId === u.id ? '…' : t('delete_user')}
+                                </button>
+                            )}
                         </li>
                     ))}
                 </ul>
