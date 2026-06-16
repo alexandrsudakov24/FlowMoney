@@ -7,7 +7,7 @@ import { useFamily } from './FamilyContext';
 import { db } from '../firebase';
 import {
     collection, onSnapshot, addDoc, doc,
-    deleteDoc, updateDoc, getDocs, setDoc
+    deleteDoc, updateDoc, getDocs, setDoc, type UpdateData
 } from 'firebase/firestore';
 
 const DEFAULT_CATEGORIES = ['Food', 'Transport', 'Home', 'Shopping', 'Health', 'Other'];
@@ -59,7 +59,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             const unsub = onSnapshot(col, (snap) => {
                 const next: Expense[] = snap.docs.map((d) => ({
                     id: d.id,
-                    ...(d.data() as any)
+                    ...(d.data() as Omit<Expense, 'id'>)
                 }));
                 setExpenses(next);
                 setLoading(false);
@@ -96,7 +96,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const addExpense = (expense: Expense) => {
         if (isAuthenticated && user) {
             const col = getExpensesCol();
-            const { id, ...payload } = expense as any;
+            const { id: _id, ...payload } = expense;
             const data = family
                 ? { ...payload, addedBy: { uid: user.id, name: user.name } }
                 : payload;
@@ -109,7 +109,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const updateExpense = (id: string, updatedData: Partial<Expense>) => {
         if (isAuthenticated && user) {
             const ref = doc(getExpensesCol(), id);
-            updateDoc(ref, updatedData as any).catch((err) =>
+            updateDoc(ref, updatedData as UpdateData<Expense>).catch((err) =>
                 console.error('Failed to update expense', err)
             );
         }
