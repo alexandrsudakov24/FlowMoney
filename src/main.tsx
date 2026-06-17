@@ -19,13 +19,13 @@ createRoot(document.getElementById('root')!).render(
             <LanguageProvider>
                 <ThemeProvider>
                     <AuthProvider>
-                        <FamilyProvider>
-                            <ToastProvider>
+                        <ToastProvider>
+                            <FamilyProvider>
                                 <AppProvider>
                                     <App />
                                 </AppProvider>
-                            </ToastProvider>
-                        </FamilyProvider>
+                            </FamilyProvider>
+                        </ToastProvider>
                     </AuthProvider>
                 </ThemeProvider>
             </LanguageProvider>
