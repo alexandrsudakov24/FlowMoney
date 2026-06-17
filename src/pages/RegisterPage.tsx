@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { useApp } from '../context/AppContext';
 import { currencySymbols } from '../utils/currencySymbols';
+import { firebaseErrorKey } from '../utils/firebaseError';
 import styles from '../styles/pages/RegisterPage.module.css';
 
 export default function RegisterPage() {
@@ -34,13 +35,7 @@ export default function RegisterPage() {
             await register({ name, email, password, language: selectedLanguage });
             navigate('/');
         } catch (err: unknown) {
-            const code = (err as { code?: string })?.code;
-            if (code === 'email_already_in_use' || code === 'auth/email-already-in-use') {
-                setError('email_already_in_use');
-            } else {
-                const message = err instanceof Error ? err.message : String(err);
-                setError(message || 'Registration failed');
-            }
+            setError(firebaseErrorKey(err));
         } finally {
             setLoading(false);
         }
@@ -56,8 +51,7 @@ export default function RegisterPage() {
             await loginWithGoogle();
             navigate('/');
         } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : String(err);
-            setError(message || 'Google login failed');
+            setError(firebaseErrorKey(err));
         } finally {
             setLoading(false);
         }
@@ -122,9 +116,9 @@ export default function RegisterPage() {
 
                     {error && (
                         <div className={styles.error}>
-                            {error === 'email_already_in_use' ? (
+                            {error === 'error_email_in_use' ? (
                                 <>{t('error_email_in_use')} <Link to="/login">{t('login')}</Link></>
-                            ) : error}
+                            ) : t(error)}
                         </div>
                     )}
                     <div className={styles.actions}>

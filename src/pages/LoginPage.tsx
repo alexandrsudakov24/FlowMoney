@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { firebaseErrorKey } from '../utils/firebaseError';
 import styles from '../styles/pages/LoginPage.module.css';
 
 export default function LoginPage() {
@@ -21,8 +22,7 @@ export default function LoginPage() {
             await login({ email, password });
             navigate('/');
         } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : String(err);
-            setError(message || 'Login failed');
+            setError(firebaseErrorKey(err));
         } finally {
             setLoading(false);
         }
@@ -35,8 +35,7 @@ export default function LoginPage() {
             await loginWithGoogle();
             navigate('/');
         } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : String(err);
-            setError(message || 'Google login failed');
+            setError(firebaseErrorKey(err));
         } finally {
             setLoading(false);
         }
@@ -65,7 +64,7 @@ export default function LoginPage() {
                             required
                         />
                     </div>
-                    {error && <div className={styles.error}>{error}</div>}
+                    {error && <div className={styles.error}>{t(error)}</div>}
                     <div className={styles.actions}>
                         <button type="submit" disabled={loading}>
                             {loading ? '...' : t('login')}
