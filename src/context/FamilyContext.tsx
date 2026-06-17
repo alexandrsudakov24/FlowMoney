@@ -7,6 +7,8 @@ import {
     query, where, arrayUnion, arrayRemove, deleteField, writeBatch, getDocs, deleteDoc
 } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
+import { useToast } from './ToastContext';
+import { useLanguage } from './LanguageContext';
 import type { Family, FamilyMember, Invitation } from '../types';
 
 export type InviteResult = { success: boolean; error?: string };
@@ -26,6 +28,8 @@ const FamilyContext = createContext<FamilyContextType | undefined>(undefined);
 
 export const FamilyProvider = ({ children }: { children: ReactNode }) => {
     const { user, isAuthenticated } = useAuth();
+    const { showToast } = useToast();
+    const { t } = useLanguage();
     const [family, setFamily] = useState<Family | null>(null);
     const [familyLoading, setFamilyLoading] = useState(true);
     const [invitations, setInvitations] = useState<Invitation[]>([]);
@@ -100,14 +104,19 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
 
     const createFamily = async (name: string): Promise<void> => {
         if (!user || !user.email) return;
-        const member: FamilyMember = { uid: user.id, email: user.email, name: user.name };
-        const docRef = await addDoc(collection(db, 'families'), {
-            name: name.trim(),
-            ownerId: user.id,
-            members: [member],
-        });
-        await updateDoc(doc(db, 'users', user.id), { familyId: docRef.id });
-        setFamily({ id: docRef.id, name: name.trim(), ownerId: user.id, members: [member] });
+        try {
+            const member: FamilyMember = { uid: user.id, email: user.email, name: user.name };
+            const docRef = await addDoc(collection(db, 'families'), {
+                name: name.trim(),
+                ownerId: user.id,
+                members: [member],
+            });
+            await updateDoc(doc(db, 'users', user.id), { familyId: docRef.id });
+            setFamily({ id: docRef.id, name: name.trim(), ownerId: user.id, members: [member] });
+        } catch (err) {
+            console.error('Failed to create family', err);
+            showToast(t('save_error'));
+        }
     };
 
     const inviteMember = async (email: string): Promise<InviteResult> => {
@@ -128,69 +137,89 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
             return { success: false, error: 'already_invited' };
         }
 
-        await addDoc(collection(db, 'invitations'), {
-            familyId: family.id,
-            familyName: family.name,
-            invitedEmail: trimmedEmail,
-            invitedByUid: user.id,
-            invitedByName: user.name,
-            status: 'pending',
-            createdAt: Date.now(),
-        });
+        try {
+            await addDoc(collection(db, 'invitations'), {
+                familyId: family.id,
+                familyName: family.name,
+                invitedEmail: trimmedEmail,
+                invitedByUid: user.id,
+                invitedByName: user.name,
+                status: 'pending',
+                createdAt: Date.now(),
+            });
+        } catch (err) {
+            console.error('Failed to send invitation', err);
+            showToast(t('save_error'));
+            return { success: false, error: 'send_failed' };
+        }
 
         return { success: true };
     };
 
     const acceptInvitation = async (invitationId: string): Promise<void> => {
         if (!user || !user.email) return;
-        const invRef = doc(db, 'invitations', invitationId);
-        const invSnap = await getDoc(invRef);
-        if (!invSnap.exists()) return;
-        const inv = invSnap.data();
+        try {
+            const invRef = doc(db, 'invitations', invitationId);
+            const invSnap = await getDoc(invRef);
+            if (!invSnap.exists()) return;
+            const inv = invSnap.data();
 
-        const member: FamilyMember = { uid: user.id, email: user.email, name: user.name };
-        const batch = writeBatch(db);
-        batch.update(doc(db, 'families', inv.familyId), { members: arrayUnion(member) });
-        batch.update(doc(db, 'users', user.id), { familyId: inv.familyId });
-        batch.update(invRef, { status: 'accepted' });
-        await batch.commit();
+            const member: FamilyMember = { uid: user.id, email: user.email, name: user.name };
+            const batch = writeBatch(db);
+            batch.update(doc(db, 'families', inv.familyId), { members: arrayUnion(member) });
+            batch.update(doc(db, 'users', user.id), { familyId: inv.familyId });
+            batch.update(invRef, { status: 'accepted' });
+            await batch.commit();
 
-        const familySnap = await getDoc(doc(db, 'families', inv.familyId));
-        if (familySnap.exists()) {
-            setFamily({ id: familySnap.id, ...(familySnap.data() as Omit<Family, 'id'>) });
+            const familySnap = await getDoc(doc(db, 'families', inv.familyId));
+            if (familySnap.exists()) {
+                setFamily({ id: familySnap.id, ...(familySnap.data() as Omit<Family, 'id'>) });
+            }
+        } catch (err) {
+            console.error('Failed to accept invitation', err);
+            showToast(t('save_error'));
         }
     };
 
     const declineInvitation = async (invitationId: string): Promise<void> => {
-        await updateDoc(doc(db, 'invitations', invitationId), { status: 'declined' });
+        try {
+            await updateDoc(doc(db, 'invitations', invitationId), { status: 'declined' });
+        } catch (err) {
+            console.error('Failed to decline invitation', err);
+            showToast(t('save_error'));
+        }
     };
 
     const leaveFamily = async (): Promise<void> => {
         if (!user || !family) return;
         const member = family.members.find(m => m.uid === user.id);
         if (!member) return;
+        try {
+            const remainingMembers = family.members.filter(m => m.uid !== user.id);
+            const batch = writeBatch(db);
 
-        const remainingMembers = family.members.filter(m => m.uid !== user.id);
-        const batch = writeBatch(db);
-
-        if (remainingMembers.length === 0) {
-            // Will delete family after batch
-        } else {
-            const updateData: Record<string, any> = { members: arrayRemove(member) };
-            if (family.ownerId === user.id) {
-                updateData.ownerId = remainingMembers[0].uid;
+            if (remainingMembers.length === 0) {
+                // Will delete family after batch
+            } else {
+                const updateData: Record<string, any> = { members: arrayRemove(member) };
+                if (family.ownerId === user.id) {
+                    updateData.ownerId = remainingMembers[0].uid;
+                }
+                batch.update(doc(db, 'families', family.id), updateData);
             }
-            batch.update(doc(db, 'families', family.id), updateData);
+
+            batch.update(doc(db, 'users', user.id), { familyId: deleteField() });
+            await batch.commit();
+
+            if (remainingMembers.length === 0) {
+                await deleteDoc(doc(db, 'families', family.id));
+            }
+
+            setFamily(null);
+        } catch (err) {
+            console.error('Failed to leave family', err);
+            showToast(t('save_error'));
         }
-
-        batch.update(doc(db, 'users', user.id), { familyId: deleteField() });
-        await batch.commit();
-
-        if (remainingMembers.length === 0) {
-            await deleteDoc(doc(db, 'families', family.id));
-        }
-
-        setFamily(null);
     };
 
     return (

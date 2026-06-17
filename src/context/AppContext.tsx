@@ -128,9 +128,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const clearAll = async () => {
         if (isAuthenticated && user) {
             const snap = await getDocs(getExpensesCol());
-            await Promise.all(snap.docs.map((d) => deleteDoc(d.ref))).catch(
-                (err) => console.error('Failed to clear expenses', err)
-            );
+            await Promise.all(snap.docs.map((d) => deleteDoc(d.ref))).catch((err) => {
+                console.error('Failed to clear expenses', err);
+                showToast(t('save_error'));
+            });
         }
     };
 
@@ -139,8 +140,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         const trimmed = name.trim();
         if (!trimmed || categories.includes(trimmed)) return;
         const next = [...categories, trimmed];
-        await setDoc(getCategoriesRef(), { list: next })
-            .catch((err) => console.error('Failed to add category', err));
+        await setDoc(getCategoriesRef(), { list: next }).catch((err) => {
+            console.error('Failed to add category', err);
+            showToast(t('save_error'));
+        });
     };
 
     const removeCategory = async (name: string): Promise<boolean> => {
@@ -149,8 +152,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         const inUse = expenses.some(e => e.category === name);
         if (inUse) return false;
         const next = categories.filter(c => c !== name);
-        await setDoc(getCategoriesRef(), { list: next })
-            .catch((err) => console.error('Failed to remove category', err));
+        await setDoc(getCategoriesRef(), { list: next }).catch((err) => {
+            console.error('Failed to remove category', err);
+            showToast(t('save_error'));
+        });
         return true;
     };
 
