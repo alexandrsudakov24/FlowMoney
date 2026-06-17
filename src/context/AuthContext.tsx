@@ -56,7 +56,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const unsub = onAuthStateChanged(auth, async (fbUser) => {
             if (fbUser) {
                 if (fbUser.isAnonymous) {
-                    // keep a minimal user record so AppContext has a uid for Firestore
                     setUser({ id: fbUser.uid, name: '', email: '' });
                     setAuthReady(true);
                     return;
@@ -155,13 +154,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         try {
             const provider = new GoogleAuthProvider();
 
-            // если текущий юзер анонимный — линкуем аккаунт Google к нему
             if (auth.currentUser?.isAnonymous) {
                 try {
                     const { linkWithPopup } = await import('firebase/auth');
                     const linked = await linkWithPopup(auth.currentUser, provider);
                     const fbUser = linked.user;
-
                     const userDoc = await getDoc(doc(db, 'users', fbUser.uid));
                     if (!userDoc.exists()) {
                         await setDoc(doc(db, 'users', fbUser.uid), {
@@ -170,7 +167,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                             language: 'en',
                         });
                     }
-
                     const publicUser: User = {
                         id: fbUser.uid,
                         name: fbUser.displayName || '',
@@ -179,16 +175,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     };
                     setUser(publicUser);
                     return publicUser;
-                } catch (linkErr) {
+                } catch (linkErr: unknown) {
                     console.warn('Failed to link Google to anonymous account:', linkErr);
-                    // fallthrough — войдём обычным способом
+                    // Account already exists - extract credential from error to avoid second popup
+                    const { GoogleAuthProvider: GA, signInWithCredential } = await import('firebase/auth');
+                    const credential = GA.credentialFromError(linkErr as Parameters<typeof GA.credentialFromError>[0]);
+                    if (credential) {
+                        const result = await signInWithCredential(auth, credential);
+                        const fbUser = result.user;
+                        const userDoc = await getDoc(doc(db, 'users', fbUser.uid));
+                        if (!userDoc.exists()) {
+                            await setDoc(doc(db, 'users', fbUser.uid), {
+                                name: fbUser.displayName || '',
+                                email: fbUser.email || '',
+                                language: 'en',
+                            });
+                        }
+                        const publicUser: User = {
+                            id: fbUser.uid,
+                            name: fbUser.displayName || '',
+                            email: fbUser.email || '',
+                            photoURL: fbUser.photoURL || undefined,
+                        };
+                        setUser(publicUser);
+                        return publicUser;
+                    }
+                    // fallthrough - opens second popup
                 }
             }
 
             const cred = await signInWithPopup(auth, provider);
             const fbUser = cred.user;
-
-            // создаём профиль в Firestore если его нет
             const userDoc = await getDoc(doc(db, 'users', fbUser.uid));
             if (!userDoc.exists()) {
                 await setDoc(doc(db, 'users', fbUser.uid), {
@@ -197,11 +214,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     language: 'en',
                 });
             }
-
             const language = userDoc.exists()
                 ? (userDoc.data()?.language as 'en' | 'ru' | 'he' | undefined)
                 : 'en';
-
             const publicUser: User = {
                 id: fbUser.uid,
                 name: fbUser.displayName || '',
