@@ -41,7 +41,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [isAnonymous, setIsAnonymous] = useState(false);
     const [authReady, setAuthReady] = useState(false);
 
     useEffect(() => {
@@ -56,7 +55,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         })();
         const unsub = onAuthStateChanged(auth, async (fbUser) => {
             if (fbUser) {
-                setIsAnonymous(fbUser.isAnonymous);
                 if (fbUser.isAnonymous) {
                     // keep a minimal user record so AppContext has a uid for Firestore
                     setUser({ id: fbUser.uid, name: '', email: '' });
@@ -83,7 +81,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 }
             } else {
                 setUser(null);
-                setIsAnonymous(false);
             }
             setAuthReady(true);
         });
@@ -107,7 +104,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     email: data.email,
                     language: data.language || 'en',
                 };
-                setIsAnonymous(false);
                 setUser(publicUser);
                 return publicUser;
             } catch (linkErr) {
@@ -181,7 +177,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         email: fbUser.email || '',
                         photoURL: fbUser.photoURL || undefined,
                     };
-                    setIsAnonymous(false);
                     setUser(publicUser);
                     return publicUser;
                 } catch (linkErr) {
@@ -224,11 +219,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const logout = async () => {
         await fbSignOut(auth);
         setUser(null);
-        setIsAnonymous(false);
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated: !!user && !isAnonymous, authReady, register, login, loginWithGoogle, logout }}>
+        <AuthContext.Provider value={{ user, isAuthenticated: !!user, authReady, register, login, loginWithGoogle, logout }}>
             {children}
         </AuthContext.Provider>
     );
