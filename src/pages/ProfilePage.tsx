@@ -177,9 +177,11 @@ export default function ProfilePage() {
                 </a>
             )}
 
-            <button className={styles.logoutBtn} onClick={logout}>
-                {t('logout')}
-            </button>
+            {hasAccount && (
+                <button className={styles.logoutBtn} onClick={logout}>
+                    {t('logout')}
+                </button>
+            )}
 
             <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
             <LanguageModal isOpen={languageOpen} onClose={() => setLanguageOpen(false)} />
