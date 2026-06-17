@@ -394,7 +394,3 @@ const he: TranslationMap = {
 };
 
 export const translations: Record<Language, TranslationMap> = { en, ru, he };
-קאות שלך ישמרו.',
-};
-
-export const translations: Record<Language, TranslationMap> = { en, ru, he };
