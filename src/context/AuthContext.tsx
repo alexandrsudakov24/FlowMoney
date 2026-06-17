@@ -34,6 +34,7 @@ type AuthContextType = {
     register: (data: RegisterData) => Promise<User>;
     login: (data: LoginData) => Promise<User>;
     loginWithGoogle: () => Promise<User>;
+    loginAnonymously: () => Promise<void>;
     logout: () => Promise<void>;
 };
 
@@ -44,15 +45,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [authReady, setAuthReady] = useState(false);
 
     useEffect(() => {
-        (async () => {
-            try {
-                if (!auth.currentUser) {
-                    await signInAnonymously(auth);
-                }
-            } catch (anonErr) {
-                console.warn('AuthContext: anonymous sign-in failed', anonErr);
-            }
-        })();
         const unsub = onAuthStateChanged(auth, async (fbUser) => {
             if (fbUser) {
                 if (fbUser.isAnonymous) {
@@ -85,6 +77,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
         return () => unsub();
     }, []);
+
+    const loginAnonymously = async () => {
+        await signInAnonymously(auth);
+    };
 
     const register = async (data: RegisterData) => {
         if (auth.currentUser?.isAnonymous) {
@@ -177,7 +173,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     return publicUser;
                 } catch (linkErr: unknown) {
                     console.warn('Failed to link Google to anonymous account:', linkErr);
-                    // Account already exists - extract credential from error to avoid second popup
                     const { GoogleAuthProvider: GA, signInWithCredential } = await import('firebase/auth');
                     const credential = GA.credentialFromError(linkErr as Parameters<typeof GA.credentialFromError>[0]);
                     if (credential) {
@@ -200,7 +195,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         setUser(publicUser);
                         return publicUser;
                     }
-                    // fallthrough - opens second popup
                 }
             }
 
@@ -237,7 +231,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated: !!user, authReady, register, login, loginWithGoogle, logout }}>
+        <AuthContext.Provider value={{ user, isAuthenticated: !!user, authReady, register, login, loginWithGoogle, loginAnonymously, logout }}>
             {children}
         </AuthContext.Provider>
     );

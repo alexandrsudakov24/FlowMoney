@@ -1,11 +1,24 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import styles from '../styles/pages/StartPage.module.css';
 
 export default function StartPage() {
-    const { user } = useAuth();
+    const { loginAnonymously } = useAuth();
     const { t } = useLanguage();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+
+    const handleGuest = async () => {
+        setLoading(true);
+        try {
+            await loginAnonymously();
+            navigate('/');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <section className={styles.hero}>
@@ -15,14 +28,15 @@ export default function StartPage() {
                     <p className={styles.lead}>{t('welcome_lead')}</p>
 
                     <div className={styles.actions}>
-                        {user ? (
-                            <p>{t('hi')}, {user.name} &mdash; <Link to="/">{t('go_to_dashboard')}</Link>.</p>
-                        ) : (
-                            <>
-                                <Link to="/register">{t('create_account')}</Link>
-                                <Link to="/login">{t('login')}</Link>
-                            </>
-                        )}
+                        <Link to="/register">{t('create_account')}</Link>
+                        <Link to="/login">{t('login')}</Link>
+                        <button
+                            className={styles.guestBtn}
+                            onClick={handleGuest}
+                            disabled={loading}
+                        >
+                            {loading ? '...' : t('continue_as_guest')}
+                        </button>
                     </div>
                 </div>
             </div>

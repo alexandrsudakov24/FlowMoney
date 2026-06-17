@@ -129,6 +129,7 @@ const en: TranslationMap = {
     'filter_results_count': 'Showing {n} of {total}',
     'load_more': 'Load more',
     'not_found': 'Page not found',
+    'continue_as_guest': 'Continue as Guest',
     'save_your_data': 'Save your data',
     'save_your_data_hint': 'Create an account or sign in — your transactions will be kept.',
 };
@@ -260,6 +261,7 @@ const ru: TranslationMap = {
     'filter_results_count': 'Показано {n} из {total}',
     'load_more': 'Показать ещё',
     'not_found': 'Страница не найдена',
+    'continue_as_guest': 'Продолжить без аккаунта',
     'save_your_data': 'Сохраните данные',
     'save_your_data_hint': 'Создайте аккаунт или войдите — ваши транзакции останутся.',
 };
@@ -389,6 +391,7 @@ const he: TranslationMap = {
      'filter_results_count': 'מציג {n} מתוך {total}',
     'load_more': 'הצג עוד',
     'not_found': 'הדף לא נמצא',
+    'continue_as_guest': 'המשך ללא חשבון',
     'save_your_data': 'שמור את הנתונים שלך',
     'save_your_data_hint': 'צור חשבון או התחבר — העסקאות שלך ישמרו.',
 };
