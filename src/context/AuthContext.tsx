@@ -101,7 +101,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 };
                 setUser(publicUser);
                 return publicUser;
-            } catch (linkErr) {
+            } catch (linkErr: unknown) {
+                const code = (linkErr as { code?: string })?.code;
+                if (code === 'auth/email-already-in-use') {
+                    // Email taken — throw so RegisterPage shows "sign in" prompt
+                    // without creating a new UID and losing anonymous data
+                    throw Object.assign(new Error('email_already_in_use'), { code: 'email_already_in_use' });
+                }
                 console.warn('Failed to link anonymous account, falling back to createUser:', linkErr);
             }
         }

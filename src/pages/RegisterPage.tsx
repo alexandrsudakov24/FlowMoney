@@ -34,8 +34,13 @@ export default function RegisterPage() {
             await register({ name, email, password, language: selectedLanguage });
             navigate('/');
         } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : String(err);
-            setError(message || 'Registration failed');
+            const code = (err as { code?: string })?.code;
+            if (code === 'email_already_in_use' || code === 'auth/email-already-in-use') {
+                setError('email_already_in_use');
+            } else {
+                const message = err instanceof Error ? err.message : String(err);
+                setError(message || 'Registration failed');
+            }
         } finally {
             setLoading(false);
         }
@@ -115,7 +120,13 @@ export default function RegisterPage() {
                         </div>
                     </div>
 
-                    {error && <div className={styles.error}>{error}</div>}
+                    {error && (
+                        <div className={styles.error}>
+                            {error === 'email_already_in_use' ? (
+                                <>{t('error_email_in_use')} <Link to="/login">{t('login')}</Link></>
+                            ) : error}
+                        </div>
+                    )}
                     <div className={styles.actions}>
                         <button type="submit" disabled={loading}>
                             {loading ? '...' : t('create_account')}
