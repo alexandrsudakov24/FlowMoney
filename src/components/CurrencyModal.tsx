@@ -13,7 +13,7 @@ export default function CurrencyModal({ isOpen, onClose }: CurrencyModalProps) {
 
     if (!isOpen) return null;
 
-    const currencies = ["USD", "EUR", "ILS", "GBP", "JPY"];
+    const currencies = ["USD", "EUR", "ILS"];
 
     return (
         <>
