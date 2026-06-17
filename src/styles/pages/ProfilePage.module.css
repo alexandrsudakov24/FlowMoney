@@ -138,6 +138,57 @@
     transform: scale(0.97);
 }
 
+.anonBlock {
+    border-color: var(--accent);
+}
+
+.anonHint {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+.anonActions {
+    display: flex;
+    gap: 10px;
+}
+
+.anonBtn,
+.anonBtnSecondary {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    border: none;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.anonBtn {
+    background: var(--accent);
+    color: #ffffff;
+}
+
+.anonBtnSecondary {
+    background: transparent;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+}
+
+.anonBtn:hover,
+.anonBtnSecondary:hover {
+    opacity: 0.88;
+}
+
+.anonBtn:active,
+.anonBtnSecondary:active {
+    transform: scale(0.97);
+}
+
 .logoutBtn {
     width: 100%;
     background: var(--danger);

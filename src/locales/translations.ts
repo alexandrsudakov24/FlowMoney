@@ -129,6 +129,8 @@ const en: TranslationMap = {
     'filter_results_count': 'Showing {n} of {total}',
     'load_more': 'Load more',
     'not_found': 'Page not found',
+    'save_your_data': 'Save your data',
+    'save_your_data_hint': 'Create an account or sign in — your transactions will be kept.',
 };
 
 const ru: TranslationMap = {
@@ -258,6 +260,8 @@ const ru: TranslationMap = {
     'filter_results_count': 'Показано {n} из {total}',
     'load_more': 'Показать ещё',
     'not_found': 'Страница не найдена',
+    'save_your_data': 'Сохраните данные',
+    'save_your_data_hint': 'Создайте аккаунт или войдите — ваши транзакции останутся.',
 };
 
 const he: TranslationMap = {
@@ -382,11 +386,15 @@ const he: TranslationMap = {
     'registered': 'נרשם',
     'filter_all_time': 'כל הזמן',
     'filter_search_placeholder': 'חפש לפי הערה או קטגוריה...',
-    'filter_type_all': 'הכל',
-    'filter_no_results': 'אין עסקאות התואמות לפילטרים',
-    'filter_results_count': 'מציג {n} מתוך {total}',
+     'filter_results_count': 'מציג {n} מתוך {total}',
     'load_more': 'הצג עוד',
     'not_found': 'הדף לא נמצא',
+    'save_your_data': 'שמור את הנתונים שלך',
+    'save_your_data_hint': 'צור חשבון או התחבר — העסקאות שלך ישמרו.',
+};
+
+export const translations: Record<Language, TranslationMap> = { en, ru, he };
+קאות שלך ישמרו.',
 };
 
 export const translations: Record<Language, TranslationMap> = { en, ru, he };

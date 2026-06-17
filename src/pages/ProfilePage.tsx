@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -79,6 +80,17 @@ export default function ProfilePage() {
                 <h2 className={styles.name}>{user?.name}</h2>
                 <p className={styles.email}>{user?.email}</p>
             </div>
+
+            {!hasAccount && (
+                <div className={`${styles.block} ${styles.anonBlock}`}>
+                    <h3 className={styles.blockTitle}>{t('save_your_data')}</h3>
+                    <p className={styles.anonHint}>{t('save_your_data_hint')}</p>
+                    <div className={styles.anonActions}>
+                        <Link to="/register" className={styles.anonBtn}>{t('create_account')}</Link>
+                        <Link to="/login" className={styles.anonBtnSecondary}>{t('login')}</Link>
+                    </div>
+                </div>
+            )}
 
             <div className={styles.block}>
                 <h3 className={styles.blockTitle}>{t('stats')}</h3>
