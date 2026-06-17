@@ -130,6 +130,8 @@ const en: TranslationMap = {
     'load_more': 'Load more',
     'not_found': 'Page not found',
     'continue_as_guest': 'Continue as Guest',
+    'select_currency': 'Currency',
+    'select_theme': 'Theme',
     'save_your_data': 'Save your data',
     'save_your_data_hint': 'Create an account or sign in — your transactions will be kept.',
 };
@@ -262,6 +264,8 @@ const ru: TranslationMap = {
     'load_more': 'Показать ещё',
     'not_found': 'Страница не найдена',
     'continue_as_guest': 'Продолжить без аккаунта',
+    'select_currency': 'Валюта',
+    'select_theme': 'Тема',
     'save_your_data': 'Сохраните данные',
     'save_your_data_hint': 'Создайте аккаунт или войдите — ваши транзакции останутся.',
 };
@@ -392,6 +396,8 @@ const he: TranslationMap = {
     'load_more': 'הצג עוד',
     'not_found': 'הדף לא נמצא',
     'continue_as_guest': 'המשך ללא חשבון',
+    'select_currency': 'מטבע',
+    'select_theme': 'ערכת נושא',
     'save_your_data': 'שמור את הנתונים שלך',
     'save_your_data_hint': 'צור חשבון או התחבר — העסקאות שלך ישמרו.',
 };

@@ -81,6 +81,18 @@
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
+.prefsRow {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 480px) {
+    .prefsRow {
+        grid-template-columns: 1fr;
+    }
+}
+
 .error {
     color: var(--danger);
     font-size: var(--font-size-sm);
