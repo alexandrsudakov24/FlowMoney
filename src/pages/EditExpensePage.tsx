@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import ExpenseForm from '../components/ExpenseForm';
@@ -20,6 +20,15 @@ export default function EditExpensePage() {
     const navigate = useNavigate();
 
     const expense = expenses.find((e) => e.id === id);
+
+    if (!expense) {
+        return (
+            <div className={styles.page}>
+                <p className={styles.description}>{t('expense_not_found')}</p>
+                <Link to="/">{t('go_back')}</Link>
+            </div>
+        );
+    }
 
     const handleSubmit = (data: FormData) => {
         if (id) {
