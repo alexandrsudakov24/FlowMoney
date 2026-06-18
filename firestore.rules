@@ -61,9 +61,11 @@ service cloud.firestore {
       }
     }
 
-    // Invitations — creator can add; only the invited user can read/update their own invitations
+    // Invitations — only family members may create; only the invited user can read/update their own invitations
     match /invitations/{invitationId} {
-      allow create: if request.auth != null && request.auth.token.email != null;
+      allow create: if request.auth != null &&
+                       request.auth.token.email != null &&
+                       isFamilyMember(request.resource.data.familyId);
       allow read:   if request.auth != null && request.auth.token.email != null && (
                       resource.data.invitedEmail == request.auth.token.email ||
                       isFamilyMember(resource.data.familyId) ||
