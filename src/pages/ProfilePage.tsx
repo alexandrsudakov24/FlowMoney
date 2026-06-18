@@ -10,11 +10,10 @@ import LanguageModal from '../components/LanguageModal';
 import CurrencyModal from '../components/CurrencyModal';
 import CategoryModal from '../components/CategoryModal';
 import FamilyModal from '../components/FamilyModal';
-import { ADMIN_EMAIL } from './AdminPage';
 import styles from '../styles/pages/ProfilePage.module.css';
 
 export default function ProfilePage() {
-    const { user, logout } = useAuth();
+    const { user, logout, isAdmin } = useAuth();
     const { expenses, currency } = useApp();
     const { t } = useLanguage();
     const { family, invitations } = useFamily();
@@ -171,7 +170,7 @@ export default function ProfilePage() {
                 </button>
             </div>
 
-            {user?.email === ADMIN_EMAIL && (
+            {isAdmin && (
                 <a href="/admin" className={styles.adminBtn}>
                     {t('admin_panel')}
                 </a>

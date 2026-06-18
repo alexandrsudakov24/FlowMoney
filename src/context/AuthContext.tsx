@@ -30,6 +30,7 @@ type LoginData = { email: string; password: string };
 type AuthContextType = {
     user: User | null;
     isAuthenticated: boolean;
+    isAdmin: boolean;
     authReady: boolean;
     register: (data: RegisterData) => Promise<User>;
     login: (data: LoginData) => Promise<User>;
@@ -42,6 +43,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     const [authReady, setAuthReady] = useState(false);
 
     useEffect(() => {
@@ -49,11 +51,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             if (fbUser) {
                 if (fbUser.isAnonymous) {
                     setUser({ id: fbUser.uid, name: '', email: '' });
+                    setIsAdmin(false);
                     setAuthReady(true);
                     return;
                 }
                 try {
-                    const userDoc = await getDoc(doc(db, 'users', fbUser.uid));
+                    const [userDoc, tokenResult] = await Promise.all([
+                        getDoc(doc(db, 'users', fbUser.uid)),
+                        fbUser.getIdTokenResult(),
+                    ]);
                     const language = userDoc.exists() ? (userDoc.data()?.language as 'en' | 'ru' | 'he' | undefined) : undefined;
                     setUser({
                         id: fbUser.uid,
@@ -62,6 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         language,
                         photoURL: fbUser.photoURL || undefined,
                     });
+                    setIsAdmin(tokenResult.claims['admin'] === true);
                 } catch (e: unknown) {
                     console.warn('failed to load auth profile from firestore', e);
                     setUser({
@@ -69,9 +76,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         name: fbUser.displayName || fbUser.email || '',
                         email: fbUser.email || '',
                     });
+                    setIsAdmin(false);
                 }
             } else {
                 setUser(null);
+                setIsAdmin(false);
             }
             setAuthReady(true);
         });
@@ -237,7 +246,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated: !!user, authReady, register, login, loginWithGoogle, loginAnonymously, logout }}>
+        <AuthContext.Provider value={{ user, isAuthenticated: !!user, isAdmin, authReady, register, login, loginWithGoogle, loginAnonymously, logout }}>
             {children}
         </AuthContext.Provider>
     );

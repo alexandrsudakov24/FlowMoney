@@ -8,8 +8,6 @@ import {
 import ConfirmModal from '../components/ConfirmModal';
 import styles from '../styles/pages/AdminPage.module.css';
 
-export const ADMIN_EMAIL = 'alexandrsudakov24@gmail.com';
-
 interface UserRecord {
     id: string;
     name: string;
@@ -20,7 +18,7 @@ interface UserRecord {
 }
 
 export default function AdminPage() {
-    const { user } = useAuth();
+    const { user, isAdmin } = useAuth();
     const { t } = useLanguage();
     const [users, setUsers] = useState<UserRecord[]>([]);
     const [loading, setLoading] = useState(true);
@@ -58,7 +56,7 @@ export default function AdminPage() {
         }
     };
 
-    if (user?.email !== ADMIN_EMAIL) {
+    if (!isAdmin) {
         return <div className={styles.denied}>403</div>;
     }
 
@@ -89,8 +87,8 @@ export default function AdminPage() {
                             <button
                                 className={styles.deleteBtn}
                                 onClick={() => setConfirmDeleteId(u.id)}
-                                disabled={deletingId === u.id || u.email === ADMIN_EMAIL}
-                                title={u.email === ADMIN_EMAIL ? 'Cannot delete admin' : t('delete_user')}
+                                disabled={deletingId === u.id || u.id === user?.id}
+                                title={u.id === user?.id ? 'Cannot delete admin' : t('delete_user')}
                             >
                                 {deletingId === u.id ? '…' : t('delete_user')}
                             </button>
