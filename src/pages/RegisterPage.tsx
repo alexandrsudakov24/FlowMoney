@@ -27,6 +27,10 @@ export default function RegisterPage() {
     const submit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+        if (password.length < 6) {
+            setError('error_weak_password');
+            return;
+        }
         setLoading(true);
         try {
             setLanguage(selectedLanguage);
@@ -72,7 +76,7 @@ export default function RegisterPage() {
                     </div>
                     <div className={styles.formGroup}>
                         <label>{t('password')}</label>
-                        <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required />
+                        <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" required minLength={6} />
                     </div>
 
                     <div className={styles.prefsRow}>
