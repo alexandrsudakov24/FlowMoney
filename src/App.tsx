@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import DashboardPage from './pages/DashboardPage';
 import AddExpensePage from './pages/AddExpensePage';
@@ -9,6 +10,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
 import { useAuth } from './context/AuthContext';
+import { useLanguage } from './context/LanguageContext';
 import Navbar from './components/Navbar';
 import Spinner from './components/Spinner';
 import type { JSX } from 'react';
@@ -28,6 +30,15 @@ const RequireAdmin = ({ children }: { children: JSX.Element }) => {
 };
 
 export default function App() {
+    const { user } = useAuth();
+    const { setLanguage } = useLanguage();
+
+    useEffect(() => {
+        if (user?.language) {
+            setLanguage(user.language);
+        }
+    }, [user?.language]);
+
     return (
         <div className="app">
             <Navbar />
