@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import ErrorBoundary from './components/ErrorBoundary';
 import DashboardPage from './pages/DashboardPage';
 import AddExpensePage from './pages/AddExpensePage';
 import EditExpensePage from './pages/EditExpensePage';
@@ -32,6 +33,7 @@ const RequireAdmin = ({ children }: { children: JSX.Element }) => {
 export default function App() {
     const { user } = useAuth();
     const { setLanguage } = useLanguage();
+    const location = useLocation();
 
     useEffect(() => {
         if (user?.language) {
@@ -43,6 +45,7 @@ export default function App() {
         <div className="app">
             <Navbar />
             <main className="container">
+                <ErrorBoundary resetKey={location.pathname}>
                 <Routes>
                     <Route path="/" element={<RequireAuth><DashboardPage /></RequireAuth>} />
                     <Route path="/add" element={<RequireAuth><AddExpensePage /></RequireAuth>} />
@@ -53,6 +56,7 @@ export default function App() {
                     <Route path="/admin" element={<RequireAdmin><AdminPage /></RequireAdmin>} />
                     <Route path="*" element={<NotFoundPage />} />
                 </Routes>
+                </ErrorBoundary>
             </main>
         </div>
     );
