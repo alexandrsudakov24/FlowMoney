@@ -1,5 +1,6 @@
 import styles from "../styles/components/SettingsModal.module.css";
 import { useLanguage } from "../context/LanguageContext";
+import { useAuth } from "../context/AuthContext";
 
 interface LanguageModalProps {
     isOpen: boolean;
@@ -8,11 +9,13 @@ interface LanguageModalProps {
 
 export default function LanguageModal({ isOpen, onClose }: LanguageModalProps) {
     const { setLanguage, t } = useLanguage();
+    const { updateLanguage } = useAuth();
 
     if (!isOpen) return null;
 
     const handleSelect = (value: "en" | "ru" | "he") => {
         setLanguage(value);
+        updateLanguage(value); // persist to Firestore so sync works across devices
         onClose();
     };
 

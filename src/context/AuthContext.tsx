@@ -39,6 +39,7 @@ type AuthContextType = {
     loginWithGoogle: () => Promise<User>;
     loginAnonymously: () => Promise<void>;
     logout: () => Promise<void>;
+    updateLanguage: (lang: 'en' | 'ru' | 'he') => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -234,17 +235,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return publicUser;
     };
 
+    const updateLanguage = async (lang: 'en' | 'ru' | 'he') => {
+        if (!user || user.isAnonymous) return;
+        setUser((prev) => prev ? { ...prev, language: lang } : prev);
+        try {
+            await setDoc(doc(db, 'users', user.id), { language: lang }, { merge: true });
+        } catch (e) {
+            console.warn('Failed to save language to Firestore:', e);
+        }
+    };
+
     const logout = async () => {
         await fbSignOut(auth);
         setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated: !!user && !user.isAnonymous, isGuest: !!user?.isAnonymous, isAdmin, authReady, register, login, loginWithGoogle, loginAnonymously, logout }}>
+        <AuthContext.Provider value={{ user, isAuthenticated: !!user && !user.isAnonymous, isGuest: !!user?.isAnonymous, isAdmin, authReady, register, login, loginWithGoogle, loginAnonymously, logout, updateLanguage }}>
             {children}
         </AuthContext.Provider>
     );
 };
+
 
 export const useAuth = () => {
     const ctx = useContext(AuthContext);
