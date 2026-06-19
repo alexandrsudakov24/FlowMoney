@@ -3,7 +3,7 @@ import DashboardPage from './pages/DashboardPage';
 import AddExpensePage from './pages/AddExpensePage';
 import EditExpensePage from './pages/EditExpensePage';
 import ProfilePage from './pages/ProfilePage';
-import AdminPage, { ADMIN_EMAIL } from './pages/AdminPage';
+import AdminPage from './pages/AdminPage';
 import StartPage from './pages/StartPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -21,9 +21,9 @@ const RequireAuth = ({ children }: { children: JSX.Element }) => {
 };
 
 const RequireAdmin = ({ children }: { children: JSX.Element }) => {
-    const { user, authReady } = useAuth();
+    const { isAdmin, authReady } = useAuth();
     if (!authReady) return <Spinner size="lg" />;
-    if (user?.email !== ADMIN_EMAIL) return <StartPage />;
+    if (!isAdmin) return <StartPage />;
     return children;
 };
 
