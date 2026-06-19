@@ -140,32 +140,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const login = async (data: LoginData) => {
+        const cred = await signInWithEmailAndPassword(auth, data.email, data.password);
+        let language: 'en' | 'ru' | 'he' | undefined = undefined;
         try {
-            const cred = await signInWithEmailAndPassword(auth, data.email, data.password);
-            let language: 'en' | 'ru' | 'he' | undefined = undefined;
-            try {
-                const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
-                language = userDoc.exists() ? (userDoc.data()?.language as 'en' | 'ru' | 'he' | undefined) : undefined;
-            } catch (profileErr) {
-                console.warn('failed to load profile from firestore:', profileErr);
-            }
-            const publicUser: User = {
-                id: cred.user.uid,
-                name: cred.user.displayName || cred.user.email || '',
-                email: cred.user.email || '',
-                language,
-                photoURL: cred.user.photoURL || undefined,
-            };
-            setUser(publicUser);
-            return publicUser;
-        } catch (err) {
-            throw err;
+            const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
+            language = userDoc.exists() ? (userDoc.data()?.language as 'en' | 'ru' | 'he' | undefined) : undefined;
+        } catch (profileErr) {
+            console.warn('failed to load profile from firestore:', profileErr);
         }
+        const publicUser: User = {
+            id: cred.user.uid,
+            name: cred.user.displayName || cred.user.email || '',
+            email: cred.user.email || '',
+            language,
+            photoURL: cred.user.photoURL || undefined,
+        };
+        setUser(publicUser);
+        return publicUser;
     };
 
     const loginWithGoogle = async () => {
-        try {
-            const provider = new GoogleAuthProvider();
+        const provider = new GoogleAuthProvider();
 
             if (auth.currentUser?.isAnonymous) {
                 try {
@@ -236,10 +231,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 photoURL: fbUser.photoURL || undefined,
             };
             setUser(publicUser);
-            return publicUser;
-        } catch (err) {
-            throw err;
-        }
+        return publicUser;
     };
 
     const logout = async () => {
