@@ -3,10 +3,13 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { db } from '../firebase';
 import {
-    collection, getDocs, deleteDoc, doc
+    collection, getDocs, deleteDoc, doc,
+    query, limit, startAfter, type QueryDocumentSnapshot, type DocumentData,
 } from 'firebase/firestore';
 import ConfirmModal from '../components/ConfirmModal';
 import styles from '../styles/pages/AdminPage.module.css';
+
+const PAGE_SIZE = 20;
 
 interface UserRecord {
     id: string;
@@ -22,18 +25,34 @@ export default function AdminPage() {
     const { t } = useLanguage();
     const [users, setUsers] = useState<UserRecord[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(false);
+    const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
+    const fetchPage = async (after: QueryDocumentSnapshot<DocumentData> | null = null) => {
+        const q = after
+            ? query(collection(db, 'users'), limit(PAGE_SIZE), startAfter(after))
+            : query(collection(db, 'users'), limit(PAGE_SIZE));
+        const snap = await getDocs(q);
+        const list: UserRecord[] = snap.docs.map((d) => ({
+            id: d.id,
+            ...(d.data() as Omit<UserRecord, 'id'>),
+        }));
+        setUsers((prev) => after ? [...prev, ...list] : list);
+        setLastDoc(snap.docs[snap.docs.length - 1] ?? null);
+        setHasMore(snap.docs.length === PAGE_SIZE);
+    };
+
     useEffect(() => {
-        getDocs(collection(db, 'users')).then((snap) => {
-            const list: UserRecord[] = snap.docs.map((d) => ({
-                id: d.id,
-                ...(d.data() as Omit<UserRecord, 'id'>),
-            }));
-            setUsers(list);
-        }).finally(() => setLoading(false));
+        fetchPage().finally(() => setLoading(false));
     }, []);
+
+    const handleLoadMore = async () => {
+        setLoadingMore(true);
+        await fetchPage(lastDoc).finally(() => setLoadingMore(false));
+    };
 
     const handleDelete = async (target: UserRecord) => {
         setDeletingId(target.id);
@@ -95,6 +114,16 @@ export default function AdminPage() {
                         </li>
                     ))}
                 </ul>
+            )}
+
+            {hasMore && (
+                <button
+                    className={styles.loadMoreBtn}
+                    onClick={handleLoadMore}
+                    disabled={loadingMore}
+                >
+                    {loadingMore ? '…' : t('load_more')}
+                </button>
             )}
 
             <ConfirmModal

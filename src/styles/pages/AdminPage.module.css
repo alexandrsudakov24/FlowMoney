@@ -123,6 +123,30 @@
     cursor: not-allowed;
 }
 
+.loadMoreBtn {
+    display: block;
+    margin: 20px auto 0;
+    padding: 10px 28px;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.loadMoreBtn:hover:not(:disabled) {
+    background: var(--accent);
+    color: #fff;
+}
+
+.loadMoreBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
 .denied {
     display: flex;
     align-items: center;
