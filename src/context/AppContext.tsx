@@ -127,12 +127,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const clearAll = async () => {
-        if (hasAccess && user) {
+        if (!hasAccess || !user) return;
+        try {
             const snap = await getDocs(getExpensesCol());
-            await Promise.all(snap.docs.map((d) => deleteDoc(d.ref))).catch((err) => {
-                console.error('Failed to clear expenses', err);
-                showToast(t('save_error'));
-            });
+            await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
+        } catch (err) {
+            console.error('Failed to clear expenses', err);
+            showToast(t('save_error'));
+            throw err;
         }
     };
 
