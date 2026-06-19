@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Expense } from '../types';
 import { useAuth } from './AuthContext';
@@ -50,39 +50,42 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem('currency', cur);
     };
 
-    const getExpensesCol = () => {
+    const expensesCol = useMemo(() => {
+        if (!hasAccess || !user) return null;
         if (family) return collection(db, 'families', family.id, 'expenses');
-        return collection(db, 'users', user!.id, 'expenses');
-    };
-
-    useEffect(() => {
-        if (hasAccess && user) {
-            setLoading(true);
-            const unsub = onSnapshot(getExpensesCol(), (snap) => {
-                const next: Expense[] = snap.docs.map((d) => ({
-                    id: d.id,
-                    ...(d.data() as Omit<Expense, 'id'>)
-                }));
-                setExpenses(next);
-                setLoading(false);
-            });
-            return () => unsub();
-        }
-        setExpenses([]);
-        setLoading(false);
+        return collection(db, 'users', user.id, 'expenses');
     }, [hasAccess, user, family]);
 
-    const getCategoriesRef = () =>
-        family
-            ? doc(db, 'families', family.id, 'settings', 'categories')
-            : doc(db, 'users', user!.id, 'settings', 'categories');
+    const categoriesRef = useMemo(() => {
+        if (!hasAccess || !user) return null;
+        if (family) return doc(db, 'families', family.id, 'settings', 'categories');
+        return doc(db, 'users', user.id, 'settings', 'categories');
+    }, [hasAccess, user, family]);
 
     useEffect(() => {
-        if (!hasAccess || !user) {
+        if (!expensesCol) {
+            setExpenses([]);
+            setLoading(false);
+            return;
+        }
+        setLoading(true);
+        const unsub = onSnapshot(expensesCol, (snap) => {
+            const next: Expense[] = snap.docs.map((d) => ({
+                id: d.id,
+                ...(d.data() as Omit<Expense, 'id'>)
+            }));
+            setExpenses(next);
+            setLoading(false);
+        });
+        return () => unsub();
+    }, [expensesCol]);
+
+    useEffect(() => {
+        if (!categoriesRef) {
             setCategories(DEFAULT_CATEGORIES);
             return;
         }
-        const unsub = onSnapshot(getCategoriesRef(), (snap) => {
+        const unsub = onSnapshot(categoriesRef, (snap) => {
             if (snap.exists()) {
                 setCategories(snap.data().list ?? DEFAULT_CATEGORIES);
             } else {
@@ -90,46 +93,42 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             }
         });
         return () => unsub();
-    }, [hasAccess, user, family]);
+    }, [categoriesRef]);
 
     const addExpense = (expense: Expense) => {
-        if (hasAccess && user) {
-            const col = getExpensesCol();
-            const { id: _id, ...payload } = expense;
-            const data = family
-                ? { ...payload, addedBy: { uid: user.id, name: user.name } }
-                : payload;
-            addDoc(col, data).catch((err) => {
-                console.error('Failed to add expense', err);
-                showToast(t('save_error'));
-            });
-        }
+        if (!expensesCol || !user) return;
+        const { id: _id, ...payload } = expense;
+        const data = family
+            ? { ...payload, addedBy: { uid: user.id, name: user.name } }
+            : payload;
+        addDoc(expensesCol, data).catch((err) => {
+            console.error('Failed to add expense', err);
+            showToast(t('save_error'));
+        });
     };
 
     const updateExpense = (id: string, updatedData: Partial<Expense>) => {
-        if (hasAccess && user) {
-            const ref = doc(getExpensesCol(), id);
-            updateDoc(ref, updatedData as UpdateData<Expense>).catch((err) => {
-                console.error('Failed to update expense', err);
-                showToast(t('save_error'));
-            });
-        }
+        if (!expensesCol) return;
+        const ref = doc(expensesCol, id);
+        updateDoc(ref, updatedData as UpdateData<Expense>).catch((err) => {
+            console.error('Failed to update expense', err);
+            showToast(t('save_error'));
+        });
     };
 
     const deleteExpense = (id: string) => {
-        if (hasAccess && user) {
-            const ref = doc(getExpensesCol(), id);
-            deleteDoc(ref).catch((err) => {
-                console.error('Failed to delete expense', err);
-                showToast(t('save_error'));
-            });
-        }
+        if (!expensesCol) return;
+        const ref = doc(expensesCol, id);
+        deleteDoc(ref).catch((err) => {
+            console.error('Failed to delete expense', err);
+            showToast(t('save_error'));
+        });
     };
 
     const clearAll = async () => {
-        if (!hasAccess || !user) return;
+        if (!expensesCol) return;
         try {
-            const snap = await getDocs(getExpensesCol());
+            const snap = await getDocs(expensesCol);
             await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
         } catch (err) {
             console.error('Failed to clear expenses', err);
@@ -139,23 +138,23 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const addCategory = async (name: string): Promise<void> => {
-        if (!hasAccess || !user) return;
+        if (!categoriesRef) return;
         const trimmed = name.trim();
         if (!trimmed || categories.includes(trimmed)) return;
         const next = [...categories, trimmed];
-        await setDoc(getCategoriesRef(), { list: next }).catch((err) => {
+        await setDoc(categoriesRef, { list: next }).catch((err) => {
             console.error('Failed to add category', err);
             showToast(t('save_error'));
         });
     };
 
     const removeCategory = async (name: string): Promise<boolean> => {
-        if (!hasAccess || !user) return false;
+        if (!categoriesRef) return false;
         if (DEFAULT_CATEGORIES.includes(name)) return false;
         const inUse = expenses.some(e => e.category === name);
         if (inUse) return false;
         const next = categories.filter(c => c !== name);
-        await setDoc(getCategoriesRef(), { list: next }).catch((err) => {
+        await setDoc(categoriesRef, { list: next }).catch((err) => {
             console.error('Failed to remove category', err);
             showToast(t('save_error'));
         });
