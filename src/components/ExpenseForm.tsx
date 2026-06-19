@@ -174,7 +174,8 @@ export default function ExpenseForm({
                     className={styles.input}
                     type="text"
                     placeholder={t('note_placeholder')}
-                    {...register('note')}
+                    {...register('note', { maxLength: 200 })}
+                    maxLength={200}
                 />
             </label>
 

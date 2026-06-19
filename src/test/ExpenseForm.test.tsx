@@ -114,4 +114,16 @@ describe('ExpenseForm', () => {
         expect(screen.getByRole('spinbutton')).toHaveValue(99);
         expect(screen.getByRole('textbox')).toHaveValue('bus');
     });
+
+    it('note input has maxLength of 200', () => {
+        renderForm();
+        expect(screen.getByRole('textbox')).toHaveAttribute('maxLength', '200');
+    });
+
+    it('caps note input at 200 characters', async () => {
+        renderForm();
+        const noteInput = screen.getByRole('textbox');
+        await userEvent.type(noteInput, 'a'.repeat(201));
+        expect(noteInput).toHaveValue('a'.repeat(200));
+    });
 });
