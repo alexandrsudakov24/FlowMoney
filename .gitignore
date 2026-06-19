@@ -1,5 +1,5 @@
-# Firebase service account key (never commit this)
-scripts/serviceAccountKey.json
+# Firebase service account keys (never commit these)
+scripts/*.json
 
 # Logs
 logs
