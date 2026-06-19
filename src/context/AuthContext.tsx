@@ -22,6 +22,7 @@ export type User = {
     email: string;
     language?: 'en' | 'ru' | 'he';
     photoURL?: string;
+    isAnonymous?: boolean;
 };
 
 type RegisterData = { name: string; email: string; password: string; language?: 'en' | 'ru' | 'he' };
@@ -30,6 +31,7 @@ type LoginData = { email: string; password: string };
 type AuthContextType = {
     user: User | null;
     isAuthenticated: boolean;
+    isGuest: boolean;
     isAdmin: boolean;
     authReady: boolean;
     register: (data: RegisterData) => Promise<User>;
@@ -50,7 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const unsub = onAuthStateChanged(auth, async (fbUser) => {
             if (fbUser) {
                 if (fbUser.isAnonymous) {
-                    setUser({ id: fbUser.uid, name: '', email: '' });
+                    setUser({ id: fbUser.uid, name: '', email: '', isAnonymous: true });
                     setIsAdmin(false);
                     setAuthReady(true);
                     return;
@@ -246,7 +248,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated: !!user, isAdmin, authReady, register, login, loginWithGoogle, loginAnonymously, logout }}>
+        <AuthContext.Provider value={{ user, isAuthenticated: !!user && !user.isAnonymous, isGuest: !!user?.isAnonymous, isAdmin, authReady, register, login, loginWithGoogle, loginAnonymously, logout }}>
             {children}
         </AuthContext.Provider>
     );

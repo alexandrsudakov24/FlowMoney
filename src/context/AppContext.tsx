@@ -35,7 +35,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [loading, setLoading] = useState(false);
     const [categories, setCategories] = useState<string[]>(DEFAULT_CATEGORIES);
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated, isGuest } = useAuth();
+    const hasAccess = isAuthenticated || isGuest;
     const { family } = useFamily();
     const { showToast } = useToast();
     const { t } = useLanguage();
@@ -55,7 +56,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
-        if (isAuthenticated && user) {
+        if (hasAccess && user) {
             setLoading(true);
             const unsub = onSnapshot(getExpensesCol(), (snap) => {
                 const next: Expense[] = snap.docs.map((d) => ({
@@ -69,7 +70,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         }
         setExpenses([]);
         setLoading(false);
-    }, [isAuthenticated, user, family]);
+    }, [hasAccess, user, family]);
 
     const getCategoriesRef = () =>
         family
@@ -77,7 +78,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             : doc(db, 'users', user!.id, 'settings', 'categories');
 
     useEffect(() => {
-        if (!isAuthenticated || !user) {
+        if (!hasAccess || !user) {
             setCategories(DEFAULT_CATEGORIES);
             return;
         }
@@ -89,10 +90,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             }
         });
         return () => unsub();
-    }, [isAuthenticated, user, family]);
+    }, [hasAccess, user, family]);
 
     const addExpense = (expense: Expense) => {
-        if (isAuthenticated && user) {
+        if (hasAccess && user) {
             const col = getExpensesCol();
             const { id: _id, ...payload } = expense;
             const data = family
@@ -106,7 +107,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const updateExpense = (id: string, updatedData: Partial<Expense>) => {
-        if (isAuthenticated && user) {
+        if (hasAccess && user) {
             const ref = doc(getExpensesCol(), id);
             updateDoc(ref, updatedData as UpdateData<Expense>).catch((err) => {
                 console.error('Failed to update expense', err);
@@ -116,7 +117,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const deleteExpense = (id: string) => {
-        if (isAuthenticated && user) {
+        if (hasAccess && user) {
             const ref = doc(getExpensesCol(), id);
             deleteDoc(ref).catch((err) => {
                 console.error('Failed to delete expense', err);
@@ -126,7 +127,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const clearAll = async () => {
-        if (isAuthenticated && user) {
+        if (hasAccess && user) {
             const snap = await getDocs(getExpensesCol());
             await Promise.all(snap.docs.map((d) => deleteDoc(d.ref))).catch((err) => {
                 console.error('Failed to clear expenses', err);
@@ -136,7 +137,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const addCategory = async (name: string): Promise<void> => {
-        if (!isAuthenticated || !user) return;
+        if (!hasAccess || !user) return;
         const trimmed = name.trim();
         if (!trimmed || categories.includes(trimmed)) return;
         const next = [...categories, trimmed];
@@ -147,7 +148,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const removeCategory = async (name: string): Promise<boolean> => {
-        if (!isAuthenticated || !user) return false;
+        if (!hasAccess || !user) return false;
         if (DEFAULT_CATEGORIES.includes(name)) return false;
         const inUse = expenses.some(e => e.category === name);
         if (inUse) return false;

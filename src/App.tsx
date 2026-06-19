@@ -16,9 +16,9 @@ import Spinner from './components/Spinner';
 import type { JSX } from 'react';
 
 const RequireAuth = ({ children }: { children: JSX.Element }) => {
-    const { isAuthenticated, authReady } = useAuth();
+    const { isAuthenticated, isGuest, authReady } = useAuth();
     if (!authReady) return <Spinner size="lg" />;
-    if (!isAuthenticated) return <StartPage />;
+    if (!isAuthenticated && !isGuest) return <StartPage />;
     return children;
 };
 
