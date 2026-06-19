@@ -48,7 +48,7 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
                     ? 'invite_error_already_member'
                     : result.error === 'already_invited'
                         ? 'invite_error_already_invited'
-                        : 'invite_error_already_invited';
+                        : 'save_error';
                 setInviteMsg({ type: 'error', text: t(errKey) });
             }
         } finally {
