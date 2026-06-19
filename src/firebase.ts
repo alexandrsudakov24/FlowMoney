@@ -1,6 +1,11 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import {
+    initializeFirestore,
+    getFirestore,
+    persistentLocalCache,
+    persistentMultipleTabManager,
+} from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -12,7 +17,18 @@ const firebaseConfig = {
 };
 
 // Инициализируем Firebase только один раз
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+const isNew = !getApps().length;
+const app = isNew ? initializeApp(firebaseConfig) : getApps()[0];
+
+// Offline persistence через IndexedDB (multi-tab).
+// initializeFirestore должен вызываться до первого getFirestore — только при первом запуске.
+if (isNew) {
+    initializeFirestore(app, {
+        localCache: persistentLocalCache({
+            tabManager: persistentMultipleTabManager(),
+        }),
+    });
+}
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
