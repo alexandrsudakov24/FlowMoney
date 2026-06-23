@@ -50,7 +50,7 @@ export default function ProfilePage() {
         a.href = url;
         a.download = `flowmoney-export-${new Date().toISOString().slice(0, 10)}.json`;
         a.click();
-        URL.revokeObjectURL(url);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
 
     const topCategory = (() => {
