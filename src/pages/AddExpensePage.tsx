@@ -21,7 +21,6 @@ export default function AddExpensePage() {
         const safeAmount = Math.round(Number(data.amount) * 100) / 100;
 
         addExpense({
-            id: crypto.randomUUID(),
             ...data,
             amount: safeAmount,
             category: data.category || 'Other',

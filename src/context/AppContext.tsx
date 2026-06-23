@@ -18,7 +18,7 @@ export const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Dividends', 'Gift', 'O
 type AppContextType = {
     expenses: Expense[];
     loading: boolean;
-    addExpense: (e: Expense) => void;
+    addExpense: (e: Omit<Expense, 'id'>) => void;
     updateExpense: (id: string, data: Partial<Expense>) => void;
     deleteExpense: (id: string) => void;
     clearAll: () => Promise<void>;
@@ -95,12 +95,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         return () => unsub();
     }, [categoriesRef]);
 
-    const addExpense = (expense: Expense) => {
+    const addExpense = (expense: Omit<Expense, 'id'>) => {
         if (!expensesCol || !user) return;
-        const { id: _id, ...payload } = expense;
         const data = family
-            ? { ...payload, addedBy: { uid: user.id, name: user.name } }
-            : payload;
+            ? { ...expense, addedBy: { uid: user.id, name: user.name } }
+            : expense;
         addDoc(expensesCol, data).catch((err) => {
             console.error('Failed to add expense', err);
             showToast(t('save_error'));

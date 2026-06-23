@@ -88,7 +88,7 @@ const Consumer = () => {
         <div>
             <span data-testid="count">{expenses.length}</span>
             <button onClick={() => addExpense({
-                id: 'tmp', amount: 10, category: 'Food',
+                amount: 10, category: 'Food',
                 date: '2025-01-01', type: 'expense',
             })}>add</button>
             <button onClick={() => updateExpense('e-1', { amount: 20 })}>update</button>
