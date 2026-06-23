@@ -6,14 +6,14 @@ import { useLanguage } from '../context/LanguageContext';
 
 const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
+function getCatLabel(cat: string, t: (key: string) => string): string {
+    const key = `cat_${cat.toLowerCase()}`;
+    const translated = t(key);
+    return translated !== key ? translated : cat;
+}
+
 export default function Charts({ expenses }: { expenses: Expense[] }) {
     const { t } = useLanguage();
-
-    const getCatLabel = (cat: string) => {
-        const key = `cat_${cat.toLowerCase()}`;
-        const translated = t(key);
-        return translated !== key ? translated : cat;
-    };
 
     const byCategory = useMemo(() => {
         const map: Record<string, number> = {};
@@ -23,8 +23,7 @@ export default function Charts({ expenses }: { expenses: Expense[] }) {
                 map[cat] = (map[cat] || 0) + Number(e.amount || 0);
             }
         });
-        return Object.entries(map).map(([name, value]) => ({ name: getCatLabel(name), value }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        return Object.entries(map).map(([name, value]) => ({ name: getCatLabel(name, t), value }));
     }, [expenses, t]);
 
     const byDate = useMemo(() => {
