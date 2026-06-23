@@ -152,8 +152,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const removeCategory = async (name: string): Promise<boolean> => {
         if (!categoriesRef) return false;
         if (DEFAULT_CATEGORIES.includes(name)) return false;
-        const inUse = expenses.some(e => e.category === name);
-        if (inUse) return false;
         const next = categories.filter(c => c !== name);
         await setDoc(categoriesRef, { list: next }).catch((err) => {
             console.error('Failed to remove category', err);

@@ -3,14 +3,9 @@ import { useMemo } from 'react';
 import styles from '../styles/components/Charts.module.css';
 import type { Expense } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { getCatLabel } from '../utils/getCatLabel';
 
 const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
-
-function getCatLabel(cat: string, t: (key: string) => string): string {
-    const key = `cat_${cat.toLowerCase()}`;
-    const translated = t(key);
-    return translated !== key ? translated : cat;
-}
 
 export default function Charts({ expenses }: { expenses: Expense[] }) {
     const { t } = useLanguage();

@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useFamily } from '../context/FamilyContext';
 import { currencySymbols } from '../utils/currencySymbols';
+import { getCatLabel } from '../utils/getCatLabel';
 import type { Expense } from '../types';
 import ConfirmModal from './ConfirmModal';
 import styles from '../styles/components/ExpenseList.module.css';
@@ -34,12 +35,6 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
     const visible = sorted.slice(0, visibleCount);
     const hasMore = visibleCount < sorted.length;
 
-    const getCatLabel = (cat: string) => {
-        const key = `cat_${cat.toLowerCase()}`;
-        const translated = t(key);
-        return translated !== key ? translated : cat;
-    };
-
     const formatDate = (dateStr: string) => {
         const d = new Date(dateStr + 'T00:00:00');
         const day = String(d.getDate()).padStart(2, '0');
@@ -62,7 +57,7 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
                         <li key={e.id} className={styles.expenseItem}>
                             <div className={styles.left}>
                                 <div className={styles.category}>
-                                    {getCatLabel(e.category)}
+                                    {getCatLabel(e.category, t)}
                                 </div>
                                 <div className={styles.note}>
                                     {e.note || t('no_note')}
@@ -121,7 +116,7 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
                 title={t('delete')}
                 message={
                     confirmingExpense
-                        ? `${getCatLabel(confirmingExpense.category)} · ${Number(confirmingExpense.amount).toFixed(2)} ${currencySymbols[currency] ?? currency}`
+                        ? `${getCatLabel(confirmingExpense.category, t)} · ${Number(confirmingExpense.amount).toFixed(2)} ${currencySymbols[currency] ?? currency}`
                         : t('delete_confirm')
                 }
                 confirmLabel={t('delete')}

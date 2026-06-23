@@ -5,6 +5,7 @@ import type { Expense } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { useApp, INCOME_CATEGORIES } from '../context/AppContext';
 import { currencySymbols } from '../utils/currencySymbols';
+import { getCatLabel } from '../utils/getCatLabel';
 
 type FormData = {
     amount: string;
@@ -71,12 +72,6 @@ export default function ExpenseForm({
             .slice(0, 3);
     }, [expenses]);
 
-    const getCatLabel = (cat: string) => {
-        const key = `cat_${cat.toLowerCase()}`;
-        const translated = t(key);
-        return translated !== key ? translated : cat;
-    };
-
     return (
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
             <div className={styles.toggle} role="tablist" aria-label="Transaction type">
@@ -127,14 +122,14 @@ export default function ExpenseForm({
                                         className={`${styles.chip} ${selectedCategory === cat ? styles.chipActive : ''}`}
                                         onClick={() => setValue('category', cat)}
                                     >
-                                        {getCatLabel(cat)}
+                                        {getCatLabel(cat, t)}
                                     </button>
                                 ))}
                             </div>
                         )}
                         <select className={styles.select} {...register('category')}>
                             {categories.map(cat => (
-                                <option key={cat} value={cat}>{getCatLabel(cat)}</option>
+                                <option key={cat} value={cat}>{getCatLabel(cat, t)}</option>
                             ))}
                         </select>
                     </>
@@ -148,13 +143,13 @@ export default function ExpenseForm({
                                     className={`${styles.chip} ${selectedCategory === cat ? styles.chipActive : ''}`}
                                     onClick={() => setValue('category', cat)}
                                 >
-                                    {getCatLabel(cat)}
+                                    {getCatLabel(cat, t)}
                                 </button>
                             ))}
                         </div>
                         <select className={styles.select} {...register('category')}>
                             {INCOME_CATEGORIES.map(cat => (
-                                <option key={cat} value={cat}>{getCatLabel(cat)}</option>
+                                <option key={cat} value={cat}>{getCatLabel(cat, t)}</option>
                             ))}
                         </select>
                     </>
