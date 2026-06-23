@@ -44,13 +44,10 @@ export default function ExpenseForm({
     }, [defaultValues, setValue]);
 
     useEffect(() => {
-        if (type === 'income') {
-            setValue('category', defaultValues?.category as string || INCOME_CATEGORIES[0]);
-        } else {
-            setValue('category', defaultValues?.category as string || categories[0] || 'Food');
-        }
+        if (defaultValues?.category) return; // не сбрасывать при редактировании
+        setValue('category', type === 'income' ? INCOME_CATEGORIES[0] : categories[0] || 'Food');
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [type, defaultValues]);
+    }, [type]);
 
     // Top-3 expense categories by usage frequency
     const topExpenseCategories = useMemo(() => {
