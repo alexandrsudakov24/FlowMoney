@@ -35,24 +35,27 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
     const [familyLoading, setFamilyLoading] = useState(true);
     const [invitations, setInvitations] = useState<Invitation[]>([]);
 
-    // Load family when user is authenticated (non-anonymous)
+    // Load family and invitations when user is authenticated
     useEffect(() => {
         const hasAccount = isAuthenticated && user && !!user.email;
         if (!hasAccount) {
             setFamily(null);
             setFamilyLoading(false);
+            setInvitations([]);
             return;
         }
 
         setFamilyLoading(true);
         let cancelled = false;
-        let familyUnsub: (() => void) | null = null;
+        const unsubscribers: Array<() => void> = [];
 
-        getDoc(doc(db, 'users', user!.id)).then((userSnap) => {
+        // Subscribe to user doc to get familyId
+        const userUnsub = onSnapshot(doc(db, 'users', user!.id), (userSnap) => {
             if (cancelled) return;
             const familyId = userSnap.exists() ? userSnap.data()?.familyId : null;
             if (familyId) {
-                familyUnsub = onSnapshot(doc(db, 'families', familyId), (snap) => {
+                // Subscribe to family doc
+                const familyUnsub = onSnapshot(doc(db, 'families', familyId), (snap) => {
                     if (cancelled) return;
                     if (snap.exists()) {
                         setFamily({ id: snap.id, ...(snap.data() as Omit<Family, 'id'>) });
@@ -61,47 +64,39 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
                     }
                     setFamilyLoading(false);
                 });
+                unsubscribers.push(familyUnsub);
             } else {
                 setFamily(null);
                 setFamilyLoading(false);
             }
-        }).catch(() => {
-            if (cancelled) return;
-            setFamily(null);
-            setFamilyLoading(false);
+        }, () => {
+            if (!cancelled) {
+                setFamily(null);
+                setFamilyLoading(false);
+            }
         });
+        unsubscribers.push(userUnsub);
 
-        return () => {
-            cancelled = true;
-            if (familyUnsub) familyUnsub();
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAuthenticated, user?.id, user?.email]);
-
-    // Subscribe to pending invitations for current user's email
-    useEffect(() => {
-        const hasAccount = isAuthenticated && user && !!user.email;
-        if (!hasAccount) {
-            setInvitations([]);
-            return;
-        }
-
-        // Single-field query to avoid composite index requirement; filter status client-side
+        // Subscribe to pending invitations
         const q = query(
             collection(db, 'invitations'),
             where('invitedEmail', '==', user!.email)
         );
-
-        const unsub = onSnapshot(q, (snap) => {
+        const invUnsub = onSnapshot(q, (snap) => {
+            if (cancelled) return;
             const invs: Invitation[] = snap.docs
                 .map((d) => ({ id: d.id, ...(d.data() as Omit<Invitation, 'id'>) }))
                 .filter((inv) => inv.status === 'pending');
             setInvitations(invs);
         }, () => {
-            setInvitations([]);
+            if (!cancelled) setInvitations([]);
         });
+        unsubscribers.push(invUnsub);
 
-        return () => unsub();
+        return () => {
+            cancelled = true;
+            unsubscribers.forEach(unsub => unsub());
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated, user?.id, user?.email]);
 
