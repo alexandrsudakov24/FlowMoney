@@ -4,7 +4,8 @@ import type { ReactNode } from 'react';
 import { db } from '../firebase';
 import {
     doc, collection, addDoc, updateDoc, getDoc, onSnapshot,
-    query, where, arrayUnion, arrayRemove, deleteField, writeBatch, getDocs, deleteDoc
+    query, where, arrayUnion, arrayRemove, deleteField, writeBatch, getDocs, deleteDoc,
+    type UpdateData
 } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
@@ -201,7 +202,7 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
             if (remainingMembers.length === 0) {
                 // Will delete family after batch
             } else {
-                const updateData: Record<string, any> = { members: arrayRemove(member) };
+                const updateData: UpdateData<Family> = { members: arrayRemove(member) };
                 if (family.ownerId === user.id) {
                     updateData.ownerId = remainingMembers[0].uid;
                 }
