@@ -188,26 +188,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     console.warn('Failed to link Google to anonymous account:', linkErr);
                     const { GoogleAuthProvider: GA, signInWithCredential } = await import('firebase/auth');
                     const credential = GA.credentialFromError(linkErr as Parameters<typeof GA.credentialFromError>[0]);
-                    if (credential) {
-                        const result = await signInWithCredential(auth, credential);
-                        const fbUser = result.user;
-                        const userDoc = await getDoc(doc(db, 'users', fbUser.uid));
-                        if (!userDoc.exists()) {
-                            await setDoc(doc(db, 'users', fbUser.uid), {
-                                name: fbUser.displayName || '',
-                                email: fbUser.email || '',
-                                language: 'en',
-                            });
-                        }
-                        const publicUser: User = {
-                            id: fbUser.uid,
+                    if (!credential) {
+                        throw new Error('Failed to extract credential from Google error');
+                    }
+                    const result = await signInWithCredential(auth, credential);
+                    const fbUser = result.user;
+                    const userDoc = await getDoc(doc(db, 'users', fbUser.uid));
+                    if (!userDoc.exists()) {
+                        await setDoc(doc(db, 'users', fbUser.uid), {
                             name: fbUser.displayName || '',
                             email: fbUser.email || '',
-                            photoURL: fbUser.photoURL || undefined,
-                        };
-                        setUser(publicUser);
-                        return publicUser;
+                            language: 'en',
+                        });
                     }
+                    const publicUser: User = {
+                        id: fbUser.uid,
+                        name: fbUser.displayName || '',
+                        email: fbUser.email || '',
+                        photoURL: fbUser.photoURL || undefined,
+                    };
+                    setUser(publicUser);
+                    return publicUser;
                 }
             }
 
