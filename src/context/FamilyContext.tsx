@@ -75,7 +75,7 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
             cancelled = true;
             if (familyUnsub) familyUnsub();
         };
-    }, [isAuthenticated, user]);
+    }, [isAuthenticated, user?.id, user?.email]);
 
     // Subscribe to pending invitations for current user's email
     useEffect(() => {
@@ -101,7 +101,7 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
         });
 
         return () => unsub();
-    }, [isAuthenticated, user]);
+    }, [isAuthenticated, user?.id, user?.email]);
 
     const createFamily = async (name: string): Promise<void> => {
         if (!user || !user.email) return;
