@@ -49,7 +49,7 @@ export default function ExpenseForm({
         } else {
             setValue('category', defaultValues?.category as string || categories[0] || 'Food');
         }
-    }, [type, setValue, defaultValues, categories]);
+    }, [type, defaultValues]);
 
     // Top-3 expense categories by usage frequency
     const topExpenseCategories = useMemo(() => {
