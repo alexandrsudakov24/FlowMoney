@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { db } from '../firebase';
@@ -31,7 +31,7 @@ export default function AdminPage() {
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
-    const fetchPage = async (after: QueryDocumentSnapshot<DocumentData> | null = null) => {
+    const fetchPage = useCallback(async (after: QueryDocumentSnapshot<DocumentData> | null = null) => {
         const q = after
             ? query(collection(db, 'users'), limit(PAGE_SIZE), startAfter(after))
             : query(collection(db, 'users'), limit(PAGE_SIZE));
@@ -43,11 +43,11 @@ export default function AdminPage() {
         setUsers((prev) => after ? [...prev, ...list] : list);
         setLastDoc(snap.docs[snap.docs.length - 1] ?? null);
         setHasMore(snap.docs.length === PAGE_SIZE);
-    };
+    }, []);
 
     useEffect(() => {
         fetchPage().finally(() => setLoading(false));
-    }, []);
+    }, [fetchPage]);
 
     const handleLoadMore = async () => {
         setLoadingMore(true);
