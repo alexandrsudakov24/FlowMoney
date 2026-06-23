@@ -49,6 +49,7 @@ export default function ExpenseForm({
         } else {
             setValue('category', defaultValues?.category as string || categories[0] || 'Food');
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [type, defaultValues]);
 
     // Top-3 expense categories by usage frequency

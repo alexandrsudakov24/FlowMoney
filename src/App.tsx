@@ -39,7 +39,7 @@ export default function App() {
         if (user?.language) {
             setLanguage(user.language);
         }
-    }, [user?.language]);
+    }, [user?.language, setLanguage]);
 
     return (
         <div className="app">

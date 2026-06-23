@@ -75,6 +75,7 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
             cancelled = true;
             if (familyUnsub) familyUnsub();
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated, user?.id, user?.email]);
 
     // Subscribe to pending invitations for current user's email
@@ -101,6 +102,7 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
         });
 
         return () => unsub();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isAuthenticated, user?.id, user?.email]);
 
     const createFamily = async (name: string): Promise<void> => {
