@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useCallback, useContext, useState } from 'react';
+import { createContext, useCallback, useContext, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import styles from '../styles/components/Toast.module.css';
 
@@ -28,15 +28,18 @@ let nextId = 0;
 
 export const ToastProvider = ({ children }: { children: ReactNode }) => {
     const [toasts, setToasts] = useState<Toast[]>([]);
+    const timers = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
 
     const remove = useCallback((id: number) => {
+        clearTimeout(timers.current.get(id));
+        timers.current.delete(id);
         setToasts((prev) => prev.filter((t) => t.id !== id));
     }, []);
 
     const showToast = useCallback((message: string, type: ToastType = 'error') => {
         const id = ++nextId;
         setToasts((prev) => [...prev, { id, message, type }]);
-        setTimeout(() => remove(id), AUTO_DISMISS_MS);
+        timers.current.set(id, setTimeout(() => remove(id), AUTO_DISMISS_MS));
     }, [remove]);
 
     return (
