@@ -54,13 +54,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         if (!hasAccess || !user) return null;
         if (family) return collection(db, 'families', family.id, 'expenses');
         return collection(db, 'users', user.id, 'expenses');
-    }, [hasAccess, user, family]);
+    }, [hasAccess, user?.id, family?.id]);
 
     const categoriesRef = useMemo(() => {
         if (!hasAccess || !user) return null;
         if (family) return doc(db, 'families', family.id, 'settings', 'categories');
         return doc(db, 'users', user.id, 'settings', 'categories');
-    }, [hasAccess, user, family]);
+    }, [hasAccess, user?.id, family?.id]);
 
     useEffect(() => {
         if (!expensesCol) {
