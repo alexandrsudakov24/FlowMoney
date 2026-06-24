@@ -56,6 +56,7 @@ vi.mock('firebase/firestore', () => ({
     deleteDoc: mockDeleteDoc,
     getDocs: mockGetDocs,
     setDoc: mockSetDoc,
+    getDoc: vi.fn().mockResolvedValue({ exists: () => false, data: () => null }),
 }));
 
 // ── Context mocks ─────────────────────────────────────────────────────────────
