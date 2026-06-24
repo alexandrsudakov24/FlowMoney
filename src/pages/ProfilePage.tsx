@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useFamily } from '../context/FamilyContext';
+import { getCatLabel } from '../utils/getCatLabel';
 import { currencySymbols } from '../utils/currencySymbols';
 import ThemeModal from '../components/ThemeModal';
 import LanguageModal from '../components/LanguageModal';
@@ -62,8 +63,7 @@ export default function ProfilePage() {
         });
         const raw = Object.entries(map).sort((a, b) => b[1] - a[1])[0]?.[0];
         if (!raw) return '—';
-        const key = `cat_${raw.toLowerCase()}`;
-        return t(key) !== key ? t(key) : raw;
+        return getCatLabel(raw, t);
     })();
 
     const hasAccount = !!user?.email;

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import type { TranslationKeys } from '../i18n';
 import { useTheme } from '../context/ThemeContext';
 import { useApp } from '../context/AppContext';
 import { currencySymbols } from '../utils/currencySymbols';
@@ -123,7 +124,7 @@ export default function RegisterPage() {
                         <div className={styles.error}>
                             {error === 'error_email_in_use' ? (
                                 <>{t('error_email_in_use')} <Link to="/login">{t('login')}</Link></>
-                            ) : t(error)}
+                            ) : t(error as TranslationKeys)}
                         </div>
                     )}
                     <div className={styles.actions}>

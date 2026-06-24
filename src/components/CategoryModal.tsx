@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
+import { getCatLabel } from '../utils/getCatLabel';
 import styles from '../styles/components/CategoryModal.module.css';
 import modalStyles from '../styles/components/SettingsModal.module.css';
 
@@ -44,12 +45,6 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
     });
     const sorted = [...categories].sort((a, b) => (usageMap[b] || 0) - (usageMap[a] || 0));
 
-    const getCatLabel = (cat: string) => {
-        const key = `cat_${cat.toLowerCase()}`;
-        const translated = t(key);
-        return translated !== key ? translated : cat;
-    };
-
     return (
         <>
             <div className={modalStyles.overlay} onClick={onClose} />
@@ -81,7 +76,7 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
                             return (
                                 <li key={cat} className={styles.item}>
                                     <span className={styles.name}>
-                                        {getCatLabel(cat)}
+                                        {getCatLabel(cat, t)}
                                         {count > 0 && (
                                             <span className={styles.count}>{count}</span>
                                         )}

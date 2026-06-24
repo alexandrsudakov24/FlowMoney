@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import type { TranslationKeys } from '../i18n';
 import { firebaseErrorKey } from '../utils/firebaseError';
 import GoogleSignInButton from '../components/GoogleSignInButton';
 import styles from '../styles/pages/LoginPage.module.css';
@@ -65,7 +66,7 @@ export default function LoginPage() {
                             required
                         />
                     </div>
-                    {error && <div className={styles.error}>{t(error)}</div>}
+                    {error && <div className={styles.error}>{t(error as TranslationKeys)}</div>}
                     <div className={styles.actions}>
                         <button type="submit" disabled={loading}>
                             {loading ? '...' : t('login')}
