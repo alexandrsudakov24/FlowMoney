@@ -25,11 +25,11 @@ export async function migrateLocalExpensesToFirestore(): Promise<number> {
 
     type ExpenseWithoutId = Omit<Expense, 'id'>;
     let migrated = 0;
-    // добавляем по очереди, чтобы избежать неожиданных ограничений
+    // Add one by one to avoid potential Firestore rate-limit bursts
     for (const it of items) {
       const item = it as Expense;
       const { id } = item;
-      void id; // используем переменную, чтобы избежать eslint-ошибки о неиспользуемой переменной
+      void id; // suppress unused-var lint warning; id is destructured but not sent to Firestore
       const payload = (({ amount, category, date, note, type }: Expense) => ({ amount, category, date, note, type }))(item) as ExpenseWithoutId;
       await addDoc(colRef(user.uid), payload);
       migrated += 1;

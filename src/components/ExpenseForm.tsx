@@ -45,7 +45,7 @@ export default function ExpenseForm({
     }, [defaultValues, setValue]);
 
     useEffect(() => {
-        if (defaultValues?.category) return; // не сбрасывать при редактировании
+        if (defaultValues?.category) return; // keep existing category when editing a transaction
         setValue('category', type === 'income' ? INCOME_CATEGORIES[0] : categories[0] || 'Food');
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [type]);

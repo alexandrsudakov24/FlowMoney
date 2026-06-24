@@ -16,12 +16,12 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-// Инициализируем Firebase только один раз
+// Initialize Firebase app only once (guard for HMR)
 const isNew = !getApps().length;
 const app = isNew ? initializeApp(firebaseConfig) : getApps()[0];
 
-// Offline persistence через IndexedDB (multi-tab).
-// initializeFirestore должен вызываться до первого getFirestore — только при первом запуске.
+// Enable offline persistence via IndexedDB (multi-tab).
+// initializeFirestore must be called before the first getFirestore call — only on initial app creation.
 if (isNew) {
     initializeFirestore(app, {
         localCache: persistentLocalCache({
