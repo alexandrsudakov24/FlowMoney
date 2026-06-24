@@ -9,7 +9,7 @@ import { useLanguage } from './LanguageContext';
 import { db } from '../firebase';
 import {
     collection, onSnapshot, addDoc, doc,
-    deleteDoc, updateDoc, getDocs, setDoc, type UpdateData
+    deleteDoc, updateDoc, getDocs, getDoc, setDoc, type UpdateData
 } from 'firebase/firestore';
 
 const DEFAULT_CATEGORIES = ['Food', 'Transport', 'Home', 'Shopping', 'Health', 'Other'];
@@ -23,7 +23,7 @@ type AppContextType = {
     deleteExpense: (id: string) => Promise<void>;
     clearAll: () => Promise<void>;
     currency: string;
-    changeCurrency: (cur: string) => void;
+    changeCurrency: (cur: string) => Promise<void>;
     categories: string[];
     addCategory: (name: string) => Promise<void>;
     removeCategory: (name: string) => Promise<boolean>;
@@ -45,10 +45,25 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         localStorage.getItem('currency') || 'USD'
     );
 
-    const changeCurrency = (cur: string) => {
+    const changeCurrency = async (cur: string): Promise<void> => {
         setCurrency(cur);
         localStorage.setItem('currency', cur);
+        if (user && !user.isAnonymous) {
+            await setDoc(doc(db, 'users', user.id), { currency: cur }, { merge: true })
+                .catch(console.warn);
+        }
     };
+
+    useEffect(() => {
+        if (!user || user.isAnonymous) return;
+        getDoc(doc(db, 'users', user.id)).then((snap) => {
+            const saved = snap.data()?.currency as string | undefined;
+            if (saved) {
+                setCurrency(saved);
+                localStorage.setItem('currency', saved);
+            }
+        }).catch(console.warn);
+    }, [user?.id]);
 
     const expensesCol = useMemo(() => {
         if (!hasAccess || !user) return null;
