@@ -179,5 +179,5 @@ export default function ExpenseForm({
                 </button>
             </div>
         </form>
-       );
+    );
 }
