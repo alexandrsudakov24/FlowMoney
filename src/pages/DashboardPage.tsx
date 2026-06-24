@@ -33,17 +33,17 @@ export default function DashboardPage() {
         });
     }, [expenses, filters]);
 
-    const totalIncome = filteredExpenses.reduce(
-        (sum, e) => sum + (e.type === 'income' ? Number(e.amount || 0) : 0),
-        0
-    );
-
-    const totalExpenses = filteredExpenses.reduce(
-        (sum, e) => sum + (e.type === 'expense' ? Number(e.amount || 0) : 0),
-        0
-    );
-
-    const net = totalIncome - totalExpenses;
+    const { totalIncome, totalExpenses, net } = useMemo(() => {
+        const totalIncome = filteredExpenses.reduce(
+            (sum, e) => sum + (e.type === 'income' ? Number(e.amount || 0) : 0),
+            0
+        );
+        const totalExpenses = filteredExpenses.reduce(
+            (sum, e) => sum + (e.type === 'expense' ? Number(e.amount || 0) : 0),
+            0
+        );
+        return { totalIncome, totalExpenses, net: totalIncome - totalExpenses };
+    }, [filteredExpenses]);
 
     const hasActiveFilters =
         filters.month !== '' || filters.search !== '' || filters.type !== 'all';
