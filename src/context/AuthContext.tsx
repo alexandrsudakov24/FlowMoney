@@ -42,6 +42,18 @@ type AuthContextType = {
     updateLanguage: (lang: 'en' | 'ru' | 'he') => Promise<void>;
 };
 
+import type { User as FirebaseUser } from 'firebase/auth';
+
+function buildPublicUser(fbUser: FirebaseUser, language?: 'en' | 'ru' | 'he'): User {
+    return {
+        id: fbUser.uid,
+        name: fbUser.displayName || fbUser.email || '',
+        email: fbUser.email || '',
+        language,
+        photoURL: fbUser.photoURL || undefined,
+    };
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -64,21 +76,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                         fbUser.getIdTokenResult(),
                     ]);
                     const language = userDoc.exists() ? (userDoc.data()?.language as 'en' | 'ru' | 'he' | undefined) : undefined;
-                    setUser({
-                        id: fbUser.uid,
-                        name: fbUser.displayName || fbUser.email || '',
-                        email: fbUser.email || '',
-                        language,
-                        photoURL: fbUser.photoURL || undefined,
-                    });
+                    setUser(buildPublicUser(fbUser, language));
                     setIsAdmin(tokenResult.claims['admin'] === true);
                 } catch (e: unknown) {
                     console.warn('failed to load auth profile from firestore', e);
-                    setUser({
-                        id: fbUser.uid,
-                        name: fbUser.displayName || fbUser.email || '',
-                        email: fbUser.email || '',
-                    });
+                    setUser(buildPublicUser(fbUser));
                     setIsAdmin(false);
                 }
             } else {
@@ -149,13 +151,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } catch (profileErr) {
             console.warn('failed to load profile from firestore:', profileErr);
         }
-        const publicUser: User = {
-            id: cred.user.uid,
-            name: cred.user.displayName || cred.user.email || '',
-            email: cred.user.email || '',
-            language,
-            photoURL: cred.user.photoURL || undefined,
-        };
+        const publicUser = buildPublicUser(cred.user, language);
         setUser(publicUser);
         return publicUser;
     };
@@ -176,12 +172,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                             language: 'en',
                         });
                     }
-                    const publicUser: User = {
-                        id: fbUser.uid,
-                        name: fbUser.displayName || '',
-                        email: fbUser.email || '',
-                        photoURL: fbUser.photoURL || undefined,
-                    };
+                    const publicUser = buildPublicUser(fbUser);
                     setUser(publicUser);
                     return publicUser;
                 } catch (linkErr: unknown) {
@@ -201,12 +192,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                             language: 'en',
                         });
                     }
-                    const publicUser: User = {
-                        id: fbUser.uid,
-                        name: fbUser.displayName || '',
-                        email: fbUser.email || '',
-                        photoURL: fbUser.photoURL || undefined,
-                    };
+                    const publicUser = buildPublicUser(fbUser);
                     setUser(publicUser);
                     return publicUser;
                 }
@@ -225,15 +211,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const language = userDoc.exists()
                 ? (userDoc.data()?.language as 'en' | 'ru' | 'he' | undefined)
                 : 'en';
-            const publicUser: User = {
-                id: fbUser.uid,
-                name: fbUser.displayName || '',
-                email: fbUser.email || '',
-                language,
-                photoURL: fbUser.photoURL || undefined,
-            };
+            const publicUser = buildPublicUser(fbUser, language);
             setUser(publicUser);
-        return publicUser;
+            return publicUser;
     };
 
     const updateLanguage = async (lang: 'en' | 'ru' | 'he') => {
