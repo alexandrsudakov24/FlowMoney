@@ -17,6 +17,7 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
     const { family } = useFamily();
     const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
     const [confirmingId, setConfirmingId] = useState<string | null>(null);
+    const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
 
     const sorted = useMemo(
         () => [...expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
@@ -109,10 +110,17 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
             <ConfirmModal
                 isOpen={!!confirmingId}
                 onClose={() => setConfirmingId(null)}
-                onConfirm={() => {
-                    if (confirmingId) deleteExpense(confirmingId);
-                    setConfirmingId(null);
+                onConfirm={async () => {
+                    if (!confirmingId) return;
+                    setIsDeletingId(confirmingId);
+                    try {
+                        await deleteExpense(confirmingId);
+                    } finally {
+                        setIsDeletingId(null);
+                        setConfirmingId(null);
+                    }
                 }}
+                loading={!!isDeletingId}
                 title={t('delete')}
                 message={
                     confirmingExpense

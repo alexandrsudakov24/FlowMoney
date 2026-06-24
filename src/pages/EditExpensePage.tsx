@@ -30,10 +30,13 @@ export default function EditExpensePage() {
         );
     }
 
-    const handleSubmit = (data: FormData) => {
-        if (id) {
-            updateExpense(id, { ...data, amount: Number(data.amount) });
+    const handleSubmit = async (data: FormData) => {
+        if (!id) return;
+        try {
+            await updateExpense(id, { ...data, amount: Number(data.amount) });
             navigate('/');
+        } catch {
+            // error already shown via toast
         }
     };
 

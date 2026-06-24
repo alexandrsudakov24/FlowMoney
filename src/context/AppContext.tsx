@@ -18,9 +18,9 @@ export const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Dividends', 'Gift', 'O
 type AppContextType = {
     expenses: Expense[];
     loading: boolean;
-    addExpense: (e: Omit<Expense, 'id'>) => void;
-    updateExpense: (id: string, data: Partial<Expense>) => void;
-    deleteExpense: (id: string) => void;
+    addExpense: (e: Omit<Expense, 'id'>) => Promise<void>;
+    updateExpense: (id: string, data: Partial<Expense>) => Promise<void>;
+    deleteExpense: (id: string) => Promise<void>;
     clearAll: () => Promise<void>;
     currency: string;
     changeCurrency: (cur: string) => void;
@@ -97,33 +97,42 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         return () => unsub();
     }, [categoriesRef]);
 
-    const addExpense = (expense: Omit<Expense, 'id'>) => {
+    const addExpense = async (expense: Omit<Expense, 'id'>): Promise<void> => {
         if (!expensesCol || !user) return;
         const data = family
             ? { ...expense, addedBy: { uid: user.id, name: user.name } }
             : expense;
-        addDoc(expensesCol, data).catch((err) => {
+        try {
+            await addDoc(expensesCol, data);
+        } catch (err) {
             console.error('Failed to add expense', err);
             showToast(t('save_error'));
-        });
+            throw err;
+        }
     };
 
-    const updateExpense = (id: string, updatedData: Partial<Expense>) => {
+    const updateExpense = async (id: string, updatedData: Partial<Expense>): Promise<void> => {
         if (!expensesCol) return;
         const ref = doc(expensesCol, id);
-        updateDoc(ref, updatedData as UpdateData<Expense>).catch((err) => {
+        try {
+            await updateDoc(ref, updatedData as UpdateData<Expense>);
+        } catch (err) {
             console.error('Failed to update expense', err);
             showToast(t('save_error'));
-        });
+            throw err;
+        }
     };
 
-    const deleteExpense = (id: string) => {
+    const deleteExpense = async (id: string): Promise<void> => {
         if (!expensesCol) return;
         const ref = doc(expensesCol, id);
-        deleteDoc(ref).catch((err) => {
+        try {
+            await deleteDoc(ref);
+        } catch (err) {
             console.error('Failed to delete expense', err);
             showToast(t('save_error'));
-        });
+            throw err;
+        }
     };
 
     const clearAll = async () => {

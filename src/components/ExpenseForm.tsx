@@ -20,12 +20,12 @@ export default function ExpenseForm({
     onSubmit
 }: {
     defaultValues?: Partial<FormData> | Partial<Expense>;
-    onSubmit: (data: FormData) => void;
+    onSubmit: (data: FormData) => void | Promise<void>;
 }) {
     const { t } = useLanguage();
     const { currency, expenses, categories } = useApp();
 
-    const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
+    const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<FormData>({
         defaultValues: (defaultValues as Partial<FormData>) || {
             amount: '',
             category: 'Food',
@@ -173,7 +173,9 @@ export default function ExpenseForm({
             </label>
 
             <div className={styles.formActions}>
-                <button className={styles.button} type="submit">{t('save')}</button>
+                <button className={styles.button} type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? t('saving') : t('save')}
+                </button>
             </div>
         </form>
     );

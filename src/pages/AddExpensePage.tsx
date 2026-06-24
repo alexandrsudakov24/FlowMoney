@@ -17,16 +17,18 @@ export default function AddExpensePage() {
     const { t } = useLanguage();
     const navigate = useNavigate();
 
-    const handleSubmit = (data: FormData) => {
+    const handleSubmit = async (data: FormData) => {
         const safeAmount = Math.round(Number(data.amount) * 100) / 100;
-
-        addExpense({
-            ...data,
-            amount: safeAmount,
-            category: data.category || 'Other',
-        });
-
-        navigate('/');
+        try {
+            await addExpense({
+                ...data,
+                amount: safeAmount,
+                category: data.category || 'Other',
+            });
+            navigate('/');
+        } catch {
+            // error already shown via toast
+        }
     };
 
 
