@@ -6,11 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useFamily } from '../context/FamilyContext';
 import { getCatLabel } from '../utils/getCatLabel';
 import { currencySymbols } from '../utils/currencySymbols';
-import ThemeModal from '../components/ThemeModal';
-import LanguageModal from '../components/LanguageModal';
-import CurrencyModal from '../components/CurrencyModal';
-import CategoryModal from '../components/CategoryModal';
-import FamilyModal from '../components/FamilyModal';
+import { ThemeModal, LanguageModal, CurrencyModal, CategoryModal, FamilyModal } from '../components/modals';
 import styles from '../styles/pages/ProfilePage.module.css';
 
 export default function ProfilePage() {

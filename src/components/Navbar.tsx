@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import styles from '../styles/components/Navbar.module.css';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import Avatar from './Avatar';
+import Avatar from './ui/Avatar';
 
 const IconDashboard = () => (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

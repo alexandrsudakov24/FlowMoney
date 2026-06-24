@@ -1,9 +1,9 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { useMemo } from 'react';
-import styles from '../styles/components/Charts.module.css';
-import type { Expense } from '../types';
-import { useLanguage } from '../context/LanguageContext';
-import { getCatLabel } from '../utils/getCatLabel';
+import styles from '../../styles/components/Charts.module.css';
+import type { Expense } from '../../types';
+import { useLanguage } from '../../context/LanguageContext';
+import { getCatLabel } from '../../utils/getCatLabel';
 
 const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
@@ -26,11 +26,8 @@ export default function Charts({ expenses }: { expenses: Expense[] }) {
         expenses.forEach((e) => {
             const d = e.date;
             if (!map[d]) map[d] = { expense: 0, income: 0 };
-            if (e.type === 'expense') {
-                map[d].expense += Number(e.amount || 0);
-            } else {
-                map[d].income += Number(e.amount || 0);
-            }
+            if (e.type === 'expense') map[d].expense += Number(e.amount || 0);
+            else map[d].income += Number(e.amount || 0);
         });
         return Object.entries(map)
             .map(([date, data]) => ({ date, ...data }))

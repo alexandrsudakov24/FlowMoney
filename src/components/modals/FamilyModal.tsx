@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useFamily } from '../context/FamilyContext';
-import { useLanguage } from '../context/LanguageContext';
-import ConfirmModal from './ConfirmModal';
-import styles from '../styles/components/FamilyModal.module.css';
+import { useFamily } from '../../context/FamilyContext';
+import { useLanguage } from '../../context/LanguageContext';
+import { ConfirmModal } from '../ui';
+import styles from '../../styles/components/FamilyModal.module.css';
 
 interface Props {
     isOpen: boolean;
@@ -78,18 +78,14 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
                 {familyLoading ? (
                     <div className={styles.loading}>...</div>
                 ) : family ? (
-                    /* ─── IN FAMILY ─── */
                     <div>
                         <div className={styles.familyName}>{family.name}</div>
-
                         <div className={styles.section}>
                             <h3 className={styles.sectionTitle}>{t('members')}</h3>
                             <ul className={styles.memberList}>
                                 {family.members.map((m) => (
                                     <li key={m.uid} className={styles.memberItem}>
-                                        <div className={styles.memberAvatar}>
-                                            {m.name.charAt(0).toUpperCase()}
-                                        </div>
+                                        <div className={styles.memberAvatar}>{m.name.charAt(0).toUpperCase()}</div>
                                         <div className={styles.memberInfo}>
                                             <span className={styles.memberName}>{m.name}</span>
                                             <span className={styles.memberEmail}>{m.email}</span>
@@ -101,7 +97,6 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
                                 ))}
                             </ul>
                         </div>
-
                         <div className={styles.section}>
                             <h3 className={styles.sectionTitle}>{t('invite_member')}</h3>
                             <div className={styles.inviteRow}>
@@ -110,10 +105,7 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
                                     type="email"
                                     placeholder={t('invite_email_placeholder')}
                                     value={inviteEmailInput}
-                                    onChange={(e) => {
-                                        setInviteEmailInput(e.target.value);
-                                        setInviteMsg(null);
-                                    }}
+                                    onChange={(e) => { setInviteEmailInput(e.target.value); setInviteMsg(null); }}
                                     onKeyDown={(e) => e.key === 'Enter' && handleInvite()}
                                 />
                                 <button
@@ -130,15 +122,9 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
                                 </p>
                             )}
                         </div>
-
-                        <button
-                            className={styles.leaveBtn}
-                            onClick={() => setConfirmLeave(true)}
-                            disabled={leaving}
-                        >
+                        <button className={styles.leaveBtn} onClick={() => setConfirmLeave(true)} disabled={leaving}>
                             {t('leave_family')}
                         </button>
-
                         <ConfirmModal
                             isOpen={confirmLeave}
                             onClose={() => setConfirmLeave(false)}
@@ -151,7 +137,6 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
                         />
                     </div>
                 ) : (
-                    /* ─── NO FAMILY ─── */
                     <div>
                         <div className={styles.section}>
                             <h3 className={styles.sectionTitle}>{t('create_family')}</h3>
@@ -173,7 +158,6 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
                                 </button>
                             </div>
                         </div>
-
                         {invitations.length > 0 && (
                             <div className={styles.section}>
                                 <h3 className={styles.sectionTitle}>{t('pending_invitations')}</h3>
@@ -182,30 +166,17 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
                                         <li key={inv.id} className={styles.invitationItem}>
                                             <div className={styles.invitationInfo}>
                                                 <strong>{inv.familyName}</strong>
-                                                <span className={styles.invitedBy}>
-                                                    {t('invited_by')}: {inv.invitedByName}
-                                                </span>
+                                                <span className={styles.invitedBy}>{t('invited_by')}: {inv.invitedByName}</span>
                                             </div>
                                             <div className={styles.invitationActions}>
-                                                <button
-                                                    className={styles.acceptBtn}
-                                                    onClick={() => acceptInvitation(inv.id)}
-                                                >
-                                                    {t('accept')}
-                                                </button>
-                                                <button
-                                                    className={styles.declineBtn}
-                                                    onClick={() => declineInvitation(inv.id)}
-                                                >
-                                                    {t('decline')}
-                                                </button>
+                                                <button className={styles.acceptBtn} onClick={() => acceptInvitation(inv.id)}>{t('accept')}</button>
+                                                <button className={styles.declineBtn} onClick={() => declineInvitation(inv.id)}>{t('decline')}</button>
                                             </div>
                                         </li>
                                     ))}
                                 </ul>
                             </div>
                         )}
-
                         {invitations.length === 0 && (
                             <p className={styles.noInvitations}>{t('no_invitations')}</p>
                         )}

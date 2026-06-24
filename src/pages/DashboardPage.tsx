@@ -1,11 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
-import ExpenseList from '../components/ExpenseList';
-import Charts from '../components/Charts';
-import ExpenseFilters from '../components/ExpenseFilters';
-import Spinner from '../components/Spinner';
-import type { FilterState } from '../components/ExpenseFilters';
+import { ExpenseList, Charts, ExpenseFilters } from '../components/expenses';
+import type { FilterState } from '../components/expenses';
+import { Spinner } from '../components/ui';
 import { currencySymbols } from '../utils/currencySymbols';
 import styles from '../styles/pages/DashboardPage.module.css';
 

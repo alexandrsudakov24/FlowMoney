@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import ErrorBoundary from './components/ErrorBoundary';
+import { ErrorBoundary, Spinner } from './components/ui';
 import DashboardPage from './pages/DashboardPage';
 import AddExpensePage from './pages/AddExpensePage';
 import EditExpensePage from './pages/EditExpensePage';
@@ -13,7 +13,6 @@ import NotFoundPage from './pages/NotFoundPage';
 import { useAuth } from './context/AuthContext';
 import { useLanguage } from './context/LanguageContext';
 import Navbar from './components/Navbar';
-import Spinner from './components/Spinner';
 import type { JSX } from 'react';
 
 const RequireAuth = ({ children }: { children: JSX.Element }) => {

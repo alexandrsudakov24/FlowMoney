@@ -1,11 +1,11 @@
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import styles from '../styles/components/ExpenseForm.module.css';
-import type { Expense } from '../types';
-import { useLanguage } from '../context/LanguageContext';
-import { useApp, INCOME_CATEGORIES } from '../context/AppContext';
-import { currencySymbols } from '../utils/currencySymbols';
-import { getCatLabel } from '../utils/getCatLabel';
+import styles from '../../styles/components/ExpenseForm.module.css';
+import type { Expense } from '../../types';
+import { useLanguage } from '../../context/LanguageContext';
+import { useApp, INCOME_CATEGORIES } from '../../context/AppContext';
+import { currencySymbols } from '../../utils/currencySymbols';
+import { getCatLabel } from '../../utils/getCatLabel';
 
 type FormData = {
     amount: string;
@@ -47,30 +47,24 @@ export default function ExpenseForm({
     const defaultCategory = defaultValues?.category;
 
     useEffect(() => {
-        if (defaultCategory) return; // keep existing category when editing a transaction
+        if (defaultCategory) return;
         setValue('category', type === 'income' ? INCOME_CATEGORIES[0] : categories[0] || 'Food');
     }, [type, defaultCategory, setValue, categories]);
 
-    // Top-3 expense categories by usage frequency
     const topExpenseCategories = useMemo(() => {
         const map: Record<string, number> = {};
         expenses.forEach(e => {
             if (e.type === 'expense') map[e.category] = (map[e.category] || 0) + 1;
         });
-        return [...categories]
-            .sort((a, b) => (map[b] || 0) - (map[a] || 0))
-            .slice(0, 3);
+        return [...categories].sort((a, b) => (map[b] || 0) - (map[a] || 0)).slice(0, 3);
     }, [expenses, categories]);
 
-    // Top-3 income categories by usage frequency
     const topIncomeCategories = useMemo(() => {
         const map: Record<string, number> = {};
         expenses.forEach(e => {
             if (e.type === 'income') map[e.category] = (map[e.category] || 0) + 1;
         });
-        return [...INCOME_CATEGORIES]
-            .sort((a, b) => (map[b] || 0) - (map[a] || 0))
-            .slice(0, 3);
+        return [...INCOME_CATEGORIES].sort((a, b) => (map[b] || 0) - (map[a] || 0)).slice(0, 3);
     }, [expenses]);
 
     return (
@@ -100,14 +94,9 @@ export default function ExpenseForm({
                     inputMode="decimal"
                     step="0.01"
                     placeholder={`0.00 ${currencySymbols[currency]}`}
-                    {...register('amount', {
-                        required: true,
-                        validate: (v) => Number(v) > 0,
-                    })}
+                    {...register('amount', { required: true, validate: (v) => Number(v) > 0 })}
                 />
-                {errors.amount && (
-                    <span className={styles.errorMsg}>{t('amount_required')}</span>
-                )}
+                {errors.amount && <span className={styles.errorMsg}>{t('amount_required')}</span>}
             </label>
 
             <label className={styles.label}>

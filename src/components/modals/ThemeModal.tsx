@@ -1,7 +1,7 @@
-import styles from "../styles/components/SettingsModal.module.css";
-import { useTheme } from "../context/ThemeContext";
-import type { Theme } from "../context/ThemeContext";
-import { useLanguage } from "../context/LanguageContext";
+import styles from '../../styles/components/SettingsModal.module.css';
+import { useTheme } from '../../context/ThemeContext';
+import type { Theme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface ThemeModalProps {
     isOpen: boolean;
@@ -24,13 +24,11 @@ export default function ThemeModal({ isOpen, onClose }: ThemeModalProps) {
     return (
         <>
             <div className={styles.overlay} onClick={onClose} />
-
             <div className={styles.modal}>
                 <div className={styles.header}>
                     <h2>{t('theme')}</h2>
                     <button className={styles.closeBtn} onClick={onClose}>✕</button>
                 </div>
-
                 <div className={styles.content}>
                     <div className={styles.setting}>
                         {THEME_OPTIONS.map((opt) => (

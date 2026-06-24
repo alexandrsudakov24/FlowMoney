@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useApp } from '../context/AppContext';
-import { useLanguage } from '../context/LanguageContext';
-import { getCatLabel } from '../utils/getCatLabel';
-import styles from '../styles/components/CategoryModal.module.css';
-import modalStyles from '../styles/components/SettingsModal.module.css';
+import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../context/LanguageContext';
+import { getCatLabel } from '../../utils/getCatLabel';
+import styles from '../../styles/components/CategoryModal.module.css';
+import modalStyles from '../../styles/components/SettingsModal.module.css';
 
 const DEFAULT_CATEGORIES = ['Food', 'Transport', 'Home', 'Shopping', 'Health', 'Other'];
 
@@ -38,7 +38,6 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
         else setError('');
     };
 
-    // Sort by usage frequency
     const usageMap: Record<string, number> = {};
     expenses.forEach(e => {
         if (e.type === 'expense') usageMap[e.category] = (usageMap[e.category] || 0) + 1;
@@ -53,7 +52,6 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
                     <h2>{t('categories')}</h2>
                     <button className={modalStyles.closeBtn} onClick={onClose}>✕</button>
                 </div>
-
                 <div className={modalStyles.content}>
                     <div className={styles.addRow}>
                         <input
@@ -66,7 +64,6 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
                         <button className={styles.addBtn} onClick={handleAdd}>+</button>
                     </div>
                     {error && <p className={styles.error}>{error}</p>}
-
                     <ul className={styles.list}>
                         {sorted.map(cat => {
                             const isDefault = DEFAULT_CATEGORIES.includes(cat);
@@ -77,19 +74,13 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
                                 <li key={cat} className={styles.item}>
                                     <span className={styles.name}>
                                         {getCatLabel(cat, t)}
-                                        {count > 0 && (
-                                            <span className={styles.count}>{count}</span>
-                                        )}
+                                        {count > 0 && <span className={styles.count}>{count}</span>}
                                     </span>
                                     <button
                                         className={styles.removeBtn}
                                         onClick={() => handleRemove(cat)}
                                         disabled={cantDelete}
-                                        title={
-                                            isDefault ? t('category_default')
-                                            : inUse ? t('category_in_use')
-                                            : ''
-                                        }
+                                        title={isDefault ? t('category_default') : inUse ? t('category_in_use') : ''}
                                     >
                                         ✕
                                     </button>
@@ -98,12 +89,8 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
                         })}
                     </ul>
                 </div>
-
                 <div className={modalStyles.footer}>
-                    <button
-                        className={`${modalStyles.btn} ${modalStyles.secondary}`}
-                        onClick={onClose}
-                    >
+                    <button className={`${modalStyles.btn} ${modalStyles.secondary}`} onClick={onClose}>
                         {t('close')}
                     </button>
                 </div>

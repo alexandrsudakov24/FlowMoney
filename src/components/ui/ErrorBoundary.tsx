@@ -1,9 +1,8 @@
 import { Component, type ReactNode } from 'react';
-import styles from '../styles/components/ErrorBoundary.module.css';
+import styles from '../../styles/components/ErrorBoundary.module.css';
 
 interface Props {
     children: ReactNode;
-    /** Optional: key to reset boundary when it changes (e.g. route change) */
     resetKey?: string;
 }
 

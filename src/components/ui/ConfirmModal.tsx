@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { useLanguage } from '../context/LanguageContext';
-import styles from '../styles/components/ConfirmModal.module.css';
+import { useLanguage } from '../../context/LanguageContext';
+import styles from '../../styles/components/ConfirmModal.module.css';
 
 interface Props {
     isOpen: boolean;
@@ -25,7 +25,6 @@ export default function ConfirmModal({
 }: Props) {
     const { t } = useLanguage();
 
-    // Close on Escape
     useEffect(() => {
         if (!isOpen) return;
         const handler = (e: KeyboardEvent) => {
@@ -35,7 +34,6 @@ export default function ConfirmModal({
         return () => document.removeEventListener('keydown', handler);
     }, [isOpen, onClose]);
 
-    // Lock body scroll while open
     useEffect(() => {
         if (!isOpen) return;
         document.body.style.overflow = 'hidden';
@@ -52,14 +50,9 @@ export default function ConfirmModal({
             <div className={styles.overlay} onClick={onClose} />
             <div className={styles.modal} role="dialog" aria-modal="true">
                 <div className={styles.handle} />
-
-                <div className={`${styles.iconWrap} ${styles[variant]}`}>
-                    {icon}
-                </div>
-
+                <div className={`${styles.iconWrap} ${styles[variant]}`}>{icon}</div>
                 <h2 className={styles.title}>{title}</h2>
                 <p className={styles.message}>{message}</p>
-
                 <div className={styles.actions}>
                     <button
                         className={`${styles.confirmBtn} ${styles[variant]}`}
@@ -68,11 +61,7 @@ export default function ConfirmModal({
                     >
                         {loading ? '…' : label}
                     </button>
-                    <button
-                        className={styles.cancelBtn}
-                        onClick={onClose}
-                        disabled={loading}
-                    >
+                    <button className={styles.cancelBtn} onClick={onClose} disabled={loading}>
                         {t('cancel')}
                     </button>
                 </div>

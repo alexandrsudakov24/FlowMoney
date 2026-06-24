@@ -6,7 +6,7 @@ import {
     collection, getDocs, deleteDoc, doc,
     query, limit, startAfter, type QueryDocumentSnapshot, type DocumentData,
 } from 'firebase/firestore';
-import ConfirmModal from '../components/ConfirmModal';
+import { ConfirmModal } from '../components/ui';
 import styles from '../styles/pages/AdminPage.module.css';
 
 const PAGE_SIZE = 20;

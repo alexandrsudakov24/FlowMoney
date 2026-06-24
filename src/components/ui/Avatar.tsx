@@ -1,4 +1,4 @@
-import styles from '../styles/components/Avatar.module.css';
+import styles from '../../styles/components/Avatar.module.css';
 
 interface AvatarProps {
     name: string;

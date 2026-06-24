@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useApp } from '../context/AppContext';
-import { useLanguage } from '../context/LanguageContext';
-import { useFamily } from '../context/FamilyContext';
-import { currencySymbols } from '../utils/currencySymbols';
-import { getCatLabel } from '../utils/getCatLabel';
-import type { Expense } from '../types';
-import ConfirmModal from './ConfirmModal';
-import styles from '../styles/components/ExpenseList.module.css';
+import { useApp } from '../../context/AppContext';
+import { useLanguage } from '../../context/LanguageContext';
+import { useFamily } from '../../context/FamilyContext';
+import { currencySymbols } from '../../utils/currencySymbols';
+import { getCatLabel } from '../../utils/getCatLabel';
+import type { Expense } from '../../types';
+import { ConfirmModal } from '../ui';
+import styles from '../../styles/components/ExpenseList.module.css';
 
 const PAGE_SIZE = 20;
 
@@ -40,8 +40,7 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
         const d = new Date(dateStr + 'T00:00:00');
         const day = String(d.getDate()).padStart(2, '0');
         const month = String(d.getMonth() + 1).padStart(2, '0');
-        const year = d.getFullYear();
-        return `${day}.${month}.${year}`;
+        return `${day}.${month}.${d.getFullYear()}`;
     };
 
     const confirmingExpense = confirmingId ? sorted.find(e => e.id === confirmingId) : null;
@@ -53,42 +52,23 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
                     const sign = e.type === 'income' ? '+' : '-';
                     const amount = Number(e.amount).toFixed(2);
                     const symbol = currencySymbols[currency] ?? currency;
-
                     return (
                         <li key={e.id} className={styles.expenseItem}>
                             <div className={styles.left}>
-                                <div className={styles.category}>
-                                    {getCatLabel(e.category, t)}
-                                </div>
-                                <div className={styles.note}>
-                                    {e.note || t('no_note')}
-                                </div>
+                                <div className={styles.category}>{getCatLabel(e.category, t)}</div>
+                                <div className={styles.note}>{e.note || t('no_note')}</div>
                                 {family && e.addedBy && (
-                                    <div className={styles.addedBy}>
-                                        {t('added_by')} {e.addedBy.name}
-                                    </div>
+                                    <div className={styles.addedBy}>{t('added_by')} {e.addedBy.name}</div>
                                 )}
                             </div>
-
                             <div className={styles.right}>
-                                <div
-                                    className={`${styles.amount} ${e.type === 'income' ? styles.amountIncome : styles.amountExpense}`}
-                                >
+                                <div className={`${styles.amount} ${e.type === 'income' ? styles.amountIncome : styles.amountExpense}`}>
                                     {sign}{amount} {symbol}
                                 </div>
-
-                                <div className={styles.date}>
-                                    {formatDate(e.date)}
-                                </div>
-
+                                <div className={styles.date}>{formatDate(e.date)}</div>
                                 <div className={styles.actions}>
-                                    <Link to={`/edit/${e.id}`} className="btn">
-                                        {t('edit')}
-                                    </Link>
-                                    <button
-                                        className="btn danger"
-                                        onClick={() => setConfirmingId(e.id)}
-                                    >
+                                    <Link to={`/edit/${e.id}`} className="btn">{t('edit')}</Link>
+                                    <button className="btn danger" onClick={() => setConfirmingId(e.id)}>
                                         {t('delete')}
                                     </button>
                                 </div>
@@ -99,10 +79,7 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
             </ul>
 
             {hasMore && (
-                <button
-                    className={styles.loadMore}
-                    onClick={() => setVisibleCount(c => c + PAGE_SIZE)}
-                >
+                <button className={styles.loadMore} onClick={() => setVisibleCount(c => c + PAGE_SIZE)}>
                     {t('load_more')} ({sorted.length - visibleCount})
                 </button>
             )}

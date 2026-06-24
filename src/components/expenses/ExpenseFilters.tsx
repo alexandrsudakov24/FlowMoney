@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
-import type { Expense } from '../types';
-import { useLanguage } from '../context/LanguageContext';
-import styles from '../styles/components/ExpenseFilters.module.css';
+import type { Expense } from '../../types';
+import { useLanguage } from '../../context/LanguageContext';
+import styles from '../../styles/components/ExpenseFilters.module.css';
 
 export interface FilterState {
-    month: string; // '' = all time, 'YYYY-MM' = specific month
+    month: string;
     search: string;
     type: 'all' | 'income' | 'expense';
 }
@@ -31,9 +31,7 @@ export default function ExpenseFilters({ expenses, filters, onChange }: Props) {
         return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
     };
 
-    const hasActive =
-        filters.month !== '' || filters.search !== '' || filters.type !== 'all';
-
+    const hasActive = filters.month !== '' || filters.search !== '' || filters.type !== 'all';
     const set = (patch: Partial<FilterState>) => onChange({ ...filters, ...patch });
 
     return (
@@ -46,9 +44,7 @@ export default function ExpenseFilters({ expenses, filters, onChange }: Props) {
             >
                 <option value="">{t('filter_all_time')}</option>
                 {months.map((m) => (
-                    <option key={m} value={m}>
-                        {formatMonth(m)}
-                    </option>
+                    <option key={m} value={m}>{formatMonth(m)}</option>
                 ))}
             </select>
 
