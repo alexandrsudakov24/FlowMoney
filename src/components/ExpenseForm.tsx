@@ -44,11 +44,12 @@ export default function ExpenseForm({
         }
     }, [defaultValues, setValue]);
 
+    const defaultCategory = defaultValues?.category;
+
     useEffect(() => {
-        if (defaultValues?.category) return; // keep existing category when editing a transaction
+        if (defaultCategory) return; // keep existing category when editing a transaction
         setValue('category', type === 'income' ? INCOME_CATEGORIES[0] : categories[0] || 'Food');
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [type]);
+    }, [type, defaultCategory, setValue, categories]);
 
     // Top-3 expense categories by usage frequency
     const topExpenseCategories = useMemo(() => {
@@ -178,5 +179,5 @@ export default function ExpenseForm({
                 </button>
             </div>
         </form>
-    );
+       );
 }
