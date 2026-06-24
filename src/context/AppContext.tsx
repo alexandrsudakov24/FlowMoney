@@ -45,39 +45,41 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         localStorage.getItem('currency') || 'USD'
     );
 
+    const userId = user?.id ?? null;
+    const familyId = family?.id ?? null;
+    const isAnonymous = user?.isAnonymous ?? true;
+
     const changeCurrency = async (cur: string): Promise<void> => {
         setCurrency(cur);
         localStorage.setItem('currency', cur);
-        if (user && !user.isAnonymous) {
-            await setDoc(doc(db, 'users', user.id), { currency: cur }, { merge: true })
+        if (userId && !isAnonymous) {
+            await setDoc(doc(db, 'users', userId), { currency: cur }, { merge: true })
                 .catch(console.warn);
         }
     };
 
     useEffect(() => {
-        if (!user || user.isAnonymous) return;
-        getDoc(doc(db, 'users', user.id)).then((snap) => {
+        if (!userId || isAnonymous) return;
+        getDoc(doc(db, 'users', userId)).then((snap) => {
             const saved = snap.data()?.currency as string | undefined;
             if (saved) {
                 setCurrency(saved);
                 localStorage.setItem('currency', saved);
             }
         }).catch(console.warn);
-    }, [user?.id]);
+    }, [userId, isAnonymous]);
 
     const expensesCol = useMemo(() => {
-        if (!hasAccess || !user) return null;
-        if (family) return collection(db, 'families', family.id, 'expenses');
-        return collection(db, 'users', user.id, 'expenses');
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [hasAccess, user?.id, family?.id]);
+        if (!hasAccess || !userId) return null;
+        if (familyId) return collection(db, 'families', familyId, 'expenses');
+        return collection(db, 'users', userId, 'expenses');
+    }, [hasAccess, userId, familyId]);
 
     const categoriesRef = useMemo(() => {
-        if (!hasAccess || !user) return null;
-        if (family) return doc(db, 'families', family.id, 'settings', 'categories');
-        return doc(db, 'users', user.id, 'settings', 'categories');
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [hasAccess, user?.id, family?.id]);
+        if (!hasAccess || !userId) return null;
+        if (familyId) return doc(db, 'families', familyId, 'settings', 'categories');
+        return doc(db, 'users', userId, 'settings', 'categories');
+    }, [hasAccess, userId, familyId]);
 
     useEffect(() => {
         if (!expensesCol) {
@@ -179,8 +181,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         const next = categories.filter(c => c !== name);
         await setDoc(categoriesRef, { list: next }).catch((err) => {
             console.error('Failed to remove category', err);
-            showToast(t('save_error'));
-        });
+            showToast(t('save_error'));        });
         return true;
     };
 

@@ -35,9 +35,12 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
     const [familyLoading, setFamilyLoading] = useState(true);
     const [invitations, setInvitations] = useState<Invitation[]>([]);
 
+    const userId = user?.id ?? null;
+    const userEmail = user?.email ?? null;
+
     // Load family and invitations when user is authenticated
     useEffect(() => {
-        const hasAccount = isAuthenticated && user && !!user.email;
+        const hasAccount = isAuthenticated && userId && !!userEmail;
         if (!hasAccount) {
             setFamily(null);
             setFamilyLoading(false);
@@ -50,7 +53,7 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
         const unsubscribers: Array<() => void> = [];
 
         // Subscribe to user doc to get familyId
-        const userUnsub = onSnapshot(doc(db, 'users', user!.id), (userSnap) => {
+        const userUnsub = onSnapshot(doc(db, 'users', userId), (userSnap) => {
             if (cancelled) return;
             const familyId = userSnap.exists() ? userSnap.data()?.familyId : null;
             if (familyId) {
@@ -80,7 +83,7 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
         // Subscribe to pending invitations
         const q = query(
             collection(db, 'invitations'),
-            where('invitedEmail', '==', user!.email)
+            where('invitedEmail', '==', userEmail)
         );
         const invUnsub = onSnapshot(q, (snap) => {
             if (cancelled) return;
@@ -97,8 +100,7 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
             cancelled = true;
             unsubscribers.forEach(unsub => unsub());
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAuthenticated, user?.id, user?.email]);
+    }, [isAuthenticated, userId, userEmail]);
 
     const createFamily = async (name: string): Promise<void> => {
         if (!user || !user.email) return;
