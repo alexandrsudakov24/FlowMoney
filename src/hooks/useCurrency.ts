@@ -1,17 +1,15 @@
 import { useEffect, useState } from 'react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { getCurrencyPreference, saveCurrencyPreference } from '../services/auth';
 
 export function useCurrency(userId: string | null, isAnonymous: boolean) {
     const [currency, setCurrency] = useState(
-        () => localStorage.getItem('currency') || 'USD'
+        () => localStorage.getItem('currency') || 'USD',
     );
 
     // Load saved currency from Firestore on sign-in
     useEffect(() => {
         if (!userId || isAnonymous) return;
-        getDoc(doc(db, 'users', userId)).then((snap) => {
-            const saved = snap.data()?.currency as string | undefined;
+        getCurrencyPreference(userId).then((saved) => {
             if (saved) {
                 setCurrency(saved);
                 localStorage.setItem('currency', saved);
@@ -23,8 +21,7 @@ export function useCurrency(userId: string | null, isAnonymous: boolean) {
         setCurrency(cur);
         localStorage.setItem('currency', cur);
         if (userId && !isAnonymous) {
-            await setDoc(doc(db, 'users', userId), { currency: cur }, { merge: true })
-                .catch(console.warn);
+            await saveCurrencyPreference(userId, cur).catch(console.warn);
         }
     };
 

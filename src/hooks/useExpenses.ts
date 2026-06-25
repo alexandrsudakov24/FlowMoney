@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import type { CollectionReference } from 'firebase/firestore';
-import { onSnapshot, addDoc, doc, deleteDoc, updateDoc, getDocs, type UpdateData } from 'firebase/firestore';
+import { onSnapshot } from 'firebase/firestore';
 import type { TranslationKeys } from '../i18n';
 import type { Expense } from '../types';
 import type { User } from '../context/AuthContext';
 import type { Family } from '../types';
+import * as expenseSvc from '../services/expenses';
 
 export function useExpenses(
     expensesCol: CollectionReference | null,
@@ -40,7 +41,7 @@ export function useExpenses(
             ? { ...expense, addedBy: { uid: user.id, name: user.name } }
             : expense;
         try {
-            await addDoc(expensesCol, data);
+            await expenseSvc.addExpense(expensesCol, data);
         } catch (err) {
             console.error('Failed to add expense', err);
             showToast(t('save_error'));
@@ -51,7 +52,7 @@ export function useExpenses(
     const updateExpense = async (id: string, updatedData: Partial<Expense>): Promise<void> => {
         if (!expensesCol) return;
         try {
-            await updateDoc(doc(expensesCol, id), updatedData as UpdateData<Expense>);
+            await expenseSvc.updateExpense(expensesCol, id, updatedData);
         } catch (err) {
             console.error('Failed to update expense', err);
             showToast(t('save_error'));
@@ -62,7 +63,7 @@ export function useExpenses(
     const deleteExpense = async (id: string): Promise<void> => {
         if (!expensesCol) return;
         try {
-            await deleteDoc(doc(expensesCol, id));
+            await expenseSvc.deleteExpense(expensesCol, id);
         } catch (err) {
             console.error('Failed to delete expense', err);
             showToast(t('save_error'));
@@ -73,8 +74,7 @@ export function useExpenses(
     const clearAll = async (): Promise<void> => {
         if (!expensesCol) return;
         try {
-            const snap = await getDocs(expensesCol);
-            await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
+            await expenseSvc.clearAllExpenses(expensesCol);
         } catch (err) {
             console.error('Failed to clear expenses', err);
             showToast(t('save_error'));

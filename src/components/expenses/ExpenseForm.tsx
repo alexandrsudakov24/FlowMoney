@@ -4,7 +4,7 @@ import styles from './ExpenseForm.module.css';
 import type { Expense } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
 import { useApp, INCOME_CATEGORIES } from '../../context/AppContext';
-import { currencySymbols } from '../../utils/currencySymbols';
+import { currencySymbols } from '../../constants/currency';
 import { getCatLabel } from '../../utils/getCatLabel';
 
 type FormData = {

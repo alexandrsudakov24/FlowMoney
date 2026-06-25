@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useFamily } from '../../context/FamilyContext';
-import { currencySymbols } from '../../utils/currencySymbols';
+import { currencySymbols } from '../../constants/currency';
 import { getCatLabel } from '../../utils/getCatLabel';
 import type { Expense } from '../../types';
 import { ConfirmModal } from '../ui';

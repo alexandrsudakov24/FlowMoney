@@ -29,7 +29,7 @@ vi.mock('../context/AppContext', () => ({
     INCOME_CATEGORIES: ['Salary', 'Freelance', 'Dividends', 'Gift', 'Other'],
 }));
 
-vi.mock('../utils/currencySymbols', () => ({
+vi.mock('../constants/currency', () => ({
     currencySymbols: { USD: '$', EUR: '€', ILS: '₪' },
 }));
 

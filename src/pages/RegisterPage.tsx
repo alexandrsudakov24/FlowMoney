@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import type { TranslationKeys } from '../i18n';
 import { useTheme } from '../context/ThemeContext';
 import { useApp } from '../context/AppContext';
-import { currencySymbols } from '../utils/currencySymbols';
+import { currencySymbols } from '../constants/currency';
 import { firebaseErrorKey } from '../utils/firebaseError';
 import GoogleSignInButton from '../components/GoogleSignInButton';
 import styles from './RegisterPage.module.css';

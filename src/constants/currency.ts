@@ -1,5 +1,5 @@
 export const currencySymbols: Record<string, string> = {
-    USD: "$",
-    EUR: "€",
-    ILS: "₪",
+    USD: '$',
+    EUR: '€',
+    ILS: '₪',
 };

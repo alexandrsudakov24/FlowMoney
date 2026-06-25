@@ -5,7 +5,7 @@ import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useFamily } from '../context/FamilyContext';
 import { getCatLabel } from '../utils/getCatLabel';
-import { currencySymbols } from '../utils/currencySymbols';
+import { currencySymbols } from '../constants/currency';
 import { ThemeModal, LanguageModal, CurrencyModal, CategoryModal, FamilyModal } from '../components/modals';
 import styles from './ProfilePage.module.css';
 

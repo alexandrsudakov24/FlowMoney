@@ -38,7 +38,7 @@ vi.mock('../context/AppContext', () => ({
     useApp: () => ({ changeCurrency: mockChangeCurrency }),
 }));
 
-vi.mock('../utils/currencySymbols', () => ({
+vi.mock('../constants/currency', () => ({
     currencySymbols: { USD: '$', EUR: '€', ILS: '₪' },
 }));
 

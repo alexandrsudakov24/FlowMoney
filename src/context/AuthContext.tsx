@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { auth, db } from '../firebase';
+import { auth } from '../firebase';
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
@@ -13,7 +13,12 @@ import {
     GoogleAuthProvider,
     signInWithPopup,
 } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import {
+    fetchUserLanguage,
+    createUserProfile,
+    ensureUserProfile,
+    updateUserLanguage,
+} from '../services/auth';
 
 export type User = {
     id: string;
@@ -70,11 +75,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     return;
                 }
                 try {
-                    const [userDoc, tokenResult] = await Promise.all([
-                        getDoc(doc(db, 'users', fbUser.uid)),
+                    const [language, tokenResult] = await Promise.all([
+                        fetchUserLanguage(fbUser.uid),
                         fbUser.getIdTokenResult(),
                     ]);
-                    const language = userDoc.exists() ? (userDoc.data()?.language as 'en' | 'ru' | 'he' | undefined) : undefined;
                     setUser(buildPublicUser(fbUser, language));
                     setIsAdmin(tokenResult.claims['admin'] === true);
                 } catch (e: unknown) {
@@ -101,7 +105,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 const credential = EmailAuthProvider.credential(data.email, data.password);
                 const linked = await linkWithCredential(auth.currentUser, credential);
                 await updateProfile(linked.user, { displayName: data.name });
-                await setDoc(doc(db, 'users', linked.user.uid), {
+                await createUserProfile(linked.user.uid, {
                     name: data.name,
                     email: data.email,
                     language: data.language || 'en',
@@ -117,8 +121,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             } catch (linkErr: unknown) {
                 const code = (linkErr as { code?: string })?.code;
                 if (code === 'auth/email-already-in-use') {
-                    // Email taken — throw so RegisterPage shows "sign in" prompt
-                    // without creating a new UID and losing anonymous data
                     throw Object.assign(new Error('email_already_in_use'), { code: 'email_already_in_use' });
                 }
                 console.warn('Failed to link anonymous account, falling back to createUser:', linkErr);
@@ -126,7 +128,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
         const cred = await createUserWithEmailAndPassword(auth, data.email, data.password);
         await updateProfile(cred.user, { displayName: data.name });
-        await setDoc(doc(db, 'users', cred.user.uid), {
+        await createUserProfile(cred.user.uid, {
             name: data.name,
             email: data.email,
             language: data.language || 'en',
@@ -145,8 +147,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const cred = await signInWithEmailAndPassword(auth, data.email, data.password);
         let language: 'en' | 'ru' | 'he' | undefined = undefined;
         try {
-            const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
-            language = userDoc.exists() ? (userDoc.data()?.language as 'en' | 'ru' | 'he' | undefined) : undefined;
+            language = await fetchUserLanguage(cred.user.uid);
         } catch (profileErr) {
             console.warn('failed to load profile from firestore:', profileErr);
         }
@@ -158,68 +159,57 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const loginWithGoogle = async () => {
         const provider = new GoogleAuthProvider();
 
-            if (auth.currentUser?.isAnonymous) {
-                try {
-                    const { linkWithPopup } = await import('firebase/auth');
-                    const linked = await linkWithPopup(auth.currentUser, provider);
-                    const fbUser = linked.user;
-                    const userDoc = await getDoc(doc(db, 'users', fbUser.uid));
-                    if (!userDoc.exists()) {
-                        await setDoc(doc(db, 'users', fbUser.uid), {
-                            name: fbUser.displayName || '',
-                            email: fbUser.email || '',
-                            language: 'en',
-                        });
-                    }
-                    const publicUser = buildPublicUser(fbUser);
-                    setUser(publicUser);
-                    return publicUser;
-                } catch (linkErr: unknown) {
-                    console.warn('Failed to link Google to anonymous account:', linkErr);
-                    const { GoogleAuthProvider: GA, signInWithCredential } = await import('firebase/auth');
-                    const credential = GA.credentialFromError(linkErr as Parameters<typeof GA.credentialFromError>[0]);
-                    if (!credential) {
-                        throw new Error('Failed to extract credential from Google error');
-                    }
-                    const result = await signInWithCredential(auth, credential);
-                    const fbUser = result.user;
-                    const userDoc = await getDoc(doc(db, 'users', fbUser.uid));
-                    if (!userDoc.exists()) {
-                        await setDoc(doc(db, 'users', fbUser.uid), {
-                            name: fbUser.displayName || '',
-                            email: fbUser.email || '',
-                            language: 'en',
-                        });
-                    }
-                    const publicUser = buildPublicUser(fbUser);
-                    setUser(publicUser);
-                    return publicUser;
-                }
-            }
-
-            const cred = await signInWithPopup(auth, provider);
-            const fbUser = cred.user;
-            const userDoc = await getDoc(doc(db, 'users', fbUser.uid));
-            if (!userDoc.exists()) {
-                await setDoc(doc(db, 'users', fbUser.uid), {
+        if (auth.currentUser?.isAnonymous) {
+            try {
+                const { linkWithPopup } = await import('firebase/auth');
+                const linked = await linkWithPopup(auth.currentUser, provider);
+                const fbUser = linked.user;
+                await ensureUserProfile(fbUser.uid, {
                     name: fbUser.displayName || '',
                     email: fbUser.email || '',
                     language: 'en',
                 });
+                const publicUser = buildPublicUser(fbUser);
+                setUser(publicUser);
+                return publicUser;
+            } catch (linkErr: unknown) {
+                console.warn('Failed to link Google to anonymous account:', linkErr);
+                const { GoogleAuthProvider: GA, signInWithCredential } = await import('firebase/auth');
+                const credential = GA.credentialFromError(linkErr as Parameters<typeof GA.credentialFromError>[0]);
+                if (!credential) {
+                    throw new Error('Failed to extract credential from Google error');
+                }
+                const result = await signInWithCredential(auth, credential);
+                const fbUser = result.user;
+                await ensureUserProfile(fbUser.uid, {
+                    name: fbUser.displayName || '',
+                    email: fbUser.email || '',
+                    language: 'en',
+                });
+                const publicUser = buildPublicUser(fbUser);
+                setUser(publicUser);
+                return publicUser;
             }
-            const language = userDoc.exists()
-                ? (userDoc.data()?.language as 'en' | 'ru' | 'he' | undefined)
-                : 'en';
-            const publicUser = buildPublicUser(fbUser, language);
-            setUser(publicUser);
-            return publicUser;
+        }
+
+        const cred = await signInWithPopup(auth, provider);
+        const fbUser = cred.user;
+        const language = await fetchUserLanguage(fbUser.uid);
+        await ensureUserProfile(fbUser.uid, {
+            name: fbUser.displayName || '',
+            email: fbUser.email || '',
+            language: 'en',
+        });
+        const publicUser = buildPublicUser(fbUser, language ?? 'en');
+        setUser(publicUser);
+        return publicUser;
     };
 
     const updateLanguage = async (lang: 'en' | 'ru' | 'he') => {
         if (!user || user.isAnonymous) return;
         setUser((prev) => prev ? { ...prev, language: lang } : prev);
         try {
-            await setDoc(doc(db, 'users', user.id), { language: lang }, { merge: true });
+            await updateUserLanguage(user.id, lang);
         } catch (e) {
             console.warn('Failed to save language to Firestore:', e);
         }
@@ -230,7 +220,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuthenticated: !!user && !user.isAnonymous, isGuest: !!user?.isAnonymous, isAdmin, authReady, register, login, loginWithGoogle, loginAnonymously, logout, updateLanguage }}>
+        <AuthContext.Provider value={{
+            user,
+            isAuthenticated: !!user && !user.isAnonymous,
+            isGuest: !!user?.isAnonymous,
+            isAdmin,
+            authReady,
+            register,
+            login,
+            loginWithGoogle,
+            loginAnonymously,
+            logout,
+            updateLanguage,
+        }}>
             {children}
         </AuthContext.Provider>
     );
