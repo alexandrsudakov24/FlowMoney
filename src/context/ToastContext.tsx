@@ -1,7 +1,7 @@
 
 import { createContext, useCallback, useContext, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import styles from '../styles/components/Toast.module.css';
+import styles from './Toast.module.css';
 
 type ToastType = 'error' | 'success' | 'info';
 

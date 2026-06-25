@@ -1,0 +1,121 @@
+
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    background: var(--bg);
+    position: relative;
+}
+
+.overlay {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.content {
+    padding: 80px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.content h1 {
+    color: var(--text);
+    font-size: 44px;
+    margin: 0 0 12px 0;
+    font-weight: 700;
+}
+
+.content .lead {
+    color: var(--muted);
+    font-size: 18px;
+    margin: 0 0 24px 0;
+}
+
+.actions {
+    margin-top: 18px;
+}
+
+.actions p {
+    margin: 0;
+}
+
+.actions a {
+    background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.12);
+}
+
+.actions a:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.actions a:active {
+    transform: translateY(0);
+}
+
+.guestBtn {
+    background: transparent;
+    color: var(--text-secondary);
+    padding: 12px 24px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    display: inline-block;
+    margin-right: 12px;
+    font-weight: 600;
+    font-size: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.guestBtn:hover {
+    border-color: var(--text-secondary);
+    transform: translateY(-2px);
+}
+
+.guestBtn:active {
+    transform: translateY(0);
+}
+
+.guestBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+    .content {
+        padding: 60px 16px;
+    }
+
+    .content h1 {
+        font-size: 32px;
+    }
+
+    .content .lead {
+        font-size: 16px;
+    }
+
+    .actions a {
+        display: block;
+        margin: 8px 0;
+    }
+
+    .guestBtn {
+        display: block;
+        margin: 8px 0;
+        width: 100%;
+        text-align: center;
+    }
+}
+

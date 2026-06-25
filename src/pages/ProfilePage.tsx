@@ -7,7 +7,7 @@ import { useFamily } from '../context/FamilyContext';
 import { getCatLabel } from '../utils/getCatLabel';
 import { currencySymbols } from '../utils/currencySymbols';
 import { ThemeModal, LanguageModal, CurrencyModal, CategoryModal, FamilyModal } from '../components/modals';
-import styles from '../styles/pages/ProfilePage.module.css';
+import styles from './ProfilePage.module.css';
 
 export default function ProfilePage() {
     const { user, logout, isAdmin } = useAuth();

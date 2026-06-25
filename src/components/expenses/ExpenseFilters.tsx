@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type { Expense } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
-import styles from '../../styles/components/ExpenseFilters.module.css';
+import styles from './ExpenseFilters.module.css';
 
 export interface FilterState {
     month: string;

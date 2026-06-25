@@ -5,7 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import type { TranslationKeys } from '../i18n';
 import { firebaseErrorKey } from '../utils/firebaseError';
 import GoogleSignInButton from '../components/GoogleSignInButton';
-import styles from '../styles/pages/LoginPage.module.css';
+import styles from './LoginPage.module.css';
 
 export default function LoginPage() {
     const { login, loginWithGoogle } = useAuth();

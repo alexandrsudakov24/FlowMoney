@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import styles from '../styles/pages/StartPage.module.css';
+import styles from './StartPage.module.css';
 
 export default function StartPage() {
     const { loginAnonymously } = useAuth();

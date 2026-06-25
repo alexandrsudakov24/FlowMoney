@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import styles from '../../styles/components/ExpenseForm.module.css';
+import styles from './ExpenseForm.module.css';
 import type { Expense } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
 import { useApp, INCOME_CATEGORIES } from '../../context/AppContext';

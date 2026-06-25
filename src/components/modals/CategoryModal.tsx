@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { getCatLabel } from '../../utils/getCatLabel';
-import styles from '../../styles/components/CategoryModal.module.css';
-import modalStyles from '../../styles/components/SettingsModal.module.css';
+import styles from './CategoryModal.module.css';
+import modalStyles from './SettingsModal.module.css';
 
 const DEFAULT_CATEGORIES = ['Food', 'Transport', 'Home', 'Shopping', 'Health', 'Other'];
 

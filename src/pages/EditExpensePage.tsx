@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import { ExpenseForm } from '../components/expenses';
 import type { Expense } from '../types';
-import styles from '../styles/pages/EditExpensePage.module.css';
+import styles from './EditExpensePage.module.css';
 
 type FormData = {
     amount: string;

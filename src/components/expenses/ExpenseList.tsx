@@ -7,7 +7,7 @@ import { currencySymbols } from '../../utils/currencySymbols';
 import { getCatLabel } from '../../utils/getCatLabel';
 import type { Expense } from '../../types';
 import { ConfirmModal } from '../ui';
-import styles from '../../styles/components/ExpenseList.module.css';
+import styles from './ExpenseList.module.css';
 
 const PAGE_SIZE = 20;
 

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
-import styles from '../styles/pages/NotFoundPage.module.css';
+import styles from './NotFoundPage.module.css';
 
 export default function NotFoundPage() {
     const { t } = useLanguage();

@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import styles from '../styles/components/Navbar.module.css';
+import styles from './Navbar.module.css';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import Avatar from './ui/Avatar';

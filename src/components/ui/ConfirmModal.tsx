@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
-import styles from '../../styles/components/ConfirmModal.module.css';
+import styles from './ConfirmModal.module.css';
 
 interface Props {
     isOpen: boolean;

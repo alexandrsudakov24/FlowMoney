@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useFamily } from '../../context/FamilyContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { ConfirmModal } from '../ui';
-import styles from '../../styles/components/FamilyModal.module.css';
+import styles from './FamilyModal.module.css';
 
 interface Props {
     isOpen: boolean;

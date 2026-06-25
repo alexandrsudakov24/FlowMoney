@@ -8,7 +8,7 @@ import { useApp } from '../context/AppContext';
 import { currencySymbols } from '../utils/currencySymbols';
 import { firebaseErrorKey } from '../utils/firebaseError';
 import GoogleSignInButton from '../components/GoogleSignInButton';
-import styles from '../styles/pages/RegisterPage.module.css';
+import styles from './RegisterPage.module.css';
 
 export default function RegisterPage() {
     const { register, loginWithGoogle } = useAuth();

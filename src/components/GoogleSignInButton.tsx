@@ -1,4 +1,4 @@
-import styles from '../styles/components/GoogleSignInButton.module.css';
+import styles from './GoogleSignInButton.module.css';
 
 interface Props {
     onClick: () => void;

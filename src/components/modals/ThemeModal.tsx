@@ -1,4 +1,4 @@
-import styles from '../../styles/components/SettingsModal.module.css';
+import styles from './SettingsModal.module.css';
 import { useTheme } from '../../context/ThemeContext';
 import type { Theme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';

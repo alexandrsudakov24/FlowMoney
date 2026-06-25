@@ -1,6 +1,6 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import { useMemo } from 'react';
-import styles from '../../styles/components/Charts.module.css';
+import styles from './Charts.module.css';
 import type { Expense } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
 import { getCatLabel } from '../../utils/getCatLabel';

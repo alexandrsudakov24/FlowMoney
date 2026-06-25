@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import { ExpenseForm } from '../components/expenses';
-import styles from '../styles/pages/AddExpensePage.module.css';
+import styles from './AddExpensePage.module.css';
 
 type FormData = {
     amount: string;

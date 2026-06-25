@@ -5,7 +5,7 @@ import { ExpenseList, Charts, ExpenseFilters } from '../components/expenses';
 import type { FilterState } from '../components/expenses';
 import { Spinner } from '../components/ui';
 import { currencySymbols } from '../utils/currencySymbols';
-import styles from '../styles/pages/DashboardPage.module.css';
+import styles from './DashboardPage.module.css';
 
 export default function DashboardPage() {
     const { expenses, loading, currency } = useApp();
