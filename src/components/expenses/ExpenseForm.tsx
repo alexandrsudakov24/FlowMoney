@@ -1,19 +1,13 @@
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import styles from './ExpenseForm.module.css';
-import type { Expense } from '../../types';
+import type { Expense, TransactionFormData } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
 import { useApp, INCOME_CATEGORIES } from '../../context/AppContext';
 import { currencySymbols } from '../../constants/currency';
 import { getCatLabel } from '../../utils/getCatLabel';
 
-type FormData = {
-    amount: string;
-    category?: string;
-    date: string;
-    note?: string;
-    type: Expense['type'];
-};
+type FormData = TransactionFormData;
 
 export default function ExpenseForm({
     defaultValues,

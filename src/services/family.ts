@@ -16,7 +16,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import type { Family, FamilyMember } from '../types';
-import type { User } from '../context/AuthContext';
+import type { User } from '../types';
 
 export async function createFamily(user: User, name: string): Promise<Family> {
     const member: FamilyMember = { uid: user.id, email: user.email, name: user.name };

@@ -2,15 +2,10 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import { ExpenseForm } from '../components/expenses';
+import type { TransactionFormData } from '../types';
 import styles from './AddExpensePage.module.css';
 
-type FormData = {
-    amount: string;
-    category?: string;
-    date: string;
-    note?: string;
-    type: 'expense' | 'income';
-};
+type FormData = TransactionFormData;
 
 export default function AddExpensePage() {
     const { addExpense } = useApp();

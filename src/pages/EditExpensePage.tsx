@@ -2,16 +2,10 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import { ExpenseForm } from '../components/expenses';
-import type { Expense } from '../types';
+import type { TransactionFormData } from '../types';
 import styles from './EditExpensePage.module.css';
 
-type FormData = {
-    amount: string;
-    category?: string;
-    date: string;
-    note?: string;
-    type: Expense['type'];
-};
+type FormData = TransactionFormData;
 
 export default function EditExpensePage() {
     const { id } = useParams();

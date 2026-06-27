@@ -3,7 +3,7 @@ import type { CollectionReference } from 'firebase/firestore';
 import { onSnapshot } from 'firebase/firestore';
 import type { TranslationKeys } from '../i18n';
 import type { Expense } from '../types';
-import type { User } from '../context/AuthContext';
+import type { User } from '../types';
 import type { Family } from '../types';
 import * as expenseSvc from '../services/expenses';
 

@@ -20,14 +20,8 @@ import {
     updateUserLanguage,
 } from '../services/auth';
 
-export type User = {
-    id: string;
-    name: string;
-    email: string;
-    language?: 'en' | 'ru' | 'he';
-    photoURL?: string;
-    isAnonymous?: boolean;
-};
+import type { User } from '../types/auth';
+export type { User };
 
 type RegisterData = { name: string; email: string; password: string; language?: 'en' | 'ru' | 'he' };
 type LoginData = { email: string; password: string };
