@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { Expense } from '../types';
 import { useAuth } from './AuthContext';
@@ -6,9 +6,9 @@ import { useFamily } from './FamilyContext';
 import { useToast } from './ToastContext';
 import { useLanguage } from './LanguageContext';
 import { useExpensesRef, useCategoriesRef } from '../hooks/useFirestoreRef';
-import { useExpenses } from '../hooks/useExpenses';
 import { useCategories } from '../hooks/useCategories';
 import { useCurrency } from '../hooks/useCurrency';
+import { useExpenseStore } from '../stores/expenseStore';
 
 export const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Dividends', 'Gift', 'Other'];
 
@@ -42,14 +42,20 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const expensesCol = useExpensesRef(userId, familyId, hasAccess);
     const categoriesRef = useCategoriesRef(userId, familyId, hasAccess);
 
-    const { expenses, loading, addExpense, updateExpense, deleteExpense, clearAll } =
-        useExpenses(expensesCol, user, family, showToast, t);
+    const { _subscribe, expenses, loading, addExpense, updateExpense, deleteExpense, clearAll } =
+        useExpenseStore();
 
     const { categories, addCategory, removeCategory } =
         useCategories(categoriesRef, showToast, t);
 
     const { currency, changeCurrency } =
         useCurrency(userId, isAnonymous);
+
+    // подключаем Firestore к стору
+    useEffect(() => {
+        const unsub = _subscribe(expensesCol, user, family, showToast);
+        return unsub;
+    }, [expensesCol, user, family, showToast]);
 
     return (
         <AppContext.Provider value={{
