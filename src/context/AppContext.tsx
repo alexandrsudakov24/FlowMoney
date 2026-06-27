@@ -4,7 +4,6 @@ import type { Expense } from '../types';
 import { useAuth } from './AuthContext';
 import { useFamily } from './FamilyContext';
 import { useToast } from './ToastContext';
-import { useLanguage } from './LanguageContext';
 import { useExpensesRef, useCategoriesRef } from '../hooks/useFirestoreRef';
 import { useExpenseStore } from '../stores/expenseStore';
 import { useCurrencyStore } from '../stores/currencyStore';
@@ -32,7 +31,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const { user, isAuthenticated, isGuest } = useAuth();
     const { family } = useFamily();
     const { showToast } = useToast();
-    const { t } = useLanguage();
 
     const userId = user?.id ?? null;
     const familyId = family?.id ?? null;
