@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
@@ -21,13 +21,26 @@ export default function ProfilePage() {
     const [categoriesOpen, setCategoriesOpen] = useState(false);
     const [familyOpen, setFamilyOpen] = useState(false);
 
-    const totalExpenses = expenses
-        .filter(e => e.type === 'expense')
-        .reduce((sum, e) => sum + Number(e.amount || 0), 0);
-
-    const totalIncome = expenses
-        .filter(e => e.type === 'income')
-        .reduce((sum, e) => sum + Number(e.amount || 0), 0);
+    const { totalExpenses, totalIncome, topCategory } = useMemo(() => {
+        const map: Record<string, number> = {};
+        let expenses_ = 0;
+        let income = 0;
+        expenses.forEach(e => {
+            const amount = Number(e.amount || 0);
+            if (e.type === 'expense') {
+                expenses_ += amount;
+                map[e.category] = (map[e.category] || 0) + amount;
+            } else {
+                income += amount;
+            }
+        });
+        const raw = Object.entries(map).sort((a, b) => b[1] - a[1])[0]?.[0];
+        return {
+            totalExpenses: expenses_,
+            totalIncome: income,
+            topCategory: raw ? getCatLabel(raw, t) : '—',
+        };
+    }, [expenses, t]);
 
     const symbol = currencySymbols[currency] ?? currency;
 
@@ -49,18 +62,6 @@ export default function ProfilePage() {
         a.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
-
-    const topCategory = (() => {
-        const map: Record<string, number> = {};
-        expenses.forEach(e => {
-            if (e.type === 'expense') {
-                map[e.category] = (map[e.category] || 0) + Number(e.amount || 0);
-            }
-        });
-        const raw = Object.entries(map).sort((a, b) => b[1] - a[1])[0]?.[0];
-        if (!raw) return '—';
-        return getCatLabel(raw, t);
-    })();
 
     const hasAccount = !!user?.email;
 
@@ -182,7 +183,4 @@ export default function ProfilePage() {
             <LanguageModal isOpen={languageOpen} onClose={() => setLanguageOpen(false)} />
             <CurrencyModal isOpen={currencyOpen} onClose={() => setCurrencyOpen(false)} />
             <CategoryModal isOpen={categoriesOpen} onClose={() => setCategoriesOpen(false)} />
-            <FamilyModal isOpen={familyOpen} onClose={() => setFamilyOpen(false)} />
-        </div>
-    );
-}
+            <FamilyModal isOpen={familyOpen} onClose={() =>

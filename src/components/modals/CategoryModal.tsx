@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { getCatLabel } from '../../utils/getCatLabel';
@@ -17,6 +17,17 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
     const { t } = useLanguage();
     const [input, setInput] = useState('');
     const [error, setError] = useState('');
+
+    const { usageMap, sorted } = useMemo(() => {
+        const map: Record<string, number> = {};
+        expenses.forEach(e => {
+            if (e.type === 'expense') map[e.category] = (map[e.category] || 0) + 1;
+        });
+        return {
+            usageMap: map,
+            sorted: [...categories].sort((a, b) => (map[b] || 0) - (map[a] || 0)),
+        };
+    }, [expenses, categories]);
 
     if (!isOpen) return null;
 
@@ -37,12 +48,6 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
         if (!ok) setError(t('category_in_use'));
         else setError('');
     };
-
-    const usageMap: Record<string, number> = {};
-    expenses.forEach(e => {
-        if (e.type === 'expense') usageMap[e.category] = (usageMap[e.category] || 0) + 1;
-    });
-    const sorted = [...categories].sort((a, b) => (usageMap[b] || 0) - (usageMap[a] || 0));
 
     return (
         <>

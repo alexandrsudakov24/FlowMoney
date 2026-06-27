@@ -33,73 +33,62 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
     const [family, setFamily] = useState<Family | null>(null);
     const [familyLoading, setFamilyLoading] = useState(true);
     const [invitations, setInvitations] = useState<Invitation[]>([]);
+    // undefined = not yet resolved, null = no family, string = has family
+    const [familyId, setFamilyId] = useState<string | null | undefined>(undefined);
 
     const userId = user?.id ?? null;
     const userEmail = user?.email ?? null;
 
-    // Load family and invitations when user is authenticated
+    // Effect 1: subscribe to userDoc (→ familyId) + pending invitations
     useEffect(() => {
         const hasAccount = isAuthenticated && userId && !!userEmail;
         if (!hasAccount) {
-            setFamily(null);
+            setFamilyId(null);
             setFamilyLoading(false);
             setInvitations([]);
             return;
         }
 
-        setFamilyLoading(true);
-        let cancelled = false;
-        const unsubscribers: Array<() => void> = [];
+        const userUnsub = onSnapshot(
+            doc(db, 'users', userId),
+            (snap) => setFamilyId(snap.exists() ? (snap.data()?.familyId ?? null) : null),
+            () => setFamilyId(null),
+        );
 
-        // Subscribe to user doc to get familyId
-        const userUnsub = onSnapshot(doc(db, 'users', userId), (userSnap) => {
-            if (cancelled) return;
-            const familyId = userSnap.exists() ? userSnap.data()?.familyId : null;
-            if (familyId) {
-                // Subscribe to family doc
-                const familyUnsub = onSnapshot(doc(db, 'families', familyId), (snap) => {
-                    if (cancelled) return;
-                    if (snap.exists()) {
-                        setFamily({ id: snap.id, ...(snap.data() as Omit<Family, 'id'>) });
-                    } else {
-                        setFamily(null);
-                    }
-                    setFamilyLoading(false);
-                });
-                unsubscribers.push(familyUnsub);
-            } else {
-                setFamily(null);
-                setFamilyLoading(false);
-            }
-        }, () => {
-            if (!cancelled) {
-                setFamily(null);
-                setFamilyLoading(false);
-            }
-        });
-        unsubscribers.push(userUnsub);
-
-        // Subscribe to pending invitations
         const q = query(
             collection(db, 'invitations'),
             where('invitedEmail', '==', userEmail),
         );
         const invUnsub = onSnapshot(q, (snap) => {
-            if (cancelled) return;
-            const invs: Invitation[] = snap.docs
-                .map((d) => ({ id: d.id, ...(d.data() as Omit<Invitation, 'id'>) }))
-                .filter((inv) => inv.status === 'pending');
-            setInvitations(invs);
-        }, () => {
-            if (!cancelled) setInvitations([]);
-        });
-        unsubscribers.push(invUnsub);
+            setInvitations(
+                snap.docs
+                    .map((d) => ({ id: d.id, ...(d.data() as Omit<Invitation, 'id'>) }))
+                    .filter((inv) => inv.status === 'pending'),
+            );
+        }, () => setInvitations([]));
 
-        return () => {
-            cancelled = true;
-            unsubscribers.forEach((unsub) => unsub());
-        };
+        return () => { userUnsub(); invUnsub(); };
     }, [isAuthenticated, userId, userEmail]);
+
+    // Effect 2: subscribe to family doc once familyId is known
+    useEffect(() => {
+        if (familyId === undefined) return; // userDoc not yet resolved
+        if (!familyId) {
+            setFamily(null);
+            setFamilyLoading(false);
+            return;
+        }
+        setFamilyLoading(true);
+        const unsub = onSnapshot(
+            doc(db, 'families', familyId),
+            (snap) => {
+                setFamily(snap.exists() ? { id: snap.id, ...(snap.data() as Omit<Family, 'id'>) } : null);
+                setFamilyLoading(false);
+            },
+            () => { setFamily(null); setFamilyLoading(false); },
+        );
+        return () => unsub();
+    }, [familyId]);
 
     const createFamily = async (name: string): Promise<void> => {
         if (!user || !user.email) return;
