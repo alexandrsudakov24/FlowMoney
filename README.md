@@ -26,9 +26,11 @@
 | Forms | react-hook-form |
 | Charts | Recharts |
 | Routing | React Router v7 |
+| State | Zustand |
 | Backend | Firebase Firestore + Firebase Auth |
 | Hosting | Firebase Hosting |
 | PWA | vite-plugin-pwa |
+| Testing | Vitest + Testing Library |
 
 ## Quick Start
 
@@ -68,10 +70,15 @@ VITE_FIREBASE_APP_ID=
 ```
 src/
 ├── components/     # UI components (Navbar, Charts, ExpenseForm, ...)
-├── context/        # React contexts (Auth, App, Language, Theme, Family)
-├── locales/        # Translation files
+├── constants/      # App-wide constants
+├── context/        # React contexts (Auth, App, Language, Theme, Family, Toast)
+├── hooks/          # Custom hooks (useExpenses, useCategories, useCurrency, ...)
+├── i18n/           # Translation files (en, ru, he)
 ├── pages/          # Pages (Dashboard, Add, Edit, Profile, Admin, ...)
+├── services/       # Firestore service layer (expenses, categories, family, auth)
+├── stores/         # Zustand stores (expense, category, currency, family, auth)
 ├── styles/         # CSS Modules + global variables
+├── test/           # Test utilities and setup
 ├── types/          # TypeScript types
 └── utils/          # Utilities (currency symbols, etc.)
 ```
@@ -110,9 +117,11 @@ The app uses Firebase anonymous auth on first open — you can start adding tran
 | Формы | react-hook-form |
 | Графики | Recharts |
 | Роутинг | React Router v7 |
+| Состояние | Zustand |
 | Backend | Firebase Firestore + Firebase Auth |
 | Хостинг | Firebase Hosting |
 | PWA | vite-plugin-pwa |
+| Тесты | Vitest + Testing Library |
 
 ## Быстрый старт
 
@@ -152,10 +161,15 @@ VITE_FIREBASE_APP_ID=
 ```
 src/
 ├── components/     # UI-компоненты (Navbar, Charts, ExpenseForm, ...)
-├── context/        # React-контексты (Auth, App, Language, Theme, Family)
-├── locales/        # Файлы переводов
+├── constants/      # Константы приложения
+├── context/        # React-контексты (Auth, App, Language, Theme, Family, Toast)
+├── hooks/          # Кастомные хуки (useExpenses, useCategories, useCurrency, ...)
+├── i18n/           # Файлы переводов (en, ru, he)
 ├── pages/          # Страницы (Dashboard, Add, Edit, Profile, Admin, ...)
+├── services/       # Сервисный слой Firestore (expenses, categories, family, auth)
+├── stores/         # Zustand-сторы (expense, category, currency, family, auth)
 ├── styles/         # CSS Modules + глобальные переменные
+├── test/           # Тестовые утилиты и настройки
 ├── types/          # TypeScript-типы
 └── utils/          # Утилиты (символы валют и др.)
 ```
