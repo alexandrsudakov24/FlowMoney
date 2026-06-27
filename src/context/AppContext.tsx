@@ -6,9 +6,9 @@ import { useFamily } from './FamilyContext';
 import { useToast } from './ToastContext';
 import { useLanguage } from './LanguageContext';
 import { useExpensesRef, useCategoriesRef } from '../hooks/useFirestoreRef';
-import { useCategories } from '../hooks/useCategories';
 import { useExpenseStore } from '../stores/expenseStore';
 import { useCurrencyStore } from '../stores/currencyStore';
+import { useCategoryStore } from '../stores/categoryStore';
 
 export const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Dividends', 'Gift', 'Other'];
 
@@ -45,8 +45,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const { _subscribe, expenses, loading, addExpense, updateExpense, deleteExpense, clearAll } =
         useExpenseStore();
 
-    const { categories, addCategory, removeCategory } =
-        useCategories(categoriesRef, showToast, t);
+    const { categories, addCategory, removeCategory, _subscribe: subscribeCategories } =
+        useCategoryStore();
 
     const { currency, changeCurrency, _init: initCurrency } = useCurrencyStore();
 
@@ -60,6 +60,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         initCurrency(userId, isAnonymous);
     }, [userId, isAnonymous]);
+
+    // Wire Firestore categories document into the category store
+    useEffect(() => {
+        const unsub = subscribeCategories(categoriesRef, showToast);
+        return unsub;
+    }, [categoriesRef, showToast]);
 
     return (
         <AppContext.Provider value={{
