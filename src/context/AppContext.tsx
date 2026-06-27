@@ -7,8 +7,8 @@ import { useToast } from './ToastContext';
 import { useLanguage } from './LanguageContext';
 import { useExpensesRef, useCategoriesRef } from '../hooks/useFirestoreRef';
 import { useCategories } from '../hooks/useCategories';
-import { useCurrency } from '../hooks/useCurrency';
 import { useExpenseStore } from '../stores/expenseStore';
+import { useCurrencyStore } from '../stores/currencyStore';
 
 export const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Dividends', 'Gift', 'Other'];
 
@@ -48,14 +48,18 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const { categories, addCategory, removeCategory } =
         useCategories(categoriesRef, showToast, t);
 
-    const { currency, changeCurrency } =
-        useCurrency(userId, isAnonymous);
+    const { currency, changeCurrency, _init: initCurrency } = useCurrencyStore();
 
-    // подключаем Firestore к стору
+    // Wire Firestore collection + user context into the expense store
     useEffect(() => {
         const unsub = _subscribe(expensesCol, user, family, showToast);
         return unsub;
     }, [expensesCol, user, family, showToast]);
+
+    // Re-init currency store whenever the user changes (login, logout, etc.)
+    useEffect(() => {
+        initCurrency(userId, isAnonymous);
+    }, [userId, isAnonymous]);
 
     return (
         <AppContext.Provider value={{
