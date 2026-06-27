@@ -183,4 +183,7 @@ export default function ProfilePage() {
             <LanguageModal isOpen={languageOpen} onClose={() => setLanguageOpen(false)} />
             <CurrencyModal isOpen={currencyOpen} onClose={() => setCurrencyOpen(false)} />
             <CategoryModal isOpen={categoriesOpen} onClose={() => setCategoriesOpen(false)} />
-            <FamilyModal isOpen={familyOpen} onClose={() =>
+            <FamilyModal isOpen={familyOpen} onClose={() => setFamilyOpen(false)} />
+        </div>
+    );
+}
