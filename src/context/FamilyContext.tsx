@@ -1,7 +1,9 @@
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
+import { useLanguage } from './LanguageContext';
+import type { TranslationKeys } from '../i18n';
 import { useFamilyStore } from '../stores/familyStore';
 import type { InviteResult } from '../stores/familyStore';
 
@@ -24,7 +26,9 @@ const FamilyContext = createContext<FamilyContextType | undefined>(undefined);
 // Keeps useFamily() working across the app without any changes.
 export const FamilyProvider = ({ children }: { children: ReactNode }) => {
     const { user, isAuthenticated } = useAuth();
-    const { showToast } = useToast();
+    const { showToast: rawShowToast } = useToast();
+    const { t } = useLanguage();
+    const showToast = useCallback((key: string) => rawShowToast(t(key as TranslationKeys)), [rawShowToast, t]);
     const store = useFamilyStore();
 
     const userId = user?.id ?? null;
