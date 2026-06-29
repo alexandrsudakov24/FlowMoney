@@ -1,9 +1,11 @@
-import { createContext, useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { Expense } from '../types';
 import { useAuth } from './AuthContext';
 import { useFamily } from './FamilyContext';
 import { useToast } from './ToastContext';
+import { useLanguage } from './LanguageContext';
+import type { TranslationKeys } from '../i18n';
 import { useExpensesRef, useCategoriesRef } from '../hooks/useFirestoreRef';
 import { useExpenseStore } from '../stores/expenseStore';
 import { useCurrencyStore } from '../stores/currencyStore';
@@ -30,7 +32,9 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider = ({ children }: { children: ReactNode }) => {
     const { user, isAuthenticated, isGuest } = useAuth();
     const { family } = useFamily();
-    const { showToast } = useToast();
+    const { showToast: rawShowToast } = useToast();
+    const { t } = useLanguage();
+    const showToast = useCallback((key: string) => rawShowToast(t(key as TranslationKeys)), [rawShowToast, t]);
 
     const userId = user?.id ?? null;
     const familyId = family?.id ?? null;
@@ -57,7 +61,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     // Re-init currency store whenever the user changes (login, logout, etc.)
     useEffect(() => {
         initCurrency(userId, isAnonymous);
-    }, [userId, isAnonymous]);
+    }, [userId, isAnonymous, initCurrency]);
 
     // Wire Firestore categories document into the category store
     useEffect(() => {
