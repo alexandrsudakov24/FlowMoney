@@ -27,7 +27,7 @@ export default function EditExpensePage() {
     const handleSubmit = async (data: FormData) => {
         if (!id) return;
         try {
-            await updateExpense(id, { ...data, amount: Number(data.amount) });
+            await updateExpense(id, { ...data, amount: Math.round(Number(data.amount) * 100) / 100 });
             navigate('/');
         } catch {
             // error already shown via toast
