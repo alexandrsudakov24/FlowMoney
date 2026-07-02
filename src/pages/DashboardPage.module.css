@@ -17,20 +17,16 @@
 }
 
 .summary {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 16px;
     margin-bottom: 24px;
-    flex-wrap: wrap;
 }
 
 .card {
-    flex: 1;
-    min-width: 250px;
-    background: var(--card);
     padding: 20px;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
-    border: 1px solid var(--border);
     transition: all 0.3s ease;
 }
 
@@ -39,11 +35,24 @@
     transform: translateY(-2px);
 }
 
+.cardToday {
+    background: linear-gradient(135deg, #22c55e, #15803d);
+}
+
+.cardWeek {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.cardMonth {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+}
+
 .cardTitle {
     margin: 0 0 8px 0;
     font-size: var(--font-size-xs);
     font-weight: 600;
-    color: var(--muted);
+    color: rgba(255, 255, 255, 0.85);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -51,7 +60,7 @@
 .cardValue {
     font-size: var(--font-size-2xl);
     font-weight: 700;
-    color: var(--accent);
+    color: #fff;
     margin: 0;
 }
 
@@ -103,16 +112,6 @@
     to {
         opacity: 1;
         transform: translateY(0);
-    }
-}
-
-@media (max-width: 900px) {
-    .summary {
-        flex-direction: column;
-    }
-
-    .card {
-        min-width: 100%;
     }
 }
 

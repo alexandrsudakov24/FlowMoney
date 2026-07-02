@@ -31,17 +31,35 @@ export default function DashboardPage() {
         });
     }, [expenses, filters]);
 
-    const { totalIncome, totalExpenses, net } = useMemo(() => {
-        const totalIncome = filteredExpenses.reduce(
-            (sum, e) => sum + (e.type === 'income' ? Number(e.amount || 0) : 0),
-            0
-        );
-        const totalExpenses = filteredExpenses.reduce(
-            (sum, e) => sum + (e.type === 'expense' ? Number(e.amount || 0) : 0),
-            0
-        );
-        return { totalIncome, totalExpenses, net: totalIncome - totalExpenses };
-    }, [filteredExpenses]);
+    const { todayTotal, weekTotal, monthTotal } = useMemo(() => {
+        const toDateStr = (d: Date) => {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        };
+
+        const now = new Date();
+        const todayStr = toDateStr(now);
+        const monthStr = todayStr.slice(0, 7);
+        const dayOfWeek = (now.getDay() + 6) % 7; // Monday = 0
+        const monday = new Date(now);
+        monday.setDate(now.getDate() - dayOfWeek);
+        const weekStartStr = toDateStr(monday);
+
+        let todayTotal = 0;
+        let weekTotal = 0;
+        let monthTotal = 0;
+        expenses.forEach((e) => {
+            if (e.type !== 'expense') return;
+            const amount = Number(e.amount || 0);
+            if (e.date === todayStr) todayTotal += amount;
+            if (e.date >= weekStartStr && e.date <= todayStr) weekTotal += amount;
+            if (e.date.startsWith(monthStr)) monthTotal += amount;
+        });
+
+        return { todayTotal, weekTotal, monthTotal };
+    }, [expenses]);
 
     const hasActiveFilters =
         filters.month !== '' || filters.search !== '' || filters.type !== 'all';
@@ -57,24 +75,24 @@ export default function DashboardPage() {
             <h2 className={styles.title}>{t('dashboard')}</h2>
 
             <div className={styles.summary}>
-                <div className={styles.card}>
-                    <h3 className={styles.cardTitle}>{t('total_income')}</h3>
+                <div className={`${styles.card} ${styles.cardToday}`}>
+                    <h3 className={styles.cardTitle}>{t('today')}</h3>
                     <div className={styles.cardValue}>
-                        {totalIncome.toFixed(2)} {symbol}
+                        {todayTotal.toFixed(2)} {symbol}
                     </div>
                 </div>
 
-                <div className={styles.card}>
-                    <h3 className={styles.cardTitle}>{t('total_expenses')}</h3>
+                <div className={`${styles.card} ${styles.cardWeek}`}>
+                    <h3 className={styles.cardTitle}>{t('this_week')}</h3>
                     <div className={styles.cardValue}>
-                        {totalExpenses.toFixed(2)} {symbol}
+                        {weekTotal.toFixed(2)} {symbol}
                     </div>
                 </div>
 
-                <div className={styles.card}>
-                    <h3 className={styles.cardTitle}>{t('net_balance')}</h3>
+                <div className={`${styles.card} ${styles.cardMonth}`}>
+                    <h3 className={styles.cardTitle}>{t('this_month')}</h3>
                     <div className={styles.cardValue}>
-                        {net.toFixed(2)} {symbol}
+                        {monthTotal.toFixed(2)} {symbol}
                     </div>
                 </div>
             </div>
