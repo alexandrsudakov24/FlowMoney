@@ -18,8 +18,21 @@ import {
     createUserProfile,
     ensureUserProfile,
     updateUserLanguage,
+    saveCurrencyPreference,
 } from '../services/auth';
 import type { User } from '../types/auth';
+
+// When a guest (anonymous) account is upgraded to a real one, carry over the
+// currency they picked — it only ever lived in localStorage until now.
+async function migrateGuestCurrency(uid: string): Promise<void> {
+    const currency = localStorage.getItem('currency');
+    if (!currency) return;
+    try {
+        await saveCurrencyPreference(uid, currency);
+    } catch (e) {
+        console.warn('Failed to migrate guest currency to Firestore:', e);
+    }
+}
 
 type RegisterData = { name: string; email: string; password: string; language?: 'en' | 'ru' | 'he' };
 type LoginData = { email: string; password: string };
@@ -127,6 +140,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     email: data.email,
                     language: data.language || 'en',
                 });
+                await migrateGuestCurrency(linked.user.uid);
                 const publicUser: User = {
                     id: linked.user.uid,
                     name: data.name,
@@ -189,6 +203,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     email: fbUser.email || '',
                     language: 'en',
                 });
+                await migrateGuestCurrency(fbUser.uid);
                 const publicUser = buildPublicUser(fbUser);
                 set({ user: publicUser, isAuthenticated: true, isGuest: false });
                 return publicUser;
@@ -204,6 +219,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                     email: fbUser.email || '',
                     language: 'en',
                 });
+                await migrateGuestCurrency(fbUser.uid);
                 const publicUser = buildPublicUser(fbUser);
                 set({ user: publicUser, isAuthenticated: true, isGuest: false });
                 return publicUser;
