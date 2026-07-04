@@ -112,6 +112,24 @@
   opacity: 0.85;
 }
 
+.cancel {
+  background: var(--danger);
+  color: white;
+}
+
+.cancel:hover {
+  opacity: 0.9;
+}
+
+.save {
+  background: var(--success);
+  color: white;
+}
+
+.save:hover {
+  opacity: 0.9;
+}
+
 @keyframes popIn {
   from {
     opacity: 0;

@@ -56,10 +56,10 @@ export default function LanguageModal({ isOpen, onClose }: LanguageModalProps) {
                     </div>
                 </div>
                 <div className={styles.footer}>
-                    <button className={`${styles.btn} ${styles.secondary}`} onClick={onClose}>
+                    <button className={`${styles.btn} ${styles.cancel}`} onClick={onClose}>
                         {t('cancel')}
                     </button>
-                    <button className={`${styles.btn} ${styles.primary}`} onClick={handleSave}>
+                    <button className={`${styles.btn} ${styles.save}`} onClick={handleSave}>
                         {t('save')}
                     </button>
                 </div>
