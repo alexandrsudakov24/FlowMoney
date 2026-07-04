@@ -18,6 +18,7 @@ const he: Record<TranslationKeys, string> = {
     close: 'סגור',
     save: 'שמור',
     saving: 'שומר…',
+    saved: 'נשמר',
     expense: 'הוצאה',
     income: 'הכנסה',
     total_income: 'סה"כ הכנסות',

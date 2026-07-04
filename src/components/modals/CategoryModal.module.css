@@ -41,6 +41,12 @@
     margin: 0 0 8px;
 }
 
+.success {
+    font-size: var(--font-size-xs);
+    color: var(--success);
+    margin: 0 0 8px;
+}
+
 .list {
     list-style: none;
     padding: 0;

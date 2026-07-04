@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { getCatLabel } from '../../utils/getCatLabel';
@@ -17,6 +17,10 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
     const { t } = useLanguage();
     const [input, setInput] = useState('');
     const [error, setError] = useState('');
+    const [saved, setSaved] = useState(false);
+    const savedTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+    useEffect(() => () => clearTimeout(savedTimeout.current), []);
 
     const { usageMap, sorted } = useMemo(() => {
         const map: Record<string, number> = {};
@@ -41,6 +45,9 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
         await addCategory(name);
         setInput('');
         setError('');
+        setSaved(true);
+        clearTimeout(savedTimeout.current);
+        savedTimeout.current = setTimeout(() => setSaved(false), 2000);
     };
 
     const handleRemove = async (cat: string) => {
@@ -62,13 +69,14 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
                         <input
                             className={styles.input}
                             value={input}
-                            onChange={e => { setInput(e.target.value); setError(''); }}
+                            onChange={e => { setInput(e.target.value); setError(''); setSaved(false); }}
                             onKeyDown={e => e.key === 'Enter' && handleAdd()}
                             placeholder={t('add_category')}
                         />
                         <button className={styles.addBtn} onClick={handleAdd}>+</button>
                     </div>
                     {error && <p className={styles.error}>{error}</p>}
+                    {saved && <p className={styles.success}>{t('saved')}</p>}
                     <ul className={styles.list}>
                         {sorted.map(cat => {
                             const isDefault = DEFAULT_CATEGORIES.includes(cat);

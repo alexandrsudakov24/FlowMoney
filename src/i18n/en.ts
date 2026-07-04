@@ -16,6 +16,7 @@ const en = {
     close: 'Close',
     save: 'Save',
     saving: 'Saving…',
+    saved: 'Saved',
     expense: 'Expense',
     income: 'Income',
     total_income: 'Total Income',

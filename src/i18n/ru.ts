@@ -18,6 +18,7 @@ const ru: Record<TranslationKeys, string> = {
     close: 'Закрыть',
     save: 'Сохранить',
     saving: 'Сохранение…',
+    saved: 'Сохранено',
     expense: 'Расход',
     income: 'Доход',
     total_income: 'Всего доходов',
