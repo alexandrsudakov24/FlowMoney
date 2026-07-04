@@ -6,6 +6,7 @@ export interface Expense {
     note?: string;
     type: 'expense' | 'income';
     addedBy?: { uid: string; name: string };
+    createdAt?: number;
 }
 
 export type TransactionFormData = {

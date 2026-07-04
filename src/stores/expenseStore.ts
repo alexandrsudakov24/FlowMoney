@@ -58,13 +58,13 @@ export const useExpenseStore = create<ExpenseStore>((set) => {
 
             // Listen to Firestore in real time — updates expenses on every change
             const unsub = onSnapshot(col, (snap) => {
-                set({
-                    expenses: snap.docs.map((d) => ({
-                        id: d.id,
-                        ...(d.data() as Omit<Expense, 'id'>),
-                    })),
-                    loading: false,
-                });
+                const expenses = snap.docs.map((d) => ({
+                    id: d.id,
+                    ...(d.data() as Omit<Expense, 'id'>),
+                }));
+                // Most recently added first; older docs without createdAt sink to the bottom.
+                expenses.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                set({ expenses, loading: false });
             });
 
             // Return unsub so AppProvider can stop listening on cleanup
@@ -76,8 +76,8 @@ export const useExpenseStore = create<ExpenseStore>((set) => {
         addExpense: async (expense) => {
             if (!_col || !_user) return;
             const data = _family
-                ? { ...expense, addedBy: { uid: _user.id, name: _user.name } }
-                : expense;
+                ? { ...expense, createdAt: Date.now(), addedBy: { uid: _user.id, name: _user.name } }
+                : { ...expense, createdAt: Date.now() };
             try {
                 await expenseSvc.addExpense(_col, data);
             } catch (err) {
