@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { onSnapshot } from 'firebase/firestore';
-import type { CollectionReference } from 'firebase/firestore';
+import type { CollectionReference, UpdateData } from 'firebase/firestore';
 import type { Expense, User, Family } from '../types';
 import * as expenseSvc from '../services/expenses';
 
@@ -12,7 +12,7 @@ type ExpenseStore = {
 
     // --- actions (called from components) ---
     addExpense: (expense: Omit<Expense, 'id'>) => Promise<void>;
-    updateExpense: (id: string, data: Partial<Expense>) => Promise<void>;
+    updateExpense: (id: string, data: UpdateData<Expense>) => Promise<void>;
     deleteExpense: (id: string) => Promise<void>;
     clearAll: () => Promise<void>;
 

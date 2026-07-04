@@ -13,12 +13,14 @@ export default function AddExpensePage() {
     const navigate = useNavigate();
 
     const handleSubmit = async (data: FormData) => {
+        const { scheduled, ...rest } = data;
         const safeAmount = Math.round(Number(data.amount) * 100) / 100;
         try {
             await addExpense({
-                ...data,
+                ...rest,
                 amount: safeAmount,
                 category: data.category || 'Other',
+                ...(scheduled ? { scheduled: true } : {}),
             });
             navigate('/');
         } catch {

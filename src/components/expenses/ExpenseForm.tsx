@@ -31,6 +31,8 @@ export default function ExpenseForm({
 
     const type = watch('type');
     const selectedCategory = watch('category');
+    const scheduled = watch('scheduled');
+    const todayStr = new Date().toISOString().slice(0, 10);
 
     useEffect(() => {
         if (defaultValues && 'type' in (defaultValues as object)) {
@@ -142,8 +144,21 @@ export default function ExpenseForm({
 
             <label className={styles.label}>
                 <span>{t('date')}</span>
-                <input className={styles.input} type="date" {...register('date')} />
+                <input
+                    className={`${styles.input} ${errors.date ? styles.inputError : ''}`}
+                    type="date"
+                    {...register('date', {
+                        validate: (v) => !scheduled || v > todayStr || t('schedule_date_future_required'),
+                    })}
+                />
+                {errors.date && <span className={styles.errorMsg}>{errors.date.message}</span>}
             </label>
+
+            <label className={styles.checkboxLabel}>
+                <input type="checkbox" {...register('scheduled')} />
+                <span>{t('schedule_later')}</span>
+            </label>
+            {scheduled && <p className={styles.hint}>{t('schedule_later_hint')}</p>}
 
             <label className={styles.label}>
                 <span>{t('notes')}</span>

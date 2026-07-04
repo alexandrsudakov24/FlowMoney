@@ -19,9 +19,9 @@ export async function addExpense(
 export async function updateExpense(
     col: CollectionReference,
     id: string,
-    data: Partial<Expense>,
+    data: UpdateData<Expense>,
 ): Promise<void> {
-    await updateDoc(doc(col, id), data as UpdateData<Expense>);
+    await updateDoc(doc(col, id), data);
 }
 
 export async function deleteExpense(

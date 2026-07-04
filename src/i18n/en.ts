@@ -155,6 +155,11 @@ const en = {
     select_theme: 'Theme',
     save_your_data: 'Save your data',
     save_your_data_hint: 'Create an account or sign in — your transactions will be kept.',
+    schedule_later: 'Schedule for later',
+    schedule_later_hint: 'Will be applied automatically once the date arrives',
+    schedule_date_future_required: 'Pick a date after today',
+    scheduled_payments: 'Scheduled Payments',
+    no_scheduled_payments: 'No scheduled payments',
 } as const;
 
 export default en;

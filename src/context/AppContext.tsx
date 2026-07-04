@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
+import type { UpdateData } from 'firebase/firestore';
 import type { Expense } from '../types';
 import { useAuth } from './AuthContext';
 import { useFamily } from './FamilyContext';
@@ -17,7 +18,7 @@ type AppContextType = {
     expenses: Expense[];
     loading: boolean;
     addExpense: (e: Omit<Expense, 'id'>) => Promise<void>;
-    updateExpense: (id: string, data: Partial<Expense>) => Promise<void>;
+    updateExpense: (id: string, data: UpdateData<Expense>) => Promise<void>;
     deleteExpense: (id: string) => Promise<void>;
     clearAll: () => Promise<void>;
     currency: string;

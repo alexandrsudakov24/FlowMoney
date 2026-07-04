@@ -157,6 +157,11 @@ const he: Record<TranslationKeys, string> = {
     select_theme: 'ערכת נושא',
     save_your_data: 'שמור את הנתונים שלך',
     save_your_data_hint: 'צור חשבון או התחבר — העסקאות שלך ישמרו.',
+    schedule_later: 'תזמן לתאריך עתידי',
+    schedule_later_hint: 'ייושם אוטומטית כשיגיע התאריך',
+    schedule_date_future_required: 'בחר תאריך שמאוחר מהיום',
+    scheduled_payments: 'תשלומים מתוזמנים',
+    no_scheduled_payments: 'אין תשלומים מתוזמנים',
 };
 
 export default he;

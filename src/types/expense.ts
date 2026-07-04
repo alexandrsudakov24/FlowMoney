@@ -7,6 +7,7 @@ export interface Expense {
     type: 'expense' | 'income';
     addedBy?: { uid: string; name: string };
     createdAt?: number;
+    scheduled?: true; // present only while the payment hasn't fired yet
 }
 
 export type TransactionFormData = {
@@ -15,4 +16,5 @@ export type TransactionFormData = {
     date: string;
     note?: string;
     type: Expense['type'];
+    scheduled?: boolean;
 };

@@ -157,6 +157,11 @@ const ru: Record<TranslationKeys, string> = {
     select_theme: 'Тема',
     save_your_data: 'Сохраните данные',
     save_your_data_hint: 'Создайте аккаунт или войдите — ваши транзакции останутся.',
+    schedule_later: 'Запланировать на будущее',
+    schedule_later_hint: 'Спишется автоматически, когда наступит дата',
+    schedule_date_future_required: 'Выберите дату позже сегодняшней',
+    scheduled_payments: 'Отложенные платежи',
+    no_scheduled_payments: 'Нет отложенных платежей',
 };
 
 export default ru;

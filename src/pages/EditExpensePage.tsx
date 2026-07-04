@@ -1,4 +1,5 @@
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { deleteField } from 'firebase/firestore';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import { ExpenseForm } from '../components/expenses';
@@ -26,8 +27,13 @@ export default function EditExpensePage() {
 
     const handleSubmit = async (data: FormData) => {
         if (!id) return;
+        const { scheduled, ...rest } = data;
         try {
-            await updateExpense(id, { ...data, amount: Math.round(Number(data.amount) * 100) / 100 });
+            await updateExpense(id, {
+                ...rest,
+                amount: Math.round(Number(data.amount) * 100) / 100,
+                scheduled: scheduled ? true : deleteField(),
+            });
             navigate('/');
         } catch {
             // error already shown via toast
