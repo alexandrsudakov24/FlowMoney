@@ -98,5 +98,16 @@ service cloud.firestore {
                        request.auth.token.email != null &&
                        resource.data.invitedEmail == request.auth.token.email;
     }
+
+    // Feedback — any signed-in user (including guests) can leave a message for the
+    // developer; only admin can read or remove them. One-way: no updates.
+    match /feedback/{feedbackId} {
+      allow create: if request.auth != null &&
+                       request.resource.data.userId == request.auth.uid &&
+                       request.resource.data.message is string &&
+                       request.resource.data.message.size() > 0 &&
+                       request.resource.data.message.size() <= 2000;
+      allow read, delete: if isAdmin();
+    }
   }
 }

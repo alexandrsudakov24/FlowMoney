@@ -6,7 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useFamily } from '../context/FamilyContext';
 import { getCatLabel } from '../utils/getCatLabel';
 import { currencySymbols } from '../constants/currency';
-import { ThemeModal, LanguageModal, CurrencyModal, CategoryModal, FamilyModal } from '../components/modals';
+import { ThemeModal, LanguageModal, CurrencyModal, CategoryModal, FamilyModal, FeedbackModal } from '../components/modals';
 import styles from './ProfilePage.module.css';
 
 export default function ProfilePage() {
@@ -20,6 +20,7 @@ export default function ProfilePage() {
     const [currencyOpen, setCurrencyOpen] = useState(false);
     const [categoriesOpen, setCategoriesOpen] = useState(false);
     const [familyOpen, setFamilyOpen] = useState(false);
+    const [feedbackOpen, setFeedbackOpen] = useState(false);
 
     const { totalExpenses, totalIncome, topCategory } = useMemo(() => {
         const map: Record<string, number> = {};
@@ -167,6 +168,13 @@ export default function ProfilePage() {
                 </button>
             </div>
 
+            <div className={styles.block}>
+                <h3 className={styles.blockTitle}>{t('contact_developer')}</h3>
+                <button className={styles.exportBtn} onClick={() => setFeedbackOpen(true)}>
+                    {t('contact_developer')}
+                </button>
+            </div>
+
             {role === 'admin' && (
                 <a href="/admin" className={styles.adminBtn}>
                     {t('admin_panel')}
@@ -184,6 +192,7 @@ export default function ProfilePage() {
             <CurrencyModal isOpen={currencyOpen} onClose={() => setCurrencyOpen(false)} />
             <CategoryModal isOpen={categoriesOpen} onClose={() => setCategoriesOpen(false)} />
             <FamilyModal isOpen={familyOpen} onClose={() => setFamilyOpen(false)} />
+            <FeedbackModal isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
         </div>
     );
 }

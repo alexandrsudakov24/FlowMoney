@@ -17,6 +17,43 @@
     margin-bottom: 24px;
 }
 
+.tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.tabBtn {
+    padding: 10px 4px;
+    margin-right: 16px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.tabBtn:hover {
+    color: var(--text);
+}
+
+.tabActive {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+.feedbackMessage {
+    font-size: var(--font-size-sm);
+    color: var(--text);
+    margin: 4px 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
 .loading,
 .empty {
     text-align: center;

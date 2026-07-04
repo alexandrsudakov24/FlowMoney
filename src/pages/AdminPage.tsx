@@ -4,9 +4,10 @@ import { useLanguage } from '../context/LanguageContext';
 import { db } from '../firebase';
 import {
     collection, getDocs, deleteDoc, doc,
-    query, limit, startAfter, type QueryDocumentSnapshot, type DocumentData,
+    query, limit, startAfter, orderBy, type QueryDocumentSnapshot, type DocumentData,
 } from 'firebase/firestore';
 import { ConfirmModal } from '../components/ui';
+import type { Feedback } from '../types';
 import styles from './AdminPage.module.css';
 
 const PAGE_SIZE = 20;
@@ -31,6 +32,12 @@ export default function AdminPage() {
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
+    const [tab, setTab] = useState<'users' | 'feedback'>('users');
+    const [feedback, setFeedback] = useState<Feedback[]>([]);
+    const [feedbackLoading, setFeedbackLoading] = useState(true);
+    const [deletingFeedbackId, setDeletingFeedbackId] = useState<string | null>(null);
+    const [confirmDeleteFeedbackId, setConfirmDeleteFeedbackId] = useState<string | null>(null);
+
     const fetchPage = useCallback(async (after: QueryDocumentSnapshot<DocumentData> | null = null) => {
         const q = after
             ? query(collection(db, 'users'), limit(PAGE_SIZE), startAfter(after))
@@ -48,6 +55,18 @@ export default function AdminPage() {
     useEffect(() => {
         fetchPage().finally(() => setLoading(false));
     }, [fetchPage]);
+
+    useEffect(() => {
+        const q = query(collection(db, 'feedback'), orderBy('createdAt', 'desc'), limit(100));
+        getDocs(q)
+            .then((snap) => {
+                setFeedback(snap.docs.map((d) => ({
+                    id: d.id,
+                    ...(d.data() as Omit<Feedback, 'id'>),
+                })));
+            })
+            .finally(() => setFeedbackLoading(false));
+    }, []);
 
     const handleLoadMore = async () => {
         setLoadingMore(true);
@@ -75,6 +94,17 @@ export default function AdminPage() {
         }
     };
 
+    const handleDeleteFeedback = async (id: string) => {
+        setDeletingFeedbackId(id);
+        setConfirmDeleteFeedbackId(null);
+        try {
+            await deleteDoc(doc(db, 'feedback', id));
+            setFeedback((prev) => prev.filter((f) => f.id !== id));
+        } finally {
+            setDeletingFeedbackId(null);
+        }
+    };
+
     if (role !== 'admin') {
         return <div className={styles.denied}>403</div>;
     }
@@ -82,48 +112,102 @@ export default function AdminPage() {
     return (
         <div className={styles.container}>
             <h1 className={styles.title}>{t('admin_panel')}</h1>
-            <p className={styles.subtitle}>{t('all_users')}: <strong>{users.length}</strong></p>
 
-            {loading ? (
-                <div className={styles.loading}>...</div>
-            ) : users.length === 0 ? (
-                <p className={styles.empty}>{t('no_users')}</p>
-            ) : (
-                <ul className={styles.list}>
-                    {users.map((u) => (
-                        <li key={u.id} className={styles.item}>
-                            <div className={styles.avatar}>
-                                {(u.name || u.email || '?').charAt(0).toUpperCase()}
-                            </div>
-                            <div className={styles.info}>
-                                <span className={styles.name}>{u.name || '—'}</span>
-                                <span className={styles.email}>{u.email || '—'}</span>
-                                <span className={styles.uid}>{u.id}</span>
-                                {u.familyId && (
-                                    <span className={styles.tag}>family: {u.familyId.slice(0, 8)}…</span>
-                                )}
-                            </div>
-                            <button
-                                className={styles.deleteBtn}
-                                onClick={() => setConfirmDeleteId(u.id)}
-                                disabled={deletingId === u.id || u.id === user?.id}
-                                title={u.id === user?.id ? 'Cannot delete admin' : t('delete_user')}
-                            >
-                                {deletingId === u.id ? '…' : t('delete_user')}
-                            </button>
-                        </li>
-                    ))}
-                </ul>
+            <div className={styles.tabs}>
+                <button
+                    className={`${styles.tabBtn} ${tab === 'users' ? styles.tabActive : ''}`}
+                    onClick={() => setTab('users')}
+                >
+                    {t('all_users')}
+                </button>
+                <button
+                    className={`${styles.tabBtn} ${tab === 'feedback' ? styles.tabActive : ''}`}
+                    onClick={() => setTab('feedback')}
+                >
+                    {t('feedback')}
+                </button>
+            </div>
+
+            {tab === 'users' && (
+                <>
+                    <p className={styles.subtitle}>{t('all_users')}: <strong>{users.length}</strong></p>
+
+                    {loading ? (
+                        <div className={styles.loading}>...</div>
+                    ) : users.length === 0 ? (
+                        <p className={styles.empty}>{t('no_users')}</p>
+                    ) : (
+                        <ul className={styles.list}>
+                            {users.map((u) => (
+                                <li key={u.id} className={styles.item}>
+                                    <div className={styles.avatar}>
+                                        {(u.name || u.email || '?').charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className={styles.info}>
+                                        <span className={styles.name}>{u.name || '—'}</span>
+                                        <span className={styles.email}>{u.email || '—'}</span>
+                                        <span className={styles.uid}>{u.id}</span>
+                                        {u.familyId && (
+                                            <span className={styles.tag}>family: {u.familyId.slice(0, 8)}…</span>
+                                        )}
+                                    </div>
+                                    <button
+                                        className={styles.deleteBtn}
+                                        onClick={() => setConfirmDeleteId(u.id)}
+                                        disabled={deletingId === u.id || u.id === user?.id}
+                                        title={u.id === user?.id ? 'Cannot delete admin' : t('delete_user')}
+                                    >
+                                        {deletingId === u.id ? '…' : t('delete_user')}
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+
+                    {hasMore && (
+                        <button
+                            className={styles.loadMoreBtn}
+                            onClick={handleLoadMore}
+                            disabled={loadingMore}
+                        >
+                            {loadingMore ? '…' : t('load_more')}
+                        </button>
+                    )}
+                </>
             )}
 
-            {hasMore && (
-                <button
-                    className={styles.loadMoreBtn}
-                    onClick={handleLoadMore}
-                    disabled={loadingMore}
-                >
-                    {loadingMore ? '…' : t('load_more')}
-                </button>
+            {tab === 'feedback' && (
+                <>
+                    <p className={styles.subtitle}>{t('feedback')}: <strong>{feedback.length}</strong></p>
+
+                    {feedbackLoading ? (
+                        <div className={styles.loading}>...</div>
+                    ) : feedback.length === 0 ? (
+                        <p className={styles.empty}>{t('no_feedback')}</p>
+                    ) : (
+                        <ul className={styles.list}>
+                            {feedback.map((f) => (
+                                <li key={f.id} className={styles.item}>
+                                    <div className={styles.info}>
+                                        <span className={styles.name}>{f.name || f.email || f.userId}</span>
+                                        {f.email && <span className={styles.email}>{f.email}</span>}
+                                        <p className={styles.feedbackMessage}>{f.message}</p>
+                                        {f.createdAt && (
+                                            <span className={styles.uid}>{new Date(f.createdAt).toLocaleString()}</span>
+                                        )}
+                                    </div>
+                                    <button
+                                        className={styles.deleteBtn}
+                                        onClick={() => setConfirmDeleteFeedbackId(f.id)}
+                                        disabled={deletingFeedbackId === f.id}
+                                    >
+                                        {deletingFeedbackId === f.id ? '…' : t('delete')}
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </>
             )}
 
             <ConfirmModal
@@ -138,6 +222,19 @@ export default function AdminPage() {
                 confirmLabel={t('delete_user')}
                 variant="danger"
                 loading={!!deletingId}
+            />
+
+            <ConfirmModal
+                isOpen={!!confirmDeleteFeedbackId}
+                onClose={() => setConfirmDeleteFeedbackId(null)}
+                onConfirm={() => {
+                    if (confirmDeleteFeedbackId) handleDeleteFeedback(confirmDeleteFeedbackId);
+                }}
+                title={t('delete')}
+                message={t('delete_feedback_confirm')}
+                confirmLabel={t('delete')}
+                variant="danger"
+                loading={!!deletingFeedbackId}
             />
         </div>
     );
