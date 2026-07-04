@@ -170,8 +170,8 @@
     z-index: 110;
     justify-content: space-around;
     align-items: center;
-    padding: 8px 0;
-    height: 60px;
+    padding: 12px 0;
+    height: 74px;
   }
 
   .navItem {
