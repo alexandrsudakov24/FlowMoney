@@ -56,14 +56,12 @@ const makeFbUser = (overrides: object = {}) => ({
 // ── Helper component ──────────────────────────────────────────────────────────
 
 const Consumer = () => {
-    const { user, isAuthenticated, isGuest, isAdmin, authReady } = useAuth();
+    const { user, role, authReady } = useAuth();
     if (!authReady) return <div>loading</div>;
     return (
         <div>
             <span data-testid="ready">ready</span>
-            <span data-testid="authenticated">{String(isAuthenticated)}</span>
-            <span data-testid="guest">{String(isGuest)}</span>
-            <span data-testid="admin">{String(isAdmin)}</span>
+            <span data-testid="role">{role ?? 'none'}</span>
             <span data-testid="email">{user?.email ?? 'none'}</span>
         </div>
     );
@@ -81,17 +79,15 @@ describe('AuthContext', () => {
         expect(screen.getByText('loading')).toBeInTheDocument();
     });
 
-    it('anonymous user → isGuest true, isAuthenticated false', async () => {
+    it('anonymous user → role is guest', async () => {
         renderWithAuth();
         await act(async () => triggerAuthState(anonFbUser));
         await waitFor(() => expect(screen.getByTestId('ready')).toBeInTheDocument());
 
-        expect(screen.getByTestId('authenticated').textContent).toBe('false');
-        expect(screen.getByTestId('guest').textContent).toBe('true');
-        expect(screen.getByTestId('admin').textContent).toBe('false');
+        expect(screen.getByTestId('role').textContent).toBe('guest');
     });
 
-    it('signed-in user → isAuthenticated true, isGuest false', async () => {
+    it('signed-in user → role is user', async () => {
         const { getDoc } = await import('firebase/firestore');
         (getDoc as Mock).mockResolvedValueOnce({
             exists: () => true,
@@ -102,31 +98,28 @@ describe('AuthContext', () => {
         await act(async () => triggerAuthState(makeFbUser()));
         await waitFor(() => expect(screen.getByTestId('ready')).toBeInTheDocument());
 
-        expect(screen.getByTestId('authenticated').textContent).toBe('true');
-        expect(screen.getByTestId('guest').textContent).toBe('false');
+        expect(screen.getByTestId('role').textContent).toBe('user');
         expect(screen.getByTestId('email').textContent).toBe('user@test.com');
     });
 
-    it('user with admin claim → isAdmin true', async () => {
+    it('user with admin claim → role is admin', async () => {
         renderWithAuth();
         await act(async () => triggerAuthState(makeFbUser({
             getIdTokenResult: vi.fn().mockResolvedValue({ claims: { admin: true } }),
         })));
         await waitFor(() => expect(screen.getByTestId('ready')).toBeInTheDocument());
 
-        expect(screen.getByTestId('admin').textContent).toBe('true');
+        expect(screen.getByTestId('role').textContent).toBe('admin');
     });
 
-    it('logout → all flags false', async () => {
+    it('logout → role is none', async () => {
         renderWithAuth();
         await act(async () => triggerAuthState(makeFbUser()));
-        await waitFor(() => expect(screen.getByTestId('authenticated').textContent).toBe('true'));
+        await waitFor(() => expect(screen.getByTestId('role').textContent).toBe('user'));
 
         await act(async () => triggerAuthState(null));
         await waitFor(() => {
-            expect(screen.getByTestId('authenticated').textContent).toBe('false');
-            expect(screen.getByTestId('guest').textContent).toBe('false');
-            expect(screen.getByTestId('admin').textContent).toBe('false');
+            expect(screen.getByTestId('role').textContent).toBe('none');
         });
     });
 });

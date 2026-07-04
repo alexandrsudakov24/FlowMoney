@@ -15,6 +15,26 @@ service cloud.firestore {
              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.familyId == familyId;
     }
 
+    // True if the caller owns the given family (checked against the family doc itself)
+    function isFamilyOwner(familyId) {
+      return request.auth != null &&
+             exists(/databases/$(database)/documents/families/$(familyId)) &&
+             get(/databases/$(database)/documents/families/$(familyId)).data.ownerId == request.auth.uid;
+    }
+
+    // Lets a family owner clear (only) a former member's own familyId pointer, and nothing
+    // else on that member's profile — this is what actually revokes their access, since
+    // isFamilyMember() is keyed off each user's own pointer rather than the family's member
+    // list. The pointer may only be removed, never reassigned to a different family.
+    function isOwnerRemovingMember(userId) {
+      return request.auth != null &&
+             request.auth.uid != userId &&
+             resource.data.get('familyId', null) != null &&
+             isFamilyOwner(resource.data.get('familyId', null)) &&
+             !('familyId' in request.resource.data) &&
+             request.resource.data.diff(resource.data).affectedKeys().hasOnly(['familyId']);
+    }
+
     // Allow a family update where only the members array changes (not ownerId/name).
     // Used when a new member accepts an invitation — at that moment their users/{uid}.familyId
     // hasn't been saved yet, so isFamilyMember() would return false.
@@ -31,7 +51,10 @@ service cloud.firestore {
     match /users/{userId} {
       allow get: if (request.auth != null && request.auth.uid == userId) || isAdmin();
       allow list: if isAdmin();
-      allow create, update: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if (request.auth != null && request.auth.uid == userId) ||
+                       isOwnerRemovingMember(userId) ||
+                       isAdmin();
       allow delete: if isAdmin();
 
       match /{document=**} {
@@ -61,11 +84,11 @@ service cloud.firestore {
       }
     }
 
-    // Invitations — only family members may create; only the invited user can read/update their own invitations
+    // Invitations — only the family owner may create; only the invited user can read/update their own invitations
     match /invitations/{invitationId} {
       allow create: if request.auth != null &&
                        request.auth.token.email != null &&
-                       isFamilyMember(request.resource.data.familyId);
+                       isFamilyOwner(request.resource.data.familyId);
       allow read:   if request.auth != null && request.auth.token.email != null && (
                       resource.data.invitedEmail == request.auth.token.email ||
                       isFamilyMember(resource.data.familyId) ||

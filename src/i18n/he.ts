@@ -103,6 +103,8 @@ const he: Record<TranslationKeys, string> = {
     invite: 'הזמן',
     leave_family: 'עזוב משפחה',
     leave_family_confirm: 'האם אתה בטוח שברצונך לעזוב את המשפחה?',
+    remove_member: 'הסר',
+    remove_member_confirm: 'להסיר את {name} מהמשפחה?',
     members: 'חברים',
     owner: 'בעלים',
     pending_invitations: 'הזמנות ממתינות',

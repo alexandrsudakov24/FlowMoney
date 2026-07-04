@@ -29,12 +29,12 @@ const IconProfile = () => (
 );
 
 export default function Navbar() {
-    const { isAuthenticated, isGuest, user } = useAuth();
+    const { role, user } = useAuth();
     const { t } = useLanguage();
     const location = useLocation();
 
     const isAuthenticatedPage =
-        (isAuthenticated || isGuest) && !['/start', '/login', '/register'].includes(location.pathname);
+        role !== null && !['/start', '/login', '/register'].includes(location.pathname);
 
     const isActive = (path: string) =>
         path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);

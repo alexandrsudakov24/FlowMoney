@@ -30,7 +30,7 @@ type AppContextType = {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
-    const { user, isAuthenticated, isGuest } = useAuth();
+    const { user, role } = useAuth();
     const { family } = useFamily();
     const { showToast: rawShowToast } = useToast();
     const { t } = useLanguage();
@@ -38,7 +38,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     const userId = user?.id ?? null;
     const familyId = family?.id ?? null;
-    const hasAccess = isAuthenticated || isGuest;
+    const hasAccess = role !== null;
     const isAnonymous = user?.isAnonymous ?? true;
 
     const expensesCol = useExpensesRef(userId, familyId, hasAccess);

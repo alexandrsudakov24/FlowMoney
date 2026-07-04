@@ -16,19 +16,19 @@ import Navbar from './components/Navbar';
 import type { JSX } from 'react';
 
 const RequireAuth = ({ children }: { children: JSX.Element }) => {
-    const { isAuthenticated, isGuest, authReady } = useAuth();
+    const { role, authReady } = useAuth();
     const location = useLocation();
     if (!authReady) return <Spinner size="lg" />;
-    if (!isAuthenticated && !isGuest) {
+    if (role === null) {
         return location.pathname === '/' ? <StartPage /> : <Navigate to="/" replace />;
     }
     return children;
 };
 
 const RequireAdmin = ({ children }: { children: JSX.Element }) => {
-    const { isAdmin, authReady } = useAuth();
+    const { role, authReady } = useAuth();
     if (!authReady) return <Spinner size="lg" />;
-    if (!isAdmin) return <Navigate to="/" replace />;
+    if (role !== 'admin') return <Navigate to="/" replace />;
     return children;
 };
 

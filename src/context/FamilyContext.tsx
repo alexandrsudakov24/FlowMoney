@@ -18,6 +18,7 @@ type FamilyContextType = {
     acceptInvitation: (invitationId: string) => Promise<void>;
     declineInvitation: (invitationId: string) => Promise<void>;
     leaveFamily: () => Promise<void>;
+    removeMember: (memberUid: string) => Promise<void>;
 };
 
 const FamilyContext = createContext<FamilyContextType | undefined>(undefined);
@@ -25,7 +26,7 @@ const FamilyContext = createContext<FamilyContextType | undefined>(undefined);
 // FamilyProvider is now a thin wrapper — all logic lives in familyStore.
 // Keeps useFamily() working across the app without any changes.
 export const FamilyProvider = ({ children }: { children: ReactNode }) => {
-    const { user, isAuthenticated } = useAuth();
+    const { user, role } = useAuth();
     const { showToast: rawShowToast } = useToast();
     const { t } = useLanguage();
     const showToast = useCallback((key: string) => rawShowToast(t(key as TranslationKeys)), [rawShowToast, t]);
@@ -33,12 +34,14 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
 
     const userId = user?.id ?? null;
     const userEmail = user?.email ?? null;
+    // Family features require a real (non-guest) account
+    const isRealAccount = role === 'user' || role === 'admin';
 
     // Wire Firestore listeners into the store whenever the user changes
     useEffect(() => {
-        const unsub = store._subscribe(userId, userEmail, isAuthenticated, user, showToast);
+        const unsub = store._subscribe(userId, userEmail, isRealAccount, user, showToast);
         return unsub;
-    }, [userId, userEmail, isAuthenticated]);
+    }, [userId, userEmail, isRealAccount]);
 
     return (
         <FamilyContext.Provider value={{
@@ -50,6 +53,7 @@ export const FamilyProvider = ({ children }: { children: ReactNode }) => {
             acceptInvitation: store.acceptInvitation,
             declineInvitation: store.declineInvitation,
             leaveFamily: store.leaveFamily,
+            removeMember: store.removeMember,
         }}>
             {children}
         </FamilyContext.Provider>

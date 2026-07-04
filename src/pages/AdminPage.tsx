@@ -21,7 +21,7 @@ interface UserRecord {
 }
 
 export default function AdminPage() {
-    const { user, isAdmin } = useAuth();
+    const { user, role } = useAuth();
     const { t } = useLanguage();
     const [users, setUsers] = useState<UserRecord[]>([]);
     const [loading, setLoading] = useState(true);
@@ -75,7 +75,7 @@ export default function AdminPage() {
         }
     };
 
-    if (!isAdmin) {
+    if (role !== 'admin') {
         return <div className={styles.denied}>403</div>;
     }
 

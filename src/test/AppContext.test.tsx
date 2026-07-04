@@ -73,8 +73,7 @@ vi.mock('firebase/firestore', () => ({
 vi.mock('../context/AuthContext', () => ({
     useAuth: () => ({
         user: stableUser,
-        isAuthenticated: true,
-        isGuest: false,
+        role: 'user',
     }),
 }));
 

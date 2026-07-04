@@ -22,6 +22,7 @@ type FamilyStore = {
     acceptInvitation: (invitationId: string) => Promise<void>;
     declineInvitation: (invitationId: string) => Promise<void>;
     leaveFamily: () => Promise<void>;
+    removeMember: (memberUid: string) => Promise<void>;
 
     // --- internal setup (called from FamilyProvider when user changes) ---
     _subscribe: (
@@ -170,6 +171,18 @@ export const useFamilyStore = create<FamilyStore>((set, get) => {
                 set({ family: null });
             } catch (err) {
                 console.error('Failed to leave family', err);
+                _showToast('save_error');
+            }
+        },
+
+        // Remove another member from the family (owner only — enforced by Firestore rules)
+        removeMember: async (memberUid) => {
+            const { family } = get();
+            if (!family) return;
+            try {
+                await familySvc.removeMember(family, memberUid);
+            } catch (err) {
+                console.error('Failed to remove member', err);
                 _showToast('save_error');
             }
         },

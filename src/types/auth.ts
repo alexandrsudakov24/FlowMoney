@@ -6,3 +6,5 @@ export type User = {
     photoURL?: string;
     isAnonymous?: boolean;
 };
+
+export type AppRole = 'guest' | 'user' | 'admin';

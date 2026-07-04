@@ -85,6 +85,16 @@ export async function declineInvitation(invitationId: string): Promise<void> {
     await updateDoc(doc(db, 'invitations', invitationId), { status: 'declined' });
 }
 
+export async function removeMember(family: Family, memberUid: string): Promise<void> {
+    const member = family.members.find((m) => m.uid === memberUid);
+    if (!member) return;
+
+    const batch = writeBatch(db);
+    batch.update(doc(db, 'families', family.id), { members: arrayRemove(member) });
+    batch.update(doc(db, 'users', memberUid), { familyId: deleteField() });
+    await batch.commit();
+}
+
 export async function leaveFamily(user: User, family: Family): Promise<void> {
     const member = family.members.find((m) => m.uid === user.id);
     if (!member) return;

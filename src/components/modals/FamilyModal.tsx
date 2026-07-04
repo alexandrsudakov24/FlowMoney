@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { useFamily } from '../../context/FamilyContext';
 import { useLanguage } from '../../context/LanguageContext';
+import type { FamilyMember } from '../../types';
 import { ConfirmModal } from '../ui';
 import styles from './FamilyModal.module.css';
 
@@ -10,8 +12,11 @@ interface Props {
 }
 
 export default function FamilyModal({ isOpen, onClose }: Props) {
-    const { family, familyLoading, invitations, createFamily, inviteMember, acceptInvitation, declineInvitation, leaveFamily } = useFamily();
+    const { family, familyLoading, invitations, createFamily, inviteMember, acceptInvitation, declineInvitation, leaveFamily, removeMember } = useFamily();
+    const { user } = useAuth();
     const { t } = useLanguage();
+
+    const isOwner = !!family && family.ownerId === user?.id;
 
     const [familyNameInput, setFamilyNameInput] = useState('');
     const [inviteEmailInput, setInviteEmailInput] = useState('');
@@ -20,6 +25,8 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
     const [inviting, setInviting] = useState(false);
     const [leaving, setLeaving] = useState(false);
     const [confirmLeave, setConfirmLeave] = useState(false);
+    const [removeTarget, setRemoveTarget] = useState<FamilyMember | null>(null);
+    const [removing, setRemoving] = useState(false);
 
     if (!isOpen) return null;
 
@@ -67,6 +74,17 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
         }
     };
 
+    const handleRemoveConfirm = async () => {
+        if (!removeTarget) return;
+        setRemoving(true);
+        try {
+            await removeMember(removeTarget.uid);
+        } finally {
+            setRemoving(false);
+            setRemoveTarget(null);
+        }
+    };
+
     return (
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -93,10 +111,20 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
                                         {m.uid === family.ownerId && (
                                             <span className={styles.ownerBadge}>{t('owner')}</span>
                                         )}
+                                        {isOwner && m.uid !== user?.id && (
+                                            <button
+                                                className={styles.removeMemberBtn}
+                                                onClick={() => setRemoveTarget(m)}
+                                                title={t('remove_member')}
+                                            >
+                                                ✕
+                                            </button>
+                                        )}
                                     </li>
                                 ))}
                             </ul>
                         </div>
+                        {isOwner && (
                         <div className={styles.section}>
                             <h3 className={styles.sectionTitle}>{t('invite_member')}</h3>
                             <div className={styles.inviteRow}>
@@ -122,6 +150,7 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
                                 </p>
                             )}
                         </div>
+                        )}
                         <button className={styles.leaveBtn} onClick={() => setConfirmLeave(true)} disabled={leaving}>
                             {t('leave_family')}
                         </button>
@@ -134,6 +163,16 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
                             confirmLabel={t('leave_family')}
                             variant="warning"
                             loading={leaving}
+                        />
+                        <ConfirmModal
+                            isOpen={!!removeTarget}
+                            onClose={() => setRemoveTarget(null)}
+                            onConfirm={handleRemoveConfirm}
+                            title={t('remove_member')}
+                            message={t('remove_member_confirm').replace('{name}', removeTarget?.name ?? '')}
+                            confirmLabel={t('remove_member')}
+                            variant="warning"
+                            loading={removing}
                         />
                     </div>
                 ) : (

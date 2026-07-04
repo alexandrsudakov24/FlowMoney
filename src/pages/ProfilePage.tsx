@@ -10,7 +10,7 @@ import { ThemeModal, LanguageModal, CurrencyModal, CategoryModal, FamilyModal } 
 import styles from './ProfilePage.module.css';
 
 export default function ProfilePage() {
-    const { user, logout, isAdmin } = useAuth();
+    const { user, logout, role } = useAuth();
     const { expenses, currency } = useApp();
     const { t } = useLanguage();
     const { family, invitations } = useFamily();
@@ -167,7 +167,7 @@ export default function ProfilePage() {
                 </button>
             </div>
 
-            {isAdmin && (
+            {role === 'admin' && (
                 <a href="/admin" className={styles.adminBtn}>
                     {t('admin_panel')}
                 </a>

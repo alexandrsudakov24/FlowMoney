@@ -1,14 +1,12 @@
 import { createContext, useContext, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { User } from '../types/auth';
+import type { User, AppRole } from '../types/auth';
 import { useAuthStore } from '../stores/authStore';
-export type { User };
+export type { User, AppRole };
 
 type AuthContextType = {
     user: User | null;
-    isAuthenticated: boolean;
-    isGuest: boolean;
-    isAdmin: boolean;
+    role: AppRole | null;
     authReady: boolean;
     register: (data: { name: string; email: string; password: string; language?: 'en' | 'ru' | 'he' }) => Promise<User>;
     login: (data: { email: string; password: string }) => Promise<User>;
@@ -32,12 +30,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return unsub;
     }, []);
 
+    const role: AppRole | null = !store.user
+        ? null
+        : store.isAdmin ? 'admin' : store.isGuest ? 'guest' : 'user';
+
     return (
         <AuthContext.Provider value={{
             user: store.user,
-            isAuthenticated: store.isAuthenticated,
-            isGuest: store.isGuest,
-            isAdmin: store.isAdmin,
+            role,
             authReady: store.authReady,
             register: store.register,
             login: store.login,

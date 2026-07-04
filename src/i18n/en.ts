@@ -101,6 +101,8 @@ const en = {
     invite: 'Invite',
     leave_family: 'Leave Family',
     leave_family_confirm: 'Are you sure you want to leave the family?',
+    remove_member: 'Remove',
+    remove_member_confirm: 'Remove {name} from the family?',
     members: 'Members',
     owner: 'Owner',
     pending_invitations: 'Pending Invitations',

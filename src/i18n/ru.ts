@@ -103,6 +103,8 @@ const ru: Record<TranslationKeys, string> = {
     invite: 'Пригласить',
     leave_family: 'Покинуть семью',
     leave_family_confirm: 'Вы уверены, что хотите покинуть семью?',
+    remove_member: 'Удалить',
+    remove_member_confirm: 'Удалить {name} из семьи?',
     members: 'Участники',
     owner: 'Владелец',
     pending_invitations: 'Ожидающие приглашения',
