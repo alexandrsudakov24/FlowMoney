@@ -43,6 +43,15 @@ const { stableUser } = vi.hoisted(() => ({
     stableUser: { id: 'user-1', name: 'Test', email: 'test@test.com', isAnonymous: false },
 }));
 
+// Must also be stable — AppContext's showToast is `useCallback([rawShowToast, t])`,
+// so a fresh function from either mock on every render re-fires the subscribe effect
+// on every render, looping forever (mirrors the real ToastContext/LanguageContext,
+// where both are memoized).
+const { stableShowToast, stableT } = vi.hoisted(() => ({
+    stableShowToast: () => {},
+    stableT: (k: string) => k,
+}));
+
 // ── Firebase mocks ────────────────────────────────────────────────────────────
 
 vi.mock('../firebase', () => ({ db: {} }));
@@ -74,11 +83,11 @@ vi.mock('../context/FamilyContext', () => ({
 }));
 
 vi.mock('../context/ToastContext', () => ({
-    useToast: () => ({ showToast: vi.fn() }),
+    useToast: () => ({ showToast: stableShowToast }),
 }));
 
 vi.mock('../context/LanguageContext', () => ({
-    useLanguage: () => ({ t: (k: string) => k }),
+    useLanguage: () => ({ t: stableT }),
 }));
 
 // ── Helper component ──────────────────────────────────────────────────────────
