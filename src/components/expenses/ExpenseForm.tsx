@@ -31,7 +31,7 @@ export default function ExpenseForm({
 
     const type = watch('type');
     const selectedCategory = watch('category');
-    const scheduled = watch('scheduled');
+    const repeat = watch('repeat') || 'none';
     const todayStr = new Date().toISOString().slice(0, 10);
 
     useEffect(() => {
@@ -148,17 +148,43 @@ export default function ExpenseForm({
                     className={`${styles.input} ${errors.date ? styles.inputError : ''}`}
                     type="date"
                     {...register('date', {
-                        validate: (v) => !scheduled || v > todayStr || t('schedule_date_future_required'),
+                        validate: (v) => repeat !== 'once' || v > todayStr || t('schedule_date_future_required'),
                     })}
                 />
                 {errors.date && <span className={styles.errorMsg}>{errors.date.message}</span>}
             </label>
 
-            <label className={styles.checkboxLabel}>
-                <input type="checkbox" {...register('scheduled')} />
-                <span>{t('schedule_later')}</span>
+            <label className={styles.label}>
+                <span>{t('repeat')}</span>
+                <div className={styles.toggle} role="tablist" aria-label="Repeat">
+                    <button
+                        type="button"
+                        className={`${styles.toggleButton} ${repeat === 'none' ? styles.active : ''}`}
+                        onClick={() => setValue('repeat', 'none')}
+                    >
+                        {t('repeat_none')}
+                    </button>
+                    <button
+                        type="button"
+                        className={`${styles.toggleButton} ${repeat === 'once' ? styles.active : ''}`}
+                        onClick={() => setValue('repeat', 'once')}
+                    >
+                        {t('repeat_once')}
+                    </button>
+                    <button
+                        type="button"
+                        className={`${styles.toggleButton} ${repeat === 'monthly' ? styles.active : ''}`}
+                        onClick={() => setValue('repeat', 'monthly')}
+                    >
+                        {t('repeat_monthly')}
+                    </button>
+                </div>
             </label>
-            {scheduled && <p className={styles.hint}>{t('schedule_later_hint')}</p>}
+            {repeat !== 'none' && (
+                <p className={styles.hint}>
+                    {repeat === 'monthly' ? t('repeat_monthly_hint') : t('schedule_later_hint')}
+                </p>
+            )}
 
             <label className={styles.label}>
                 <span>{t('notes')}</span>

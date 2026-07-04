@@ -27,12 +27,13 @@ export default function EditExpensePage() {
 
     const handleSubmit = async (data: FormData) => {
         if (!id) return;
-        const { scheduled, ...rest } = data;
+        const { repeat, ...rest } = data;
         try {
             await updateExpense(id, {
                 ...rest,
                 amount: Math.round(Number(data.amount) * 100) / 100,
-                scheduled: scheduled ? true : deleteField(),
+                scheduled: repeat === 'none' ? deleteField() : true,
+                repeat: repeat === 'monthly' ? 'monthly' : deleteField(),
             });
             navigate('/');
         } catch {
@@ -40,11 +41,15 @@ export default function EditExpensePage() {
         }
     };
 
+    const initialRepeat: FormData['repeat'] = expense.repeat === 'monthly'
+        ? 'monthly'
+        : expense.scheduled ? 'once' : 'none';
+
     return (
         <div className={styles.page}>
             <h2 className={styles.title}>{t('edit_transaction')}</h2>
             <p className={styles.description}>{t('edit_transaction_desc')}</p>
-            <ExpenseForm defaultValues={expense} onSubmit={handleSubmit} />
+            <ExpenseForm defaultValues={{ ...expense, repeat: initialRepeat } as unknown as Partial<FormData>} onSubmit={handleSubmit} />
         </div>
     );
 }

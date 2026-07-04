@@ -8,6 +8,7 @@ export interface Expense {
     addedBy?: { uid: string; name: string };
     createdAt?: number;
     scheduled?: true; // present only while the payment hasn't fired yet
+    repeat?: 'monthly'; // only meaningful when `scheduled` is also true
 }
 
 export type TransactionFormData = {
@@ -16,5 +17,5 @@ export type TransactionFormData = {
     date: string;
     note?: string;
     type: Expense['type'];
-    scheduled?: boolean;
+    repeat?: 'none' | 'once' | 'monthly';
 };

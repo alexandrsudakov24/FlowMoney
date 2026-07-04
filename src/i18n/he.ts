@@ -157,11 +157,15 @@ const he: Record<TranslationKeys, string> = {
     select_theme: 'ערכת נושא',
     save_your_data: 'שמור את הנתונים שלך',
     save_your_data_hint: 'צור חשבון או התחבר — העסקאות שלך ישמרו.',
-    schedule_later: 'תזמן לתאריך עתידי',
     schedule_later_hint: 'ייושם אוטומטית כשיגיע התאריך',
     schedule_date_future_required: 'בחר תאריך שמאוחר מהיום',
     scheduled_payments: 'תשלומים מתוזמנים',
     no_scheduled_payments: 'אין תשלומים מתוזמנים',
+    repeat: 'חזרה',
+    repeat_none: 'עכשיו',
+    repeat_once: 'פעם אחת',
+    repeat_monthly: 'כל חודש',
+    repeat_monthly_hint: 'עסקה חדשה תתווסף אוטומטית כל חודש בתאריך הזה',
 };
 
 export default he;

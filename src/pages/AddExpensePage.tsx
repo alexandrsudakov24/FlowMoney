@@ -13,14 +13,15 @@ export default function AddExpensePage() {
     const navigate = useNavigate();
 
     const handleSubmit = async (data: FormData) => {
-        const { scheduled, ...rest } = data;
+        const { repeat, ...rest } = data;
         const safeAmount = Math.round(Number(data.amount) * 100) / 100;
         try {
             await addExpense({
                 ...rest,
                 amount: safeAmount,
                 category: data.category || 'Other',
-                ...(scheduled ? { scheduled: true } : {}),
+                ...(repeat === 'once' ? { scheduled: true } : {}),
+                ...(repeat === 'monthly' ? { scheduled: true, repeat: 'monthly' } : {}),
             });
             navigate('/');
         } catch {
