@@ -9,12 +9,15 @@
 - Add income and expenses with category, date, and note
 - Dashboard with balance summary and filters (by month, type, keyword search)
 - Charts: spending by category and income vs. expenses over time
-- Family budget: invitations and shared transactions
+- Family budget: owner-only invitations, member removal, shared transactions
 - Custom categories
 - Three languages: English, Russian, Hebrew (with RTL support)
 - Light and dark theme
 - Currency selection
 - JSON data export
+- Role-based access: guest, registered user, admin
+- Admin panel: manage users, review user feedback
+- In-app feedback: send a message to the developer from your profile
 - PWA: installable on mobile, works like a native app
 
 ## Tech Stack
@@ -87,6 +90,14 @@ src/
 
 The app uses Firebase anonymous auth on first open — you can start adding transactions immediately. On sign-up or Google login, the anonymous account is upgraded without any data loss.
 
+## Roles
+
+- **Guest** — anonymous session, full app access, can send feedback
+- **User** — registered account (email/password or Google), can own/join a family budget
+- **Admin** — access to `/admin`: manage users and review feedback messages
+
+Within a family budget, only the **owner** can invite or remove members; a removed member's access is revoked immediately via Firestore security rules.
+
 ---
 
 # FlowMoney (Русский)
@@ -100,12 +111,15 @@ The app uses Firebase anonymous auth on first open — you can start adding tran
 - Добавление доходов и расходов с категорией, датой и заметкой
 - Дашборд с балансом, суммой доходов/расходов и фильтрами (по месяцу, типу, поиску)
 - Графики: распределение по категориям и динамика доходов/расходов по датам
-- Семейный бюджет: приглашения, общие транзакции
+- Семейный бюджет: приглашения только от владельца, удаление участников, общие транзакции
 - Кастомные категории
 - Три языка: русский, английский, иврит (с поддержкой RTL)
 - Светлая и тёмная тема
 - Выбор валюты
 - Экспорт данных в JSON
+- Ролевая модель: гость, зарегистрированный пользователь, админ
+- Панель администратора: управление пользователями, просмотр отзывов
+- Обратная связь: отправка сообщения разработчику прямо из профиля
 - PWA: устанавливается на телефон, работает как нативное приложение
 
 ## Стек
@@ -177,3 +191,11 @@ src/
 ## Авторизация
 
 Приложение использует анонимную авторизацию Firebase при первом открытии — можно сразу вносить транзакции. При регистрации или входе через Google анонимный аккаунт обновляется без потери данных.
+
+## Роли
+
+- **Гость** — анонимная сессия, полный доступ к приложению, может отправлять отзывы
+- **Пользователь** — зарегистрированный аккаунт (email/пароль или Google), может владеть семейным бюджетом или состоять в нём
+- **Админ** — доступ к `/admin`: управление пользователями и просмотр отзывов
+
+В семейном бюджете приглашать и удалять участников может только **владелец**; доступ удалённого участника отзывается немедленно через правила безопасности Firestore.
