@@ -65,8 +65,7 @@
 }
 
 .balanceCard {
-    background: var(--card);
-    border: 1px solid var(--border);
+    background: linear-gradient(135deg, #16a34a, #065f46);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
     padding: 24px;
@@ -76,13 +75,18 @@
 
 .balanceCard:hover {
     box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.balanceNegative {
+    background: linear-gradient(135deg, #ef4444, #991b1b);
 }
 
 .balanceTitle {
     margin: 0 0 8px 0;
     font-size: var(--font-size-xs);
     font-weight: 600;
-    color: var(--muted);
+    color: rgba(255, 255, 255, 0.85);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -90,12 +94,8 @@
 .balanceValue {
     font-size: 36px;
     font-weight: 800;
-    color: #16a34a;
+    color: #fff;
     margin: 0;
-}
-
-.balanceNegative .balanceValue {
-    color: #ef4444;
 }
 
 .chartsSection {
