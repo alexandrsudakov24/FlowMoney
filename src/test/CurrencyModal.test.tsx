@@ -44,16 +44,27 @@ describe('CurrencyModal', () => {
         expect(screen.getByRole('combobox')).toHaveValue('USD');
     });
 
-    it('calls changeCurrency when a new option is selected', async () => {
+    it('does not call changeCurrency just from selecting a new option', async () => {
         render(<CurrencyModal isOpen={true} onClose={vi.fn()} />);
         await userEvent.selectOptions(screen.getByRole('combobox'), 'EUR');
-        expect(mockChangeCurrency).toHaveBeenCalledWith('EUR');
+        expect(mockChangeCurrency).not.toHaveBeenCalled();
     });
 
-    it('calls onClose when close button is clicked', async () => {
+    it('calls changeCurrency only when save is clicked', async () => {
         const onClose = vi.fn();
         render(<CurrencyModal isOpen={true} onClose={onClose} />);
-        await userEvent.click(screen.getByRole('button', { name: '✕' }));
+        await userEvent.selectOptions(screen.getByRole('combobox'), 'EUR');
+        await userEvent.click(screen.getByRole('button', { name: 'save' }));
+        expect(mockChangeCurrency).toHaveBeenCalledWith('EUR');
+        expect(onClose).toHaveBeenCalledOnce();
+    });
+
+    it('calls onClose without saving when cancel is clicked', async () => {
+        const onClose = vi.fn();
+        render(<CurrencyModal isOpen={true} onClose={onClose} />);
+        await userEvent.selectOptions(screen.getByRole('combobox'), 'EUR');
+        await userEvent.click(screen.getByRole('button', { name: 'cancel' }));
+        expect(mockChangeCurrency).not.toHaveBeenCalled();
         expect(onClose).toHaveBeenCalledOnce();
     });
 

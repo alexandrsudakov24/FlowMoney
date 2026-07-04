@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import styles from './SettingsModal.module.css';
 import { useTheme } from '../../context/ThemeContext';
 import type { Theme } from '../../context/ThemeContext';
@@ -13,11 +14,18 @@ const THEME_OPTIONS: Theme[] = ['light', 'dark', 'auto'];
 export default function ThemeModal({ isOpen, onClose }: ThemeModalProps) {
     const { theme, setTheme } = useTheme();
     const { t } = useLanguage();
+    const [selected, setSelected] = useState<Theme>(theme);
+
+    // Reset the pending selection to the applied theme each time the modal opens
+    useEffect(() => {
+        if (isOpen) setSelected(theme);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen]);
 
     if (!isOpen) return null;
 
-    const handleSelect = (t: Theme) => {
-        setTheme(t);
+    const handleSave = () => {
+        setTheme(selected);
         onClose();
     };
 
@@ -27,21 +35,28 @@ export default function ThemeModal({ isOpen, onClose }: ThemeModalProps) {
             <div className={styles.modal}>
                 <div className={styles.header}>
                     <h2>{t('theme')}</h2>
-                    <button className={styles.closeBtn} onClick={onClose}>✕</button>
                 </div>
                 <div className={styles.content}>
                     <div className={styles.setting}>
                         {THEME_OPTIONS.map((opt) => (
                             <button
                                 key={opt}
-                                className={`${styles.btn} ${theme === opt ? styles.primary : styles.secondary}`}
-                                onClick={() => handleSelect(opt)}
+                                className={`${styles.btn} ${selected === opt ? styles.primary : styles.secondary}`}
+                                onClick={() => setSelected(opt)}
                                 style={{ marginBottom: 8 }}
                             >
                                 {t(opt)}
                             </button>
                         ))}
                     </div>
+                </div>
+                <div className={styles.footer}>
+                    <button className={`${styles.btn} ${styles.secondary}`} onClick={onClose}>
+                        {t('cancel')}
+                    </button>
+                    <button className={`${styles.btn} ${styles.primary}`} onClick={handleSave}>
+                        {t('save')}
+                    </button>
                 </div>
             </div>
         </>
