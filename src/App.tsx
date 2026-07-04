@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { ErrorBoundary, Spinner } from './components/ui';
 import DashboardPage from './pages/DashboardPage';
 import AddExpensePage from './pages/AddExpensePage';
@@ -17,15 +17,18 @@ import type { JSX } from 'react';
 
 const RequireAuth = ({ children }: { children: JSX.Element }) => {
     const { isAuthenticated, isGuest, authReady } = useAuth();
+    const location = useLocation();
     if (!authReady) return <Spinner size="lg" />;
-    if (!isAuthenticated && !isGuest) return <StartPage />;
+    if (!isAuthenticated && !isGuest) {
+        return location.pathname === '/' ? <StartPage /> : <Navigate to="/" replace />;
+    }
     return children;
 };
 
 const RequireAdmin = ({ children }: { children: JSX.Element }) => {
     const { isAdmin, authReady } = useAuth();
     if (!authReady) return <Spinner size="lg" />;
-    if (!isAdmin) return <StartPage />;
+    if (!isAdmin) return <Navigate to="/" replace />;
     return children;
 };
 
