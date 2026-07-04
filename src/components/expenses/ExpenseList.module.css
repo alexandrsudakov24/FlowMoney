@@ -56,6 +56,12 @@
   white-space: nowrap;
 }
 
+.repeatBadge {
+  display: block;
+  color: var(--accent);
+  opacity: 0.8;
+}
+
 .right {
   display: flex;
   flex-direction: column;

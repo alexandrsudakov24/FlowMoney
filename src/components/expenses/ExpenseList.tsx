@@ -65,7 +65,12 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
                                 <div className={`${styles.amount} ${e.type === 'income' ? styles.amountIncome : styles.amountExpense}`}>
                                     {sign}{amount} {symbol}
                                 </div>
-                                <div className={styles.date}>{formatDate(e.date)}</div>
+                                <div className={styles.date}>
+                                    {formatDate(e.date)}
+                                    {e.repeat === 'monthly' && (
+                                        <span className={styles.repeatBadge}>↻ {t('repeat_monthly')}</span>
+                                    )}
+                                </div>
                                 <div className={styles.actions}>
                                     <Link to={`/edit/${e.id}`} className="btn">{t('edit')}</Link>
                                     <button className="btn danger" onClick={() => setConfirmingId(e.id)}>

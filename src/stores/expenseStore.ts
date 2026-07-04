@@ -4,6 +4,17 @@ import type { CollectionReference, UpdateData } from 'firebase/firestore';
 import type { Expense, User, Family } from '../types';
 import * as expenseSvc from '../services/expenses';
 
+// Advances a YYYY-MM-DD date by one calendar month, clamping to the last
+// day of the target month when the original day doesn't exist there
+// (e.g. Jan 31 -> Feb 28/29). JS Date normalizes month/year overflow, so
+// December correctly rolls into January of the next year.
+function addOneMonthClamped(dateStr: string): string {
+    const [y, m, d] = dateStr.split('-').map(Number); // m is 1-based
+    const lastDayOfNextMonth = new Date(y, m + 1, 0).getDate();
+    const next = new Date(y, m, Math.min(d, lastDayOfNextMonth));
+    return `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, '0')}-${String(next.getDate()).padStart(2, '0')}`;
+}
+
 // Shape of the store — what data it holds and what actions it can do
 type ExpenseStore = {
     // --- state ---
@@ -66,13 +77,23 @@ export const useExpenseStore = create<ExpenseStore>((set) => {
                 expenses.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
                 set({ expenses, loading: false });
 
-                // Fire any scheduled payments whose date has arrived — clearing the
-                // flag turns them into normal transactions on the next snapshot.
+                // Fire any scheduled payments whose date has arrived. One-time payments
+                // simply lose their `scheduled` flag. Monthly ones stay alive as a
+                // template: this occurrence is cloned into a real historical
+                // transaction and the template's date advances to next month.
                 const todayStr = new Date().toISOString().slice(0, 10);
                 expenses
                     .filter((e) => e.scheduled && e.date <= todayStr)
                     .forEach((e) => {
-                        expenseSvc.updateExpense(col, e.id, { scheduled: deleteField() }).catch(() => {});
+                        if (e.repeat === 'monthly') {
+                            const { id, ...rest } = e;
+                            delete rest.scheduled;
+                            delete rest.repeat;
+                            expenseSvc.addExpense(col, { ...rest, createdAt: Date.now() }).catch(() => {});
+                            expenseSvc.updateExpense(col, id, { date: addOneMonthClamped(e.date) }).catch(() => {});
+                        } else {
+                            expenseSvc.updateExpense(col, e.id, { scheduled: deleteField() }).catch(() => {});
+                        }
                     });
             });
 
