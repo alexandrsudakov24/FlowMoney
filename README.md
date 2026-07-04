@@ -7,6 +7,7 @@
 ## Features
 
 - Add income and expenses with category, date, and note
+- Scheduled payments: defer a transaction to a future date, or repeat it monthly, from the transaction form
 - Dashboard with balance summary and filters (by month, type, keyword search)
 - Charts: spending by category and income vs. expenses over time
 - Family budget: owner-only invitations, member removal, shared transactions
@@ -98,6 +99,10 @@ The app uses Firebase anonymous auth on first open — you can start adding tran
 
 Within a family budget, only the **owner** can invite or remove members; a removed member's access is revoked immediately via Firestore security rules.
 
+## Scheduled Payments
+
+From the transaction form, a transaction can be set to **Now** (immediate, the default), **Once** (applied automatically on a future date you pick), or **Monthly** (repeats indefinitely on the same day each month, clamped to the last day of shorter months, e.g. Jan 31 → Feb 28). Pending entries are excluded from dashboard totals and analytics until they fire, and are managed from Profile → Scheduled Payments. Firing runs client-side (no server/Cloud Functions in this project), so it applies the next time any device with the app open syncs — not necessarily at the exact moment the date arrives.
+
 ---
 
 # FlowMoney (Русский)
@@ -109,6 +114,7 @@ Within a family budget, only the **owner** can invite or remove members; a remov
 ## Возможности
 
 - Добавление доходов и расходов с категорией, датой и заметкой
+- Отложенные платежи: перенос транзакции на будущую дату или повтор каждый месяц прямо из формы транзакции
 - Дашборд с балансом, суммой доходов/расходов и фильтрами (по месяцу, типу, поиску)
 - Графики: распределение по категориям и динамика доходов/расходов по датам
 - Семейный бюджет: приглашения только от владельца, удаление участников, общие транзакции
@@ -199,3 +205,7 @@ src/
 - **Админ** — доступ к `/admin`: управление пользователями и просмотр отзывов
 
 В семейном бюджете приглашать и удалять участников может только **владелец**; доступ удалённого участника отзывается немедленно через правила безопасности Firestore.
+
+## Отложенные платежи
+
+В форме транзакции можно выбрать: **Сейчас** (обычная транзакция, по умолчанию), **Один раз** (спишется автоматически в выбранную будущую дату) или **Каждый месяц** (повторяется бессрочно в одно и то же число, с переносом на последний день короткого месяца — например, 31 января → 28 февраля). Пока платёж не сработал, он не учитывается в итогах и аналитике на дашборде и управляется в Профиль → Отложенные платежи. Списание происходит на стороне клиента (в проекте нет сервера/Cloud Functions), поэтому оно применяется при следующей синхронизации любого устройства с открытым приложением — не обязательно точно в момент наступления даты.
