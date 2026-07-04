@@ -8,7 +8,7 @@ import { currencySymbols } from '../constants/currency';
 import styles from './DashboardPage.module.css';
 
 export default function DashboardPage() {
-    const { expenses, loading, currency } = useApp();
+    const { activeExpenses: expenses, loading, currency } = useApp();
     const { t } = useLanguage();
 
     const [filters, setFilters] = useState<FilterState>({

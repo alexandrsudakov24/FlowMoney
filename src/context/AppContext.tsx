@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useCallback } from 'react';
+import { createContext, useContext, useEffect, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { UpdateData } from 'firebase/firestore';
 import type { Expense } from '../types';
@@ -16,6 +16,8 @@ export const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Dividends', 'Gift', 'O
 
 type AppContextType = {
     expenses: Expense[];
+    activeExpenses: Expense[];
+    scheduledExpenses: Expense[];
     loading: boolean;
     addExpense: (e: Omit<Expense, 'id'>) => Promise<void>;
     updateExpense: (id: string, data: UpdateData<Expense>) => Promise<void>;
@@ -53,6 +55,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     const { currency, changeCurrency, _init: initCurrency } = useCurrencyStore();
 
+    const activeExpenses = useMemo(() => expenses.filter((e) => !e.scheduled), [expenses]);
+    const scheduledExpenses = useMemo(() => expenses.filter((e) => e.scheduled), [expenses]);
+
     // Wire Firestore collection + user context into the expense store
     useEffect(() => {
         const unsub = _subscribe(expensesCol, user, family, showToast);
@@ -72,7 +77,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     return (
         <AppContext.Provider value={{
-            expenses, loading, addExpense, updateExpense, deleteExpense, clearAll,
+            expenses, activeExpenses, scheduledExpenses, loading, addExpense, updateExpense, deleteExpense, clearAll,
             currency, changeCurrency,
             categories, addCategory, removeCategory,
         }}>

@@ -6,12 +6,12 @@ import { useLanguage } from '../context/LanguageContext';
 import { useFamily } from '../context/FamilyContext';
 import { getCatLabel } from '../utils/getCatLabel';
 import { currencySymbols } from '../constants/currency';
-import { ThemeModal, LanguageModal, CurrencyModal, CategoryModal, FamilyModal, FeedbackModal } from '../components/modals';
+import { ThemeModal, LanguageModal, CurrencyModal, CategoryModal, FamilyModal, FeedbackModal, ScheduledPaymentsModal } from '../components/modals';
 import styles from './ProfilePage.module.css';
 
 export default function ProfilePage() {
     const { user, logout, role } = useAuth();
-    const { expenses, currency } = useApp();
+    const { activeExpenses: expenses, scheduledExpenses, currency } = useApp();
     const { t } = useLanguage();
     const { family, invitations } = useFamily();
 
@@ -21,6 +21,7 @@ export default function ProfilePage() {
     const [categoriesOpen, setCategoriesOpen] = useState(false);
     const [familyOpen, setFamilyOpen] = useState(false);
     const [feedbackOpen, setFeedbackOpen] = useState(false);
+    const [scheduledOpen, setScheduledOpen] = useState(false);
 
     const { totalExpenses, totalIncome, topCategory } = useMemo(() => {
         const map: Record<string, number> = {};
@@ -162,6 +163,16 @@ export default function ProfilePage() {
             </div>
 
             <div className={styles.block}>
+                <h3 className={styles.blockTitle}>{t('scheduled_payments')}</h3>
+                <button className={styles.exportBtn} onClick={() => setScheduledOpen(true)}>
+                    {t('change')}
+                    {scheduledExpenses.length > 0 && (
+                        <span className={styles.invitationBadge}>{scheduledExpenses.length}</span>
+                    )}
+                </button>
+            </div>
+
+            <div className={styles.block}>
                 <h3 className={styles.blockTitle}>{t('data_export')}</h3>
                 <button className={styles.exportBtn} onClick={handleExport}>
                     {t('export_json')}
@@ -193,6 +204,7 @@ export default function ProfilePage() {
             <CategoryModal isOpen={categoriesOpen} onClose={() => setCategoriesOpen(false)} />
             <FamilyModal isOpen={familyOpen} onClose={() => setFamilyOpen(false)} />
             <FeedbackModal isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+            <ScheduledPaymentsModal isOpen={scheduledOpen} onClose={() => setScheduledOpen(false)} />
         </div>
     );
 }
