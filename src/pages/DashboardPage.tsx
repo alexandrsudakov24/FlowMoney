@@ -31,7 +31,7 @@ export default function DashboardPage() {
         });
     }, [expenses, filters]);
 
-    const { todayTotal, weekTotal, monthTotal } = useMemo(() => {
+    const { todayTotal, weekTotal, monthTotal, balance } = useMemo(() => {
         const toDateStr = (d: Date) => {
             const y = d.getFullYear();
             const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -50,15 +50,17 @@ export default function DashboardPage() {
         let todayTotal = 0;
         let weekTotal = 0;
         let monthTotal = 0;
+        let balance = 0;
         expenses.forEach((e) => {
-            if (e.type !== 'expense') return;
             const amount = Number(e.amount || 0);
+            balance += e.type === 'income' ? amount : -amount;
+            if (e.type !== 'expense') return;
             if (e.date === todayStr) todayTotal += amount;
             if (e.date >= weekStartStr && e.date <= todayStr) weekTotal += amount;
             if (e.date.startsWith(monthStr)) monthTotal += amount;
         });
 
-        return { todayTotal, weekTotal, monthTotal };
+        return { todayTotal, weekTotal, monthTotal, balance };
     }, [expenses]);
 
     const hasActiveFilters =
@@ -73,6 +75,13 @@ export default function DashboardPage() {
     return (
         <div className={styles.dashboard}>
             <h2 className={styles.title}>{t('dashboard')}</h2>
+
+            <div className={`${styles.balanceCard} ${balance < 0 ? styles.balanceNegative : ''}`}>
+                <h3 className={styles.balanceTitle}>{t('net_balance')}</h3>
+                <div className={styles.balanceValue}>
+                    {balance.toFixed(2)} {symbol}
+                </div>
+            </div>
 
             <div className={styles.summary}>
                 <div className={`${styles.card} ${styles.cardToday}`}>

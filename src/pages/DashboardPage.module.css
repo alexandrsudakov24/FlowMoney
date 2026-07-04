@@ -64,6 +64,40 @@
     margin: 0;
 }
 
+.balanceCard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 24px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+}
+
+.balanceCard:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.balanceTitle {
+    margin: 0 0 8px 0;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.balanceValue {
+    font-size: 36px;
+    font-weight: 800;
+    color: #16a34a;
+    margin: 0;
+}
+
+.balanceNegative .balanceValue {
+    color: #ef4444;
+}
+
 .chartsSection {
     margin-top: 24px;
 }
