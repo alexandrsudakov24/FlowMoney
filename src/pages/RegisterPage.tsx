@@ -8,6 +8,7 @@ import { useApp } from '../context/AppContext';
 import { currencySymbols } from '../constants/currency';
 import { firebaseErrorKey } from '../utils/firebaseError';
 import GoogleSignInButton from '../components/GoogleSignInButton';
+import { ButtonSpinner } from '../components/ui';
 import styles from './RegisterPage.module.css';
 
 export default function RegisterPage() {
@@ -129,7 +130,7 @@ export default function RegisterPage() {
                     )}
                     <div className={styles.actions}>
                         <button type="submit" disabled={loading}>
-                            {loading ? '...' : t('create_account')}
+                            {loading ? <ButtonSpinner /> : t('create_account')}
                         </button>
                         <Link to="/login">{t('already_have_account')}</Link>
                     </div>

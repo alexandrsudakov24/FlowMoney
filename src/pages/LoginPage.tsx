@@ -5,6 +5,7 @@ import { useLanguage } from '../context/LanguageContext';
 import type { TranslationKeys } from '../i18n';
 import { firebaseErrorKey } from '../utils/firebaseError';
 import GoogleSignInButton from '../components/GoogleSignInButton';
+import { ButtonSpinner } from '../components/ui';
 import styles from './LoginPage.module.css';
 
 export default function LoginPage() {
@@ -69,7 +70,7 @@ export default function LoginPage() {
                     {error && <div className={styles.error}>{t(error as TranslationKeys)}</div>}
                     <div className={styles.actions}>
                         <button type="submit" disabled={loading}>
-                            {loading ? '...' : t('login')}
+                            {loading ? <ButtonSpinner /> : t('login')}
                         </button>
                         <Link to="/register">{t('register')}</Link>
                     </div>
