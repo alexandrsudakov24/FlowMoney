@@ -1,7 +1,4 @@
 .charts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
   margin-bottom: 24px;
 }
 
@@ -11,12 +8,6 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--border);
-}
-
-@media (max-width: 640px) {
-  .charts {
-    grid-template-columns: 1fr;
-  }
 }
 
 .donutRow {

@@ -1,4 +1,4 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useMemo } from 'react';
 import styles from './Charts.module.css';
 import type { Expense } from '../../types';
@@ -20,19 +20,6 @@ export default function Charts({ expenses }: { expenses: Expense[] }) {
         });
         return Object.entries(map).map(([name, value]) => ({ name: getCatLabel(name, t), value }));
     }, [expenses, t]);
-
-    const byDate = useMemo(() => {
-        const map: Record<string, { expense: number; income: number }> = {};
-        expenses.forEach((e) => {
-            const d = e.date;
-            if (!map[d]) map[d] = { expense: 0, income: 0 };
-            if (e.type === 'expense') map[d].expense += Number(e.amount || 0);
-            else map[d].income += Number(e.amount || 0);
-        });
-        return Object.entries(map)
-            .map(([date, data]) => ({ date, ...data }))
-            .sort((a, b) => a.date.localeCompare(b.date));
-    }, [expenses]);
 
     return (
         <div className={styles.charts}>
@@ -69,21 +56,6 @@ export default function Charts({ expenses }: { expenses: Expense[] }) {
                             ))}
                         </ul>
                     </div>
-                )}
-            </div>
-            <div className={styles.chartCard}>
-                <h3>{t('chart_income_vs_expenses')}</h3>
-                {byDate.length === 0 ? <p>{t('no_data')}</p> : (
-                    <ResponsiveContainer width="100%" height={250}>
-                        <BarChart data={byDate}>
-                            <XAxis dataKey="date" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Bar dataKey="expense" fill="#ef4444" name={t('expense')} />
-                            <Bar dataKey="income" fill="#10b981" name={t('income')} />
-                        </BarChart>
-                    </ResponsiveContainer>
                 )}
             </div>
         </div>
