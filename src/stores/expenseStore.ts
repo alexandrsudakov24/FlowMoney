@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { onSnapshot } from 'firebase/firestore';
+import { onSnapshot, deleteField } from 'firebase/firestore';
 import type { CollectionReference, UpdateData } from 'firebase/firestore';
 import type { Expense, User, Family } from '../types';
 import * as expenseSvc from '../services/expenses';
@@ -65,6 +65,15 @@ export const useExpenseStore = create<ExpenseStore>((set) => {
                 // Most recently added first; older docs without createdAt sink to the bottom.
                 expenses.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
                 set({ expenses, loading: false });
+
+                // Fire any scheduled payments whose date has arrived — clearing the
+                // flag turns them into normal transactions on the next snapshot.
+                const todayStr = new Date().toISOString().slice(0, 10);
+                expenses
+                    .filter((e) => e.scheduled && e.date <= todayStr)
+                    .forEach((e) => {
+                        expenseSvc.updateExpense(col, e.id, { scheduled: deleteField() }).catch(() => {});
+                    });
             });
 
             // Return unsub so AppProvider can stop listening on cleanup
