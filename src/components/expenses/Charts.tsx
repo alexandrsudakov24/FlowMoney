@@ -5,7 +5,11 @@ import type { Expense } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
 import { getCatLabel } from '../../utils/getCatLabel';
 
-const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+const COLORS = [
+    '#2a78d6', '#1baf7a', '#eda100', '#008300',
+    '#4a3aa7', '#e34948', '#e87ba4', '#eb6834',
+    '#812964', '#5dbdfb', '#4c51f6', '#911a36',
+];
 
 export default function Charts({ expenses }: { expenses: Expense[] }) {
     const { t } = useLanguage();
