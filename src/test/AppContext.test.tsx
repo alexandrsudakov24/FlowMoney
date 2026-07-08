@@ -70,11 +70,13 @@ vi.mock('firebase/firestore', () => ({
 
 // ── Context mocks ─────────────────────────────────────────────────────────────
 
+const mockUseAuth = vi.fn(() => ({
+    user: stableUser,
+    role: 'user',
+}));
+
 vi.mock('../context/AuthContext', () => ({
-    useAuth: () => ({
-        user: stableUser,
-        role: 'user',
-    }),
+    useAuth: () => mockUseAuth(),
 }));
 
 vi.mock('../context/FamilyContext', () => ({
@@ -111,7 +113,10 @@ const renderWithApp = () => render(<AppProvider><Consumer /></AppProvider>);
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 describe('AppContext', () => {
-    beforeEach(() => vi.clearAllMocks());
+    beforeEach(() => {
+        vi.clearAllMocks();
+        mockUseAuth.mockReturnValue({ user: stableUser, role: 'user' });
+    });
 
     it('initialises with empty expenses', async () => {
         renderWithApp();
@@ -156,6 +161,22 @@ describe('AppContext', () => {
         }));
 
         await waitFor(() => expect(screen.getByTestId('count').textContent).toBe('1'));
+    });
+
+    it('fetches the saved currency from Firestore for a real user without an explicit isAnonymous flag', async () => {
+        // Regression test: buildPublicUser() in authStore never sets `isAnonymous` for
+        // real (non-guest) accounts, so it comes back `undefined` here — not `false`.
+        // AppContext must still treat that as "not anonymous" and fetch the saved
+        // currency preference, instead of silently defaulting to USD forever.
+        mockUseAuth.mockReturnValue({
+            user: { id: 'user-1', name: 'Test', email: 'test@test.com' },
+            role: 'user',
+        });
+
+        const firestoreModule = await import('firebase/firestore');
+        renderWithApp();
+
+        await waitFor(() => expect(firestoreModule.getDoc).toHaveBeenCalled());
     });
 
     it('uses family expenses collection when family is active', async () => {

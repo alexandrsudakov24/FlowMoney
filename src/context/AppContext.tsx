@@ -42,7 +42,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const userId = user?.id ?? null;
     const familyId = family?.id ?? null;
     const hasAccess = role !== null;
-    const isAnonymous = user?.isAnonymous ?? true;
+    const isAnonymous = !user || user.isAnonymous === true;
 
     const expensesCol = useExpensesRef(userId, familyId, hasAccess);
     const categoriesRef = useCategoriesRef(userId, familyId, hasAccess);
