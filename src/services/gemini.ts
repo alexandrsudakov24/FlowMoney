@@ -1,7 +1,7 @@
 import type { Language } from '../i18n';
 import type { Insight } from '../types';
 
-const MODEL = 'gemini-2.5-flash';
+const MODEL = 'gemini-flash-latest';
 const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 
 export type GeminiErrorCode = 'rate_limited' | 'blocked' | 'parse_error' | 'network_error' | 'no_api_key';
