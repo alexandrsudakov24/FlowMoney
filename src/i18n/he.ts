@@ -166,6 +166,18 @@ const he: Record<TranslationKeys, string> = {
     repeat_once: 'פעם אחת',
     repeat_monthly: 'כל חודש',
     repeat_monthly_hint: 'עסקה חדשה תתווסף אוטומטית כל חודש בתאריך הזה',
+    insights_error_rate_limited: 'יותר מדי בקשות. נסה שוב בעוד רגע.',
+    insights_error_blocked: 'ה-AI לא הצליח ליצור תובנות עבור נתונים אלה. נסה שוב מאוחר יותר.',
+    insights_error_parse_error: 'משהו השתבש ביצירת התובנות. נסה שוב.',
+    insights_error_network_error: 'שגיאת רשת. בדוק את החיבור ונסה שוב.',
+    insights_error_no_api_key: 'תובנות AI אינן מוגדרות.',
+    insights: 'תובנות',
+    insights_teaser_desc: 'קבל ניתוח AI מהיר של הוצאותיך.',
+    insights_empty: 'עדיין אין תובנות. צור את הראשונה כדי לראות ניתוח של ההוצאות שלך.',
+    insights_generate_cta: 'צור תובנות',
+    insights_regenerate_cta: 'רענן',
+    insights_cooldown_hint: 'הרענון הבא יהיה זמין בעוד {time}',
+    insights_last_updated: 'עודכן {time}',
 };
 
 export default he;

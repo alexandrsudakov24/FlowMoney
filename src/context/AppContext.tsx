@@ -1,16 +1,17 @@
 import { createContext, useContext, useEffect, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { UpdateData } from 'firebase/firestore';
-import type { Expense } from '../types';
+import type { Expense, InsightsDoc } from '../types';
 import { useAuth } from './AuthContext';
 import { useFamily } from './FamilyContext';
 import { useToast } from './ToastContext';
 import { useLanguage } from './LanguageContext';
-import type { TranslationKeys } from '../i18n';
-import { useExpensesRef, useCategoriesRef } from '../hooks/useFirestoreRef';
+import type { TranslationKeys, Language } from '../i18n';
+import { useExpensesRef, useCategoriesRef, useInsightsRef } from '../hooks/useFirestoreRef';
 import { useExpenseStore } from '../stores/expenseStore';
 import { useCurrencyStore } from '../stores/currencyStore';
 import { useCategoryStore } from '../stores/categoryStore';
+import { useInsightsStore } from '../stores/insightsStore';
 
 export const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Dividends', 'Gift', 'Other'];
 
@@ -28,6 +29,10 @@ type AppContextType = {
     categories: string[];
     addCategory: (name: string) => Promise<void>;
     removeCategory: (name: string) => Promise<boolean>;
+    insightsDoc: InsightsDoc | null;
+    insightsLoading: boolean;
+    insightsGenerating: boolean;
+    regenerateInsights: (expenses: Expense[], language: Language) => Promise<void>;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -46,12 +51,21 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     const expensesCol = useExpensesRef(userId, familyId, hasAccess);
     const categoriesRef = useCategoriesRef(userId, familyId, hasAccess);
+    const insightsRef = useInsightsRef(userId, familyId, hasAccess);
 
     const { _subscribe, expenses, loading, addExpense, updateExpense, deleteExpense, clearAll } =
         useExpenseStore();
 
     const { categories, addCategory, removeCategory, _subscribe: subscribeCategories } =
         useCategoryStore();
+
+    const {
+        doc: insightsDoc,
+        loading: insightsLoading,
+        generating: insightsGenerating,
+        regenerate: regenerateInsights,
+        _subscribe: subscribeInsights,
+    } = useInsightsStore();
 
     const { currency, changeCurrency, _init: initCurrency } = useCurrencyStore();
 
@@ -75,11 +89,18 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         return unsub;
     }, [categoriesRef, showToast]);
 
+    // Wire Firestore insights document into the insights store
+    useEffect(() => {
+        const unsub = subscribeInsights(insightsRef, user, showToast);
+        return unsub;
+    }, [insightsRef, user, showToast]);
+
     return (
         <AppContext.Provider value={{
             expenses, activeExpenses, scheduledExpenses, loading, addExpense, updateExpense, deleteExpense, clearAll,
             currency, changeCurrency,
             categories, addCategory, removeCategory,
+            insightsDoc, insightsLoading, insightsGenerating, regenerateInsights,
         }}>
             {children}
         </AppContext.Provider>

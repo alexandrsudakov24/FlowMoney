@@ -10,6 +10,7 @@
 - Scheduled payments: defer a transaction to a future date, or repeat it monthly, from the transaction form
 - Dashboard with balance summary and filters (by month, type, keyword search)
 - Charts: spending by category and income vs. expenses over time
+- AI Insights: Gemini-generated spending insights (trends, spikes), cached and shared with your family, refreshed manually every 24h
 - Family budget: owner-only invitations, member removal, shared transactions
 - Custom categories
 - Three languages: English, Russian, Hebrew (with RTL support)
@@ -67,6 +68,7 @@ VITE_FIREBASE_PROJECT_ID=
 VITE_FIREBASE_STORAGE_BUCKET=
 VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
+VITE_GEMINI_API_KEY=
 ```
 
 ## Project Structure
@@ -103,6 +105,12 @@ Within a family budget, only the **owner** can invite or remove members; a remov
 
 From the transaction form, a transaction can be set to **Now** (immediate, the default), **Once** (applied automatically on a future date you pick), or **Monthly** (repeats indefinitely on the same day each month, clamped to the last day of shorter months, e.g. Jan 31 → Feb 28). Pending entries are excluded from dashboard totals and analytics until they fire, and are managed from Profile → Scheduled Payments. Firing runs client-side (no server/Cloud Functions in this project), so it applies the next time any device with the app open syncs — not necessarily at the exact moment the date arrives.
 
+## AI Insights
+
+Gemini (`gemini-2.5-flash`) reads a compact stats summary — category totals for the current and previous month, percent change per category, spending spikes (≥50% growth, not a negligible amount), and a 3-month moving average — and returns 3–6 short insights, each with a severity (info/warning/critical). No raw data (individual transactions, notes) is sent, only the aggregated numbers. Results are cached in Firestore (`users/{uid}/settings/insights` or `families/{familyId}/settings/insights`), so a family shares one set of insights and one regeneration cooldown. Regeneration is manual, gated by a 24h cooldown per user/family.
+
+**Setup**: get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey) and set `VITE_GEMINI_API_KEY` in `.env`. The key ships in the client bundle and there is no way around that here: Google Cloud Console does not offer HTTP referrer restriction for Generative Language API keys (only "None" or "IP addresses" — and IP restriction doesn't fit a public web app with arbitrary user IPs). Mitigate the exposure with a budget/quota alert on the key in Google Cloud Console instead, so a leaked key causes bounded damage rather than none. Removing the exposure entirely would mean proxying the call through a server (Cloud Function) or switching to the Firebase AI Logic SDK, which authenticates via Firebase App Check instead of a bundled key — out of scope for now since this project has no backend.
+
 ---
 
 # FlowMoney (Русский)
@@ -117,6 +125,7 @@ From the transaction form, a transaction can be set to **Now** (immediate, the d
 - Отложенные платежи: перенос транзакции на будущую дату или повтор каждый месяц прямо из формы транзакции
 - Дашборд с балансом, суммой доходов/расходов и фильтрами (по месяцу, типу, поиску)
 - Графики: распределение по категориям и динамика доходов/расходов по датам
+- ИИ-инсайты: сгенерированные Gemini инсайты по тратам (тренды, всплески), кэшируются и доступны всей семье, обновление вручную раз в 24 часа
 - Семейный бюджет: приглашения только от владельца, удаление участников, общие транзакции
 - Кастомные категории
 - Три языка: русский, английский, иврит (с поддержкой RTL)
@@ -174,6 +183,7 @@ VITE_FIREBASE_PROJECT_ID=
 VITE_FIREBASE_STORAGE_BUCKET=
 VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
+VITE_GEMINI_API_KEY=
 ```
 
 ## Структура проекта
@@ -209,3 +219,9 @@ src/
 ## Отложенные платежи
 
 В форме транзакции можно выбрать: **Сейчас** (обычная транзакция, по умолчанию), **Один раз** (спишется автоматически в выбранную будущую дату) или **Каждый месяц** (повторяется бессрочно в одно и то же число, с переносом на последний день короткого месяца — например, 31 января → 28 февраля). Пока платёж не сработал, он не учитывается в итогах и аналитике на дашборде и управляется в Профиль → Отложенные платежи. Списание происходит на стороне клиента (в проекте нет сервера/Cloud Functions), поэтому оно применяется при следующей синхронизации любого устройства с открытым приложением — не обязательно точно в момент наступления даты.
+
+## ИИ-инсайты
+
+Gemini (`gemini-2.5-flash`) получает компактную сводку статистики — суммы по категориям за текущий и прошлый месяц, % изменения по каждой категории, «спайки» трат (рост ≥50% и не копеечная сумма) и скользящее среднее трат за 3 месяца — и возвращает 3–6 коротких инсайтов, каждый с уровнем важности (info/warning/critical). Сырые данные (сами транзакции, заметки) никуда не отправляются — только агрегированные цифры. Результат кэшируется в Firestore (`users/{uid}/settings/insights` или `families/{familyId}/settings/insights`), поэтому семья видит один и тот же набор инсайтов и один общий таймер cooldown. Регенерация — ручная, ограничена cooldown'ом 24 часа на пользователя/семью.
+
+**Настройка**: получите ключ на [aistudio.google.com/apikey](https://aistudio.google.com/apikey) и укажите его в `VITE_GEMINI_API_KEY` в `.env`. Ключ попадает в клиентский бандл, и обойти это не получится: Google Cloud Console не поддерживает ограничение по HTTP referrer для ключей Generative Language API (доступны только «None» или «IP addresses», а IP-ограничение не подходит публичному веб-приложению с произвольными адресами пользователей). Вместо этого снизьте риск утечки лимитом бюджета/квоты на ключ в Google Cloud Console — тогда утёкший ключ нанесёт ограниченный, а не неограниченный ущерб. Полностью убрать риск можно только проксированием вызова через сервер (Cloud Function) или переходом на Firebase AI Logic SDK, который авторизуется через Firebase App Check вместо ключа в бандле — сейчас это вне рамок проекта, так как бэкенда здесь нет.

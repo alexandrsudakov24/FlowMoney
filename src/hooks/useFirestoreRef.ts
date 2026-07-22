@@ -17,3 +17,11 @@ export function useCategoriesRef(userId: string | null, familyId: string | null,
         return doc(db, 'users', userId, 'settings', 'categories');
     }, [hasAccess, userId, familyId]);
 }
+
+export function useInsightsRef(userId: string | null, familyId: string | null, hasAccess: boolean) {
+    return useMemo(() => {
+        if (!hasAccess || !userId) return null;
+        if (familyId) return doc(db, 'families', familyId, 'settings', 'insights');
+        return doc(db, 'users', userId, 'settings', 'insights');
+    }, [hasAccess, userId, familyId]);
+}

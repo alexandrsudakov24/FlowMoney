@@ -164,6 +164,18 @@ const en = {
     repeat_once: 'Once',
     repeat_monthly: 'Monthly',
     repeat_monthly_hint: 'A new transaction will be added automatically every month on this date',
+    insights_error_rate_limited: 'Too many requests. Please try again in a bit.',
+    insights_error_blocked: "The AI couldn't generate insights for this data. Please try again later.",
+    insights_error_parse_error: 'Something went wrong generating insights. Please try again.',
+    insights_error_network_error: 'Network error. Check your connection and try again.',
+    insights_error_no_api_key: 'AI insights are not configured.',
+    insights: 'Insights',
+    insights_teaser_desc: 'Get a quick AI read on your spending trends.',
+    insights_empty: "No insights yet. Generate your first one to see how you're spending.",
+    insights_generate_cta: 'Generate insights',
+    insights_regenerate_cta: 'Regenerate',
+    insights_cooldown_hint: 'Next regeneration available in {time}',
+    insights_last_updated: 'Last updated {time}',
 } as const;
 
 export default en;
