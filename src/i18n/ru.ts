@@ -171,6 +171,13 @@ const ru: Record<TranslationKeys, string> = {
     insights_error_parse_error: 'Не удалось сгенерировать инсайты. Попробуйте снова.',
     insights_error_network_error: 'Ошибка сети. Проверьте подключение и попробуйте снова.',
     insights_error_no_api_key: 'ИИ-инсайты не настроены.',
+    insights: 'Инсайты',
+    insights_teaser_desc: 'Быстрый ИИ-разбор ваших трат.',
+    insights_empty: 'Пока нет инсайтов. Сгенерируйте первый, чтобы увидеть анализ трат.',
+    insights_generate_cta: 'Сгенерировать инсайты',
+    insights_regenerate_cta: 'Обновить',
+    insights_cooldown_hint: 'Следующее обновление будет доступно через {time}',
+    insights_last_updated: 'Обновлено {time}',
 };
 
 export default ru;

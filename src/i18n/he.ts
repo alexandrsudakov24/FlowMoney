@@ -171,6 +171,13 @@ const he: Record<TranslationKeys, string> = {
     insights_error_parse_error: 'משהו השתבש ביצירת התובנות. נסה שוב.',
     insights_error_network_error: 'שגיאת רשת. בדוק את החיבור ונסה שוב.',
     insights_error_no_api_key: 'תובנות AI אינן מוגדרות.',
+    insights: 'תובנות',
+    insights_teaser_desc: 'קבל ניתוח AI מהיר של הוצאותיך.',
+    insights_empty: 'עדיין אין תובנות. צור את הראשונה כדי לראות ניתוח של ההוצאות שלך.',
+    insights_generate_cta: 'צור תובנות',
+    insights_regenerate_cta: 'רענן',
+    insights_cooldown_hint: 'הרענון הבא יהיה זמין בעוד {time}',
+    insights_last_updated: 'עודכן {time}',
 };
 
 export default he;

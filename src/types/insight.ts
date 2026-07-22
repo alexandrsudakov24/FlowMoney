@@ -1,6 +1,9 @@
+export type InsightSeverity = 'info' | 'warning' | 'critical';
+
 export interface Insight {
     title: string;
     description: string;
+    severity: InsightSeverity;
 }
 
 export interface CategoryStat {

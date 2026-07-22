@@ -34,7 +34,7 @@ describe('generateInsights', () => {
     });
 
     it('returns parsed insights on success', async () => {
-        const insights = [{ title: 'Overspending', description: 'You spent more on food this month.' }];
+        const insights = [{ title: 'Overspending', description: 'You spent more on food this month.', severity: 'warning' }];
         mockFetchOnce({ json: () => Promise.resolve(geminiTextResponse(JSON.stringify({ insights }))) });
 
         const result = await generateInsights({ total: 100 }, 'en');

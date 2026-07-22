@@ -5,6 +5,7 @@ import DashboardPage from './pages/DashboardPage';
 import AddExpensePage from './pages/AddExpensePage';
 import EditExpensePage from './pages/EditExpensePage';
 import ProfilePage from './pages/ProfilePage';
+import InsightsPage from './pages/InsightsPage';
 import AdminPage from './pages/AdminPage';
 import StartPage from './pages/StartPage';
 import LoginPage from './pages/LoginPage';
@@ -53,6 +54,7 @@ export default function App() {
                     <Route path="/add" element={<RequireAuth><AddExpensePage /></RequireAuth>} />
                     <Route path="/edit/:id" element={<RequireAuth><EditExpensePage /></RequireAuth>} />
                     <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
+                    <Route path="/insights" element={<RequireAuth><InsightsPage /></RequireAuth>} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/admin" element={<RequireAdmin><AdminPage /></RequireAdmin>} />
