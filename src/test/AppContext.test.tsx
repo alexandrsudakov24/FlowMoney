@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { act } from '@testing-library/react';
 import { AppProvider, useApp } from '../context/AppContext';
+import type { User, AppRole } from '../types';
 
 // ── Hoist mock fns so vi.mock factory can reference them ──────────────────────
 
@@ -70,7 +71,7 @@ vi.mock('firebase/firestore', () => ({
 
 // ── Context mocks ─────────────────────────────────────────────────────────────
 
-const mockUseAuth = vi.fn(() => ({
+const mockUseAuth = vi.fn<() => { user: User | null; role: AppRole | null }>(() => ({
     user: stableUser,
     role: 'user',
 }));
