@@ -20,3 +20,11 @@ export interface InsightsStats {
     spikes: CategoryStat[];
     threeMonthAverage: number;
 }
+
+export interface InsightsDoc {
+    insights: Insight[];
+    generatedAt: number;
+    statsFingerprint: string;
+    language: 'en' | 'ru' | 'he';
+    generatedBy?: string;
+}

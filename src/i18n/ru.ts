@@ -166,6 +166,11 @@ const ru: Record<TranslationKeys, string> = {
     repeat_once: 'Один раз',
     repeat_monthly: 'Каждый месяц',
     repeat_monthly_hint: 'Каждый месяц в эту дату будет автоматически добавляться новая транзакция',
+    insights_error_rate_limited: 'Слишком много запросов. Попробуйте немного позже.',
+    insights_error_blocked: 'ИИ не смог сгенерировать инсайты для этих данных. Попробуйте позже.',
+    insights_error_parse_error: 'Не удалось сгенерировать инсайты. Попробуйте снова.',
+    insights_error_network_error: 'Ошибка сети. Проверьте подключение и попробуйте снова.',
+    insights_error_no_api_key: 'ИИ-инсайты не настроены.',
 };
 
 export default ru;
