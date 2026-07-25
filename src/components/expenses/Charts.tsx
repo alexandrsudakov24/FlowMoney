@@ -4,12 +4,7 @@ import styles from './Charts.module.css';
 import type { Expense } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
 import { getCatLabel } from '../../utils/getCatLabel';
-
-const COLORS = [
-    '#2a78d6', '#1baf7a', '#eda100', '#008300',
-    '#4a3aa7', '#e34948', '#e87ba4', '#eb6834',
-    '#812964', '#5dbdfb', '#4c51f6', '#911a36',
-];
+import { getCategoryColorMap } from '../../utils/getCategoryColors';
 
 interface ChartsProps {
     expenses: Expense[];
@@ -30,6 +25,8 @@ export default function Charts({ expenses, selectedCategories = [], onSelectCate
         });
         return Object.entries(map).map(([key, value]) => ({ key, name: getCatLabel(key, t), value }));
     }, [expenses, t]);
+
+    const colorMap = useMemo(() => getCategoryColorMap(expenses), [expenses]);
 
     const hasSelection = selectedCategories.length > 0;
     const isSelected = (key: string) => selectedCategories.includes(key);
@@ -53,7 +50,7 @@ export default function Charts({ expenses, selectedCategories = [], onSelectCate
                                     {byCategory.map((entry, index) => (
                                         <Cell
                                             key={`cell-${index}`}
-                                            fill={COLORS[index % COLORS.length]}
+                                            fill={colorMap[entry.key]}
                                             opacity={hasSelection && !isSelected(entry.key) ? 0.35 : 1}
                                             stroke={isSelected(entry.key) ? 'var(--card)' : undefined}
                                             strokeWidth={isSelected(entry.key) ? 2 : 0}
@@ -66,7 +63,7 @@ export default function Charts({ expenses, selectedCategories = [], onSelectCate
                             </PieChart>
                         </ResponsiveContainer>
                         <ul className={styles.legend}>
-                            {byCategory.map((entry, index) => (
+                            {byCategory.map((entry) => (
                                 <li key={entry.key} className={styles.legendItem}>
                                     <button
                                         type="button"
@@ -76,7 +73,7 @@ export default function Charts({ expenses, selectedCategories = [], onSelectCate
                                     >
                                         <span
                                             className={styles.legendDot}
-                                            style={{ background: COLORS[index % COLORS.length] }}
+                                            style={{ background: colorMap[entry.key] }}
                                         />
                                         {entry.name}
                                     </button>

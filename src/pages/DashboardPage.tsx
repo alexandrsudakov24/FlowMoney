@@ -8,6 +8,7 @@ import { Spinner } from '../components/ui';
 import { currencySymbols } from '../constants/currency';
 import { useCountUp } from '../hooks/useCountUp';
 import { getCatLabel } from '../utils/getCatLabel';
+import { getCategoryColorMap, darkenHex } from '../utils/getCategoryColors';
 import styles from './DashboardPage.module.css';
 
 export default function DashboardPage() {
@@ -104,6 +105,11 @@ export default function DashboardPage() {
     );
     const animatedCategoriesTotal = useCountUp(selectedCategoriesTotal, 600, 0);
 
+    // Same color a category's slice/legend dot uses in the chart below, so the
+    // totals card visually matches whichever category was picked most recently.
+    const categoryColorMap = useMemo(() => getCategoryColorMap(chartExpenses), [chartExpenses]);
+    const lastCategoryColor = categoryColorMap[filters.categories[filters.categories.length - 1]];
+
     const hasActiveFilters =
         filters.month !== '' || filters.search !== '' || filters.type !== 'all' || filters.categories.length > 0;
 
@@ -158,7 +164,12 @@ export default function DashboardPage() {
             )}
 
             {filters.categories.length > 0 && (
-                <div className={styles.categoryTotalCard}>
+                <div
+                    className={styles.categoryTotalCard}
+                    style={lastCategoryColor ? {
+                        background: `linear-gradient(135deg, ${lastCategoryColor}, ${darkenHex(lastCategoryColor, 0.3)})`,
+                    } : undefined}
+                >
                     <h3 className={styles.categoryTotalTitle}>
                         {filters.categories.map((c) => getCatLabel(c, t)).join(', ')}
                     </h3>
