@@ -18,7 +18,7 @@ const ru: Record<TranslationKeys, string> = {
     close: 'Закрыть',
     loading: 'Загрузка…',
     avatar: 'Аватар',
-    clear_filters: 'Сбросить фильтры',
+    remove_filter: 'Убрать фильтр',
     transaction_type: 'Тип операции',
     save: 'Сохранить',
     saving: 'Сохранение…',

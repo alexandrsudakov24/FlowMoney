@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { Expense } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
+import { getCatLabel } from '../../utils/getCatLabel';
 import styles from './ExpenseFilters.module.css';
 
 export interface FilterState {
@@ -32,52 +33,64 @@ export default function ExpenseFilters({ expenses, filters, onChange }: Props) {
         return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
     };
 
-    const hasActive = filters.month !== '' || filters.search !== '' || filters.type !== 'all' || filters.category !== '';
     const set = (patch: Partial<FilterState>) => onChange({ ...filters, ...patch });
 
+    const chips: { key: string; label: string; clear: () => void }[] = [];
+    if (filters.month) chips.push({ key: 'month', label: formatMonth(filters.month), clear: () => set({ month: '' }) });
+    if (filters.type !== 'all') chips.push({ key: 'type', label: t(filters.type), clear: () => set({ type: 'all' }) });
+    if (filters.category) chips.push({ key: 'category', label: getCatLabel(filters.category, t), clear: () => set({ category: '' }) });
+    if (filters.search) chips.push({ key: 'search', label: `"${filters.search}"`, clear: () => set({ search: '' }) });
+
     return (
-        <div className={styles.filters}>
-            <select
-                value={filters.month}
-                onChange={(e) => set({ month: e.target.value })}
-                className={styles.select}
-                aria-label={t('filter_all_time')}
-            >
-                <option value="">{t('filter_all_time')}</option>
-                {months.map((m) => (
-                    <option key={m} value={m}>{formatMonth(m)}</option>
-                ))}
-            </select>
+        <div>
+            <div className={styles.filters}>
+                <select
+                    value={filters.month}
+                    onChange={(e) => set({ month: e.target.value })}
+                    className={styles.select}
+                    aria-label={t('filter_all_time')}
+                >
+                    <option value="">{t('filter_all_time')}</option>
+                    {months.map((m) => (
+                        <option key={m} value={m}>{formatMonth(m)}</option>
+                    ))}
+                </select>
 
-            <input
-                type="search"
-                placeholder={t('filter_search_placeholder')}
-                value={filters.search}
-                onChange={(e) => set({ search: e.target.value })}
-                className={styles.search}
-            />
+                <input
+                    type="search"
+                    placeholder={t('filter_search_placeholder')}
+                    value={filters.search}
+                    onChange={(e) => set({ search: e.target.value })}
+                    className={styles.search}
+                />
 
-            <div className={styles.typeToggle} role="group">
-                {(['all', 'expense', 'income'] as const).map((type) => (
-                    <button
-                        key={type}
-                        className={`${styles.typeBtn} ${filters.type === type ? styles.typeBtnActive : ''}`}
-                        onClick={() => set({ type })}
-                    >
-                        {t(type === 'all' ? 'filter_type_all' : type)}
-                    </button>
-                ))}
+                <div className={styles.typeToggle} role="group">
+                    {(['all', 'expense', 'income'] as const).map((type) => (
+                        <button
+                            key={type}
+                            className={`${styles.typeBtn} ${filters.type === type ? styles.typeBtnActive : ''}`}
+                            onClick={() => set({ type })}
+                        >
+                            {t(type === 'all' ? 'filter_type_all' : type)}
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            {hasActive && (
-                <button
-                    className={styles.clearBtn}
-                    onClick={() => onChange({ month: '', search: '', type: 'all', category: '' })}
-                    title={t('clear_filters')}
-                    aria-label={t('clear_filters')}
-                >
-                    ✕
-                </button>
+            {chips.length > 0 && (
+                <div className={styles.activeChips}>
+                    {chips.map((chip) => (
+                        <button
+                            key={chip.key}
+                            className={styles.chip}
+                            onClick={chip.clear}
+                            aria-label={`${t('remove_filter')}: ${chip.label}`}
+                        >
+                            {chip.label}
+                            <span aria-hidden="true">✕</span>
+                        </button>
+                    ))}
+                </div>
             )}
         </div>
     );

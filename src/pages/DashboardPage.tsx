@@ -44,8 +44,10 @@ export default function DashboardPage() {
         [expenses, filters]
     );
 
+    // Charts already toggles: it passes '' when re-clicking the currently
+    // selected category, or the new key otherwise — so this just applies it.
     const selectCategory = (category: string) => {
-        setFilters((f) => ({ ...f, category: f.category === category ? '' : category }));
+        setFilters((f) => ({ ...f, category }));
     };
 
     const { todayTotal, weekTotal, monthTotal, balance } = useMemo(() => {

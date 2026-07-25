@@ -18,7 +18,7 @@ const he: Record<TranslationKeys, string> = {
     close: 'סגור',
     loading: 'טוען…',
     avatar: 'תמונת פרופיל',
-    clear_filters: 'נקה מסננים',
+    remove_filter: 'הסר מסנן',
     transaction_type: 'סוג עסקה',
     save: 'שמור',
     saving: 'שומר…',

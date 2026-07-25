@@ -16,7 +16,7 @@ const en = {
     close: 'Close',
     loading: 'Loading…',
     avatar: 'Avatar',
-    clear_filters: 'Clear filters',
+    remove_filter: 'Remove filter',
     transaction_type: 'Transaction type',
     save: 'Save',
     saving: 'Saving…',
