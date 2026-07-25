@@ -39,7 +39,7 @@ export default function Charts({ expenses, selectedCategory = '', onSelectCatego
         <div className={styles.charts}>
             <div className={styles.chartCard}>
                 <h3>{t('chart_by_category')}</h3>
-                {byCategory.length === 0 ? <p>{t('no_expense_data')}</p> : (
+                {byCategory.length === 0 ? <p className={styles.empty}>{t('no_expense_data')}</p> : (
                     <div className={styles.donutRow}>
                         <ResponsiveContainer width="100%" height={220} className={styles.donutChart}>
                             <PieChart>

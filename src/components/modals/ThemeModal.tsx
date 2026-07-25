@@ -3,6 +3,7 @@ import styles from './SettingsModal.module.css';
 import { useTheme } from '../../context/ThemeContext';
 import type { Theme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useModalA11y } from '../../hooks/useModalA11y';
 
 interface ThemeModalProps {
     isOpen: boolean;
@@ -15,6 +16,7 @@ export default function ThemeModal({ isOpen, onClose }: ThemeModalProps) {
     const { theme, setTheme } = useTheme();
     const { t } = useLanguage();
     const [selected, setSelected] = useState<Theme>(theme);
+    const modalRef = useModalA11y(isOpen, onClose);
 
     // Reset the pending selection to the applied theme each time the modal opens
     useEffect(() => {
@@ -32,7 +34,7 @@ export default function ThemeModal({ isOpen, onClose }: ThemeModalProps) {
     return (
         <>
             <div className={styles.overlay} onClick={onClose} />
-            <div className={styles.modal}>
+            <div className={styles.modal} role="dialog" aria-modal="true" aria-label={t('theme')} tabIndex={-1} ref={modalRef}>
                 <div className={styles.header}>
                     <h2>{t('theme')}</h2>
                 </div>

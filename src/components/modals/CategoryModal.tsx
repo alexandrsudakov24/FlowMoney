@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { getCatLabel } from '../../utils/getCatLabel';
+import { useModalA11y } from '../../hooks/useModalA11y';
 import styles from './CategoryModal.module.css';
 import modalStyles from './SettingsModal.module.css';
 
@@ -19,6 +20,7 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
     const [error, setError] = useState('');
     const [saved, setSaved] = useState(false);
     const savedTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
+    const modalRef = useModalA11y(isOpen, onClose);
 
     useEffect(() => () => clearTimeout(savedTimeout.current), []);
 
@@ -59,10 +61,10 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
     return (
         <>
             <div className={modalStyles.overlay} onClick={onClose} />
-            <div className={modalStyles.modal}>
+            <div className={modalStyles.modal} role="dialog" aria-modal="true" aria-label={t('categories')} tabIndex={-1} ref={modalRef}>
                 <div className={modalStyles.header}>
                     <h2>{t('categories')}</h2>
-                    <button className={modalStyles.closeBtn} onClick={onClose}>✕</button>
+                    <button className={modalStyles.closeBtn} onClick={onClose} aria-label={t('close')}>✕</button>
                 </div>
                 <div className={modalStyles.content}>
                     <div className={styles.addRow}>
@@ -94,6 +96,7 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
                                         onClick={() => handleRemove(cat)}
                                         disabled={cantDelete}
                                         title={isDefault ? t('category_default') : inUse ? t('category_in_use') : ''}
+                                        aria-label={`${t('delete')}: ${getCatLabel(cat, t)}`}
                                     >
                                         ✕
                                     </button>

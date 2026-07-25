@@ -65,7 +65,7 @@ export default function ProfilePage() {
             <div className={styles.profileSection}>
                 <img
                     src={user?.photoURL || '/icon.png'}
-                    alt="Avatar"
+                    alt={t('avatar')}
                     className={styles.avatar}
                 />
                 <h2 className={styles.name}>{user?.name}</h2>

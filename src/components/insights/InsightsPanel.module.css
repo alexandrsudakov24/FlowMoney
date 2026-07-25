@@ -13,7 +13,7 @@
     border-radius: var(--radius-lg);
     background: linear-gradient(135deg, #6366f1, #8b5cf6);
     box-shadow: var(--shadow-md);
-    text-align: left;
+    text-align: start;
     cursor: pointer;
     transition: all 0.3s ease;
 }

@@ -6,7 +6,7 @@ import {
     collection, getDocs, deleteDoc, doc,
     query, limit, startAfter, orderBy, type QueryDocumentSnapshot, type DocumentData,
 } from 'firebase/firestore';
-import { ConfirmModal } from '../components/ui';
+import { ConfirmModal, Spinner } from '../components/ui';
 import type { Feedback } from '../types';
 import styles from './AdminPage.module.css';
 
@@ -133,7 +133,7 @@ export default function AdminPage() {
                     <p className={styles.subtitle}>{t('all_users')}: <strong>{users.length}</strong></p>
 
                     {loading ? (
-                        <div className={styles.loading}>...</div>
+                        <Spinner size="sm" />
                     ) : users.length === 0 ? (
                         <p className={styles.empty}>{t('no_users')}</p>
                     ) : (
@@ -181,7 +181,7 @@ export default function AdminPage() {
                     <p className={styles.subtitle}>{t('feedback')}: <strong>{feedback.length}</strong></p>
 
                     {feedbackLoading ? (
-                        <div className={styles.loading}>...</div>
+                        <Spinner size="sm" />
                     ) : feedback.length === 0 ? (
                         <p className={styles.empty}>{t('no_feedback')}</p>
                     ) : (

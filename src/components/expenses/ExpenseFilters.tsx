@@ -73,8 +73,8 @@ export default function ExpenseFilters({ expenses, filters, onChange }: Props) {
                 <button
                     className={styles.clearBtn}
                     onClick={() => onChange({ month: '', search: '', type: 'all', category: '' })}
-                    title="Clear filters"
-                    aria-label="Clear filters"
+                    title={t('clear_filters')}
+                    aria-label={t('clear_filters')}
                 >
                     ✕
                 </button>

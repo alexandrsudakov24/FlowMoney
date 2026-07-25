@@ -3,6 +3,7 @@ import styles from './SettingsModal.module.css';
 import { useLanguage } from '../../context/LanguageContext';
 import type { Language } from '../../i18n';
 import { useAuth } from '../../context/AuthContext';
+import { useModalA11y } from '../../hooks/useModalA11y';
 
 interface LanguageModalProps {
     isOpen: boolean;
@@ -19,6 +20,7 @@ export default function LanguageModal({ isOpen, onClose }: LanguageModalProps) {
     const { language, setLanguage, t } = useLanguage();
     const { updateLanguage } = useAuth();
     const [selected, setSelected] = useState<Language>(language);
+    const modalRef = useModalA11y(isOpen, onClose);
 
     // Reset the pending selection to the applied language each time the modal opens
     useEffect(() => {
@@ -37,7 +39,7 @@ export default function LanguageModal({ isOpen, onClose }: LanguageModalProps) {
     return (
         <>
             <div className={styles.overlay} onClick={onClose} />
-            <div className={styles.modal}>
+            <div className={styles.modal} role="dialog" aria-modal="true" aria-label={t('language')} tabIndex={-1} ref={modalRef}>
                 <div className={styles.header}>
                     <h2>{t('language')}</h2>
                 </div>

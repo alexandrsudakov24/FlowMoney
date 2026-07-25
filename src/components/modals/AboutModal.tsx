@@ -1,5 +1,6 @@
 import styles from './SettingsModal.module.css';
 import { useLanguage } from '../../context/LanguageContext';
+import { useModalA11y } from '../../hooks/useModalA11y';
 
 interface AboutModalProps {
     isOpen: boolean;
@@ -8,13 +9,14 @@ interface AboutModalProps {
 
 export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
     const { t } = useLanguage();
+    const modalRef = useModalA11y(isOpen, onClose);
 
     if (!isOpen) return null;
 
     return (
         <>
             <div className={styles.overlay} onClick={onClose} />
-            <div className={styles.modal}>
+            <div className={styles.modal} role="dialog" aria-modal="true" aria-label={t('about_app')} tabIndex={-1} ref={modalRef}>
                 <div className={styles.header}>
                     <h2>{t('about_app')}</h2>
                 </div>

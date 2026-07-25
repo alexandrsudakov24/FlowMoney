@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useModalA11y } from '../../hooks/useModalA11y';
 import styles from './ConfirmModal.module.css';
 
 interface Props {
@@ -24,21 +24,7 @@ export default function ConfirmModal({
     loading = false,
 }: Props) {
     const { t } = useLanguage();
-
-    useEffect(() => {
-        if (!isOpen) return;
-        const handler = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') onClose();
-        };
-        document.addEventListener('keydown', handler);
-        return () => document.removeEventListener('keydown', handler);
-    }, [isOpen, onClose]);
-
-    useEffect(() => {
-        if (!isOpen) return;
-        document.body.style.overflow = 'hidden';
-        return () => { document.body.style.overflow = ''; };
-    }, [isOpen]);
+    const modalRef = useModalA11y(isOpen, onClose);
 
     if (!isOpen) return null;
 
@@ -48,7 +34,7 @@ export default function ConfirmModal({
     return (
         <>
             <div className={styles.overlay} onClick={onClose} />
-            <div className={styles.modal} role="dialog" aria-modal="true">
+            <div className={styles.modal} role="dialog" aria-modal="true" aria-label={title} tabIndex={-1} ref={modalRef}>
                 <div className={styles.handle} />
                 <div className={`${styles.iconWrap} ${styles[variant]}`}>{icon}</div>
                 <h2 className={styles.title}>{title}</h2>

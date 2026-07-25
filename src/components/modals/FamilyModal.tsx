@@ -4,6 +4,7 @@ import { useFamily } from '../../context/FamilyContext';
 import { useLanguage } from '../../context/LanguageContext';
 import type { FamilyMember } from '../../types';
 import { ConfirmModal } from '../ui';
+import { useModalA11y } from '../../hooks/useModalA11y';
 import styles from './FamilyModal.module.css';
 
 interface Props {
@@ -27,6 +28,7 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
     const [confirmLeave, setConfirmLeave] = useState(false);
     const [removeTarget, setRemoveTarget] = useState<FamilyMember | null>(null);
     const [removing, setRemoving] = useState(false);
+    const modalRef = useModalA11y(isOpen, onClose);
 
     if (!isOpen) return null;
 
@@ -87,10 +89,18 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
 
     return (
         <div className={styles.overlay} onClick={onClose}>
-            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+            <div
+                className={styles.modal}
+                onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-label={t('family_budget')}
+                tabIndex={-1}
+                ref={modalRef}
+            >
                 <div className={styles.header}>
                     <h2 className={styles.title}>{t('family_budget')}</h2>
-                    <button className={styles.closeBtn} onClick={onClose}>✕</button>
+                    <button className={styles.closeBtn} onClick={onClose} aria-label={t('close')}>✕</button>
                 </div>
 
                 {familyLoading ? (
@@ -116,6 +126,7 @@ export default function FamilyModal({ isOpen, onClose }: Props) {
                                                 className={styles.removeMemberBtn}
                                                 onClick={() => setRemoveTarget(m)}
                                                 title={t('remove_member')}
+                                                aria-label={t('remove_member')}
                                             >
                                                 ✕
                                             </button>

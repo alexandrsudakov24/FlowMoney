@@ -1,5 +1,7 @@
+import { useLanguage } from '../../context/LanguageContext';
 import styles from './ButtonSpinner.module.css';
 
 export default function ButtonSpinner() {
-    return <span className={styles.spinner} role="status" aria-label="Loading" />;
+    const { t } = useLanguage();
+    return <span className={styles.spinner} role="status" aria-label={t('loading')} />;
 }

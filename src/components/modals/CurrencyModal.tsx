@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import styles from './SettingsModal.module.css';
 import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useModalA11y } from '../../hooks/useModalA11y';
 
 interface CurrencyModalProps {
     isOpen: boolean;
@@ -14,6 +15,7 @@ export default function CurrencyModal({ isOpen, onClose }: CurrencyModalProps) {
     const { currency, changeCurrency } = useApp();
     const { t } = useLanguage();
     const [selected, setSelected] = useState(currency);
+    const modalRef = useModalA11y(isOpen, onClose);
 
     // Reset the pending selection to the applied currency each time the modal opens
     useEffect(() => {
@@ -31,7 +33,7 @@ export default function CurrencyModal({ isOpen, onClose }: CurrencyModalProps) {
     return (
         <>
             <div className={styles.overlay} onClick={onClose} />
-            <div className={styles.modal}>
+            <div className={styles.modal} role="dialog" aria-modal="true" aria-label={t('currency')} tabIndex={-1} ref={modalRef}>
                 <div className={styles.header}>
                     <h2>{t('currency')}</h2>
                 </div>

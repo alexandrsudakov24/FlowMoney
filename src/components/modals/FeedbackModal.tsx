@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useToast } from '../../context/ToastContext';
 import { sendFeedback } from '../../services/feedback';
+import { useModalA11y } from '../../hooks/useModalA11y';
 
 interface FeedbackModalProps {
     isOpen: boolean;
@@ -16,6 +17,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     const { showToast } = useToast();
     const [message, setMessage] = useState('');
     const [sending, setSending] = useState(false);
+    const modalRef = useModalA11y(isOpen, onClose);
 
     if (!isOpen) return null;
 
@@ -37,7 +39,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     return (
         <>
             <div className={styles.overlay} onClick={onClose} />
-            <div className={styles.modal}>
+            <div className={styles.modal} role="dialog" aria-modal="true" aria-label={t('contact_developer')} tabIndex={-1} ref={modalRef}>
                 <div className={styles.header}>
                     <h2>{t('contact_developer')}</h2>
                 </div>

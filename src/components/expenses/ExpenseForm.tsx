@@ -65,7 +65,7 @@ export default function ExpenseForm({
 
     return (
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-            <div className={styles.toggle} role="tablist" aria-label="Transaction type">
+            <div className={styles.toggle} role="tablist" aria-label={t('transaction_type')}>
                 <button
                     type="button"
                     className={`${styles.toggleButton} ${type === 'expense' ? styles.active : ''}`}
@@ -156,7 +156,7 @@ export default function ExpenseForm({
 
             <label className={styles.label}>
                 <span>{t('repeat')}</span>
-                <div className={styles.toggle} role="tablist" aria-label="Repeat">
+                <div className={styles.toggle} role="tablist" aria-label={t('repeat')}>
                     <button
                         type="button"
                         className={`${styles.toggleButton} ${repeat === 'none' ? styles.active : ''}`}
