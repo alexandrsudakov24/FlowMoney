@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styles from './Navbar.module.css';
 import { useAuth } from '../context/AuthContext';
@@ -28,9 +29,15 @@ const IconProfile = () => (
     </svg>
 );
 
+const NAV_ITEMS = [
+    { path: '/', Icon: IconDashboard, labelKey: 'dashboard' as const },
+    { path: '/add', Icon: IconAdd, labelKey: 'add' as const },
+    { path: '/profile', Icon: IconProfile, labelKey: 'profile' as const },
+];
+
 export default function Navbar() {
     const { role, user } = useAuth();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const location = useLocation();
 
     const isAuthenticatedPage =
@@ -38,6 +45,34 @@ export default function Navbar() {
 
     const isActive = (path: string) =>
         path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
+
+    const activeIndex = NAV_ITEMS.findIndex((item) => isActive(item.path));
+
+    // Slides a single pill indicator behind the active tab's icon, measuring
+    // real DOM positions so it works regardless of RTL, locale label widths,
+    // or viewport size.
+    const navRef = useRef<HTMLElement>(null);
+    const iconRefs = useRef<(HTMLSpanElement | null)[]>([]);
+    const [indicator, setIndicator] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
+
+    useLayoutEffect(() => {
+        const recompute = () => {
+            const nav = navRef.current;
+            const icon = iconRefs.current[activeIndex];
+            if (!nav || !icon) return;
+            const navRect = nav.getBoundingClientRect();
+            const iconRect = icon.getBoundingClientRect();
+            setIndicator({
+                left: iconRect.left - navRect.left,
+                top: iconRect.top - navRect.top,
+                width: iconRect.width,
+                height: iconRect.height,
+            });
+        };
+        recompute();
+        window.addEventListener('resize', recompute);
+        return () => window.removeEventListener('resize', recompute);
+    }, [activeIndex, language]);
 
     return (
         <>
@@ -74,28 +109,29 @@ export default function Navbar() {
 
             {/* Mobile Bottom Nav */}
             {isAuthenticatedPage && (
-                <nav className={styles.mobileNav}>
-                    <Link
-                        to="/"
-                        className={`${styles.navItem} ${isActive('/') ? styles.navItemActive : ''}`}
-                    >
-                        <span className={styles.navIconWrap}><IconDashboard /></span>
-                        <span className={styles.navLabel}>{t('dashboard')}</span>
-                    </Link>
-                    <Link
-                        to="/add"
-                        className={`${styles.navItem} ${isActive('/add') ? styles.navItemActive : ''}`}
-                    >
-                        <span className={styles.navIconWrap}><IconAdd /></span>
-                        <span className={styles.navLabel}>{t('add')}</span>
-                    </Link>
-                    <Link
-                        to="/profile"
-                        className={`${styles.navItem} ${isActive('/profile') ? styles.navItemActive : ''}`}
-                    >
-                        <span className={styles.navIconWrap}><IconProfile /></span>
-                        <span className={styles.navLabel}>{t('profile')}</span>
-                    </Link>
+                <nav className={styles.mobileNav} ref={navRef}>
+                    {indicator && (
+                        <span
+                            className={styles.navIndicator}
+                            style={{
+                                transform: `translate(${indicator.left}px, ${indicator.top}px)`,
+                                width: indicator.width,
+                                height: indicator.height,
+                            }}
+                        />
+                    )}
+                    {NAV_ITEMS.map(({ path, Icon, labelKey }, i) => (
+                        <Link
+                            key={path}
+                            to={path}
+                            className={`${styles.navItem} ${isActive(path) ? styles.navItemActive : ''}`}
+                        >
+                            <span className={styles.navIconWrap} ref={(el) => { iconRefs.current[i] = el; }}>
+                                <Icon />
+                            </span>
+                            <span className={styles.navLabel}>{t(labelKey)}</span>
+                        </Link>
+                    ))}
                 </nav>
             )}
         </>
