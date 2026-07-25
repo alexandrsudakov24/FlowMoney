@@ -18,6 +18,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: false,
       includeAssets: ['icon.png', 'icon-192.png', 'icon-512.png'],
       workbox: {
         cleanupOutdatedCaches: true,
