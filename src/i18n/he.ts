@@ -144,6 +144,7 @@ const he: Record<TranslationKeys, string> = {
     filter_search_placeholder: 'חפש לפי הערה או קטגוריה...',
     filter_type_all: 'הכל',
     filter_no_results: 'אין עסקאות התואמות לפילטרים שלך',
+    clear_filters: 'נקה מסננים',
     filter_results_count: 'מציג {n} מתוך {total}',
     load_more: 'הצג עוד',
     not_found: 'הדף לא נמצא',

@@ -142,6 +142,7 @@ const en = {
     filter_search_placeholder: 'Search by note or category…',
     filter_type_all: 'All',
     filter_no_results: 'No transactions match your filters',
+    clear_filters: 'Clear filters',
     filter_results_count: 'Showing {n} of {total}',
     load_more: 'Load more',
     not_found: 'Page not found',

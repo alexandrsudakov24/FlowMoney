@@ -144,6 +144,7 @@ const ru: Record<TranslationKeys, string> = {
     filter_search_placeholder: 'Поиск по заметке или категории…',
     filter_type_all: 'Все',
     filter_no_results: 'Нет операций по выбранным фильтрам',
+    clear_filters: 'Очистить фильтры',
     filter_results_count: 'Показано {n} из {total}',
     load_more: 'Показать ещё',
     not_found: 'Страница не найдена',

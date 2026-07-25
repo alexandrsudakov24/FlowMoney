@@ -112,7 +112,7 @@ export default function DashboardPage() {
         [expenses]
     );
 
-    const [openSummaryModal, setOpenSummaryModal] = useState<'today' | 'week' | 'negative' | null>(null);
+    const [openSummaryModal, setOpenSummaryModal] = useState<'today' | 'week' | 'negative' | 'categories' | null>(null);
 
     // startAt: 0 so the numbers count up every time the dashboard is shown
     // (e.g. right after adding a transaction), not just on the very first load.
@@ -121,15 +121,18 @@ export default function DashboardPage() {
     const animatedMonth = useCountUp(monthTotal, 600, 0);
     const animatedBalance = useCountUp(balance, 600, 0);
 
-    // Sum of expense amounts within the categories currently selected in the
-    // chart — filteredExpenses already respects the category (and other) filters.
-    const selectedCategoriesTotal = useMemo(
-        () => filteredExpenses
-            .filter((e) => e.type === 'expense')
-            .reduce((sum, e) => sum + Number(e.amount || 0), 0),
+    // Expenses within the categories currently selected in the chart —
+    // filteredExpenses already respects the category (and other) filters.
+    const selectedCategoriesExpenses = useMemo(
+        () => filteredExpenses.filter((e) => e.type === 'expense'),
         [filteredExpenses]
     );
+    const selectedCategoriesTotal = useMemo(
+        () => selectedCategoriesExpenses.reduce((sum, e) => sum + Number(e.amount || 0), 0),
+        [selectedCategoriesExpenses]
+    );
     const animatedCategoriesTotal = useCountUp(selectedCategoriesTotal, 600, 0);
+    const categoryFilterLabel = filters.categories.map((c) => getCatLabel(c, t)).join(', ');
 
     // Same color a category's slice/legend dot uses in the chart below, so the
     // totals card visually matches whichever category was picked most recently.
@@ -213,9 +216,13 @@ export default function DashboardPage() {
                     style={lastCategoryColor ? {
                         background: `linear-gradient(135deg, ${lastCategoryColor}, ${darkenHex(lastCategoryColor, 0.3)})`,
                     } : undefined}
+                    onClick={() => setOpenSummaryModal('categories')}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && setOpenSummaryModal('categories')}
                 >
                     <h3 className={styles.categoryTotalTitle}>
-                        {filters.categories.map((c) => getCatLabel(c, t)).join(', ')}
+                        {categoryFilterLabel}
                     </h3>
                     <div className={styles.categoryTotalValue}>
                         {animatedCategoriesTotal.toFixed(2)} {symbol}
@@ -235,20 +242,35 @@ export default function DashboardPage() {
                 </div>
             )}
 
-            {filteredExpenses.length > 0 && (
-                <h2 className={styles.recentTitle}>
-                    {t('recent_transactions')}
-                    {hasActiveFilters && filteredExpenses.length !== expenses.length && (
-                        <span className={styles.countBadge}>
-                            {filteredExpenses.length} / {expenses.length}
-                        </span>
+            {filters.categories.length > 0 ? (
+                <div className={styles.clearFiltersCard}>
+                    <button
+                        type="button"
+                        className={styles.clearFiltersBtn}
+                        onClick={() => setFilters((f) => ({ ...f, categories: [] }))}
+                    >
+                        {t('clear_filters')}
+                    </button>
+                </div>
+            ) : (
+                <>
+                    {filteredExpenses.length > 0 && (
+                        <h2 className={styles.recentTitle}>
+                            {t('recent_transactions')}
+                            {hasActiveFilters && filteredExpenses.length !== expenses.length && (
+                                <span className={styles.countBadge}>
+                                    {filteredExpenses.length} / {expenses.length}
+                                </span>
+                            )}
+                        </h2>
                     )}
-                </h2>
-            )}
 
-            {expenses.length > 0 && filteredExpenses.length === 0 ? (
-                <div className={styles.noResults}>{t('filter_no_results')}</div>            ) : (
-                <ExpenseList expenses={filteredExpenses} />
+                    {expenses.length > 0 && filteredExpenses.length === 0 ? (
+                        <div className={styles.noResults}>{t('filter_no_results')}</div>
+                    ) : (
+                        <ExpenseList expenses={filteredExpenses} />
+                    )}
+                </>
             )}
 
             <TransactionsModal
@@ -268,6 +290,12 @@ export default function DashboardPage() {
                 onClose={() => setOpenSummaryModal(null)}
                 title={t('expense_transactions')}
                 expenses={expenseTransactions}
+            />
+            <TransactionsModal
+                isOpen={openSummaryModal === 'categories'}
+                onClose={() => setOpenSummaryModal(null)}
+                title={categoryFilterLabel}
+                expenses={selectedCategoriesExpenses}
             />
         </div>
     );

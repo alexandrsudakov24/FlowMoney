@@ -120,6 +120,7 @@
     margin-top: 16px;
     transition: all 0.3s ease;
     animation: fadeIn 0.3s ease;
+    cursor: pointer;
 }
 
 .categoryTotalCard:hover {
@@ -185,6 +186,34 @@
     border: 1px solid var(--border);
     color: var(--muted);
     font-size: var(--font-size-md);
+}
+
+.clearFiltersCard {
+    display: flex;
+    justify-content: center;
+    padding: 32px 20px;
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+}
+
+.clearFiltersBtn {
+    background: var(--bg-secondary);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: none;
+    text-shadow: none;
+    transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.clearFiltersBtn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
 }
 
 @keyframes fadeIn {
