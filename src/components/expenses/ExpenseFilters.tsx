@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { Expense } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
 import { getCatLabel } from '../../utils/getCatLabel';
+import { useSlidingIndicator } from '../../hooks/useSlidingIndicator';
 import styles from './ExpenseFilters.module.css';
 
 export interface FilterState {
@@ -10,6 +11,8 @@ export interface FilterState {
     type: 'all' | 'income' | 'expense';
     categories: string[];
 }
+
+const TYPE_FILTER_OPTIONS = ['all', 'expense', 'income'] as const;
 
 interface Props {
     expenses: Expense[];
@@ -34,6 +37,8 @@ export default function ExpenseFilters({ expenses, filters, onChange }: Props) {
     };
 
     const set = (patch: Partial<FilterState>) => onChange({ ...filters, ...patch });
+
+    const typeIndicator = useSlidingIndicator(TYPE_FILTER_OPTIONS.indexOf(filters.type));
 
     const chips: { key: string; label: string; clear: () => void }[] = [];
     if (filters.month) chips.push({ key: 'month', label: formatMonth(filters.month), clear: () => set({ month: '' }) });
@@ -68,12 +73,29 @@ export default function ExpenseFilters({ expenses, filters, onChange }: Props) {
                     className={styles.search}
                 />
 
-                <div className={styles.typeToggle} role="group">
-                    {(['all', 'expense', 'income'] as const).map((type) => (
+                <div
+                    className={styles.typeToggle}
+                    role="tablist"
+                    aria-label={t('transaction_type')}
+                    ref={typeIndicator.containerRef}
+                >
+                    {typeIndicator.rect && (
+                        <span
+                            className={styles.typeToggleIndicator}
+                            style={{
+                                transform: `translate(${typeIndicator.rect.left}px, ${typeIndicator.rect.top}px)`,
+                                width: typeIndicator.rect.width,
+                                height: typeIndicator.rect.height,
+                            }}
+                        />
+                    )}
+                    {TYPE_FILTER_OPTIONS.map((type, i) => (
                         <button
                             key={type}
+                            type="button"
                             className={`${styles.typeBtn} ${filters.type === type ? styles.typeBtnActive : ''}`}
                             onClick={() => set({ type })}
+                            ref={(el) => { typeIndicator.itemRefs.current[i] = el; }}
                         >
                             {t(type === 'all' ? 'filter_type_all' : type)}
                         </button>
