@@ -9,10 +9,13 @@ import { getCategoryColorMap } from '../../utils/getCategoryColors';
 interface ChartsProps {
     expenses: Expense[];
     selectedCategories?: string[];
+    /** Legend list click — toggles the category in/out of a multi-select filter. */
     onSelectCategory?: (category: string) => void;
+    /** Donut slice click — single-select, replaces the current pick. Falls back to onSelectCategory. */
+    onSelectDonutCategory?: (category: string) => void;
 }
 
-export default function Charts({ expenses, selectedCategories = [], onSelectCategory }: ChartsProps) {
+export default function Charts({ expenses, selectedCategories = [], onSelectCategory, onSelectDonutCategory }: ChartsProps) {
     const { t } = useLanguage();
 
     const byCategory = useMemo(() => {
@@ -54,8 +57,8 @@ export default function Charts({ expenses, selectedCategories = [], onSelectCate
                                             opacity={hasSelection && !isSelected(entry.key) ? 0.35 : 1}
                                             stroke={isSelected(entry.key) ? 'var(--card)' : undefined}
                                             strokeWidth={isSelected(entry.key) ? 2 : 0}
-                                            cursor={onSelectCategory ? 'pointer' : undefined}
-                                            onClick={() => onSelectCategory?.(entry.key)}
+                                            cursor={onSelectDonutCategory || onSelectCategory ? 'pointer' : undefined}
+                                            onClick={() => (onSelectDonutCategory ?? onSelectCategory)?.(entry.key)}
                                         />
                                     ))}
                                 </Pie>

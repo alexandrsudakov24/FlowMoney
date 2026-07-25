@@ -48,12 +48,22 @@ export default function DashboardPage() {
         [expenses, filters]
     );
 
+    // The legend list stays multi-select (toggle a category in/out of the filter)...
     const toggleCategory = (category: string) => {
         setFilters((f) => ({
             ...f,
             categories: f.categories.includes(category)
                 ? f.categories.filter((c) => c !== category)
                 : [...f.categories, category],
+        }));
+    };
+
+    // ...but the donut itself is single-select: picking a slice replaces any
+    // previous pick, and picking the already-selected slice again clears it.
+    const selectDonutCategory = (category: string) => {
+        setFilters((f) => ({
+            ...f,
+            categories: f.categories.length === 1 && f.categories[0] === category ? [] : [category],
         }));
     };
 
@@ -220,6 +230,7 @@ export default function DashboardPage() {
                         expenses={chartExpenses}
                         selectedCategories={filters.categories}
                         onSelectCategory={toggleCategory}
+                        onSelectDonutCategory={selectDonutCategory}
                     />
                 </div>
             )}
