@@ -40,7 +40,7 @@ export default defineConfig({
       manifest: {
         name: 'FlowMoney',
         short_name: 'FlowMoney',
-        start_url: '/',
+        start_url: '/add',
         display: 'standalone',
         background_color: '#f5f7fb',
         theme_color: '#6200ee',
