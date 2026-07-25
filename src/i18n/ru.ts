@@ -153,7 +153,7 @@ const ru: Record<TranslationKeys, string> = {
     error_email_in_use: 'Этот email уже зарегистрирован. Войдите, чтобы сохранить данные гостя.',
     error_invalid_credential: 'Неверный email или пароль.',
     error_invalid_email: 'Некорректный email адрес.',
-    error_weak_password: 'Пароль должен содержать минимум 6 символов.',
+    error_weak_password: 'Пароль должен содержать минимум 8 символов, заглавную букву и цифру, без пробелов и других знаков (только латинские буквы и цифры).',
     error_too_many_requests: 'Слишком много попыток. Попробуйте позже.',
     error_network: 'Ошибка сети. Проверьте подключение.',
     error_popup_closed: 'Окно входа было закрыто. Попробуйте снова.',

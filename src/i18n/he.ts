@@ -153,7 +153,7 @@ const he: Record<TranslationKeys, string> = {
     error_email_in_use: 'כתובת האימייל כבר רשומה. התחבר כדי לשמור את נתוני האורח.',
     error_invalid_credential: 'אימייל או סיסמה שגויים.',
     error_invalid_email: 'כתובת אימייל לא חוקית.',
-    error_weak_password: 'הסיסמה חייבת להכיל לפחות 6 תווים.',
+    error_weak_password: 'הסיסמה חייבת להכיל לפחות 8 תווים, אות גדולה וספרה, ורק אותיות וספרות (ללא רווחים או סימנים).',
     error_too_many_requests: 'יותר מדי ניסיונות. נסה שוב מאוחר יותר.',
     error_network: 'שגיאת רשת. בדוק את החיבור.',
     error_popup_closed: 'חלון ההתחברות נסגר. נסה שוב.',

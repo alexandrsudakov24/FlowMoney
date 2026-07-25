@@ -151,7 +151,7 @@ const en = {
     error_email_in_use: 'This email is already registered. Sign in to keep your guest data.',
     error_invalid_credential: 'Incorrect email or password.',
     error_invalid_email: 'Invalid email address.',
-    error_weak_password: 'Password must be at least 6 characters.',
+    error_weak_password: 'Password must be at least 8 characters, include an uppercase letter and a digit, and contain only letters and numbers (no spaces or symbols).',
     error_too_many_requests: 'Too many attempts. Please try again later.',
     error_network: 'Network error. Check your connection.',
     error_popup_closed: 'Sign-in window was closed. Please try again.',
