@@ -43,6 +43,13 @@ export default function App() {
         }
     }, [user?.language, setLanguage]);
 
+    // React Router doesn't reset scroll on navigation by default — without
+    // this, navigating away from a scrolled-down page (e.g. the add-transaction
+    // form) lands on the new page still scrolled down.
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location.pathname]);
+
     return (
         <div className="app">
             <Navbar />
