@@ -154,6 +154,9 @@ body {
     box-shadow: var(--shadow-lg);
     transform: translateY(-2px);
 }
+.card:active {
+    transform: scale(0.98);
+}
 .card h3 {
     margin: 0 0 8px 0;
     font-size: 14px;
@@ -238,7 +241,7 @@ button:hover {
     box-shadow: var(--shadow-md);
 }
 button:active {
-    transform: translateY(0);
+    transform: scale(0.97);
 }
 button.danger {
     background: linear-gradient(135deg, var(--danger), #dc2626);
@@ -274,7 +277,7 @@ button.secondary:hover {
     box-shadow: var(--shadow-md);
 }
 .btn:active {
-    transform: translateY(0);
+    transform: scale(0.96);
 }
 .btn.danger {
     background: var(--danger);

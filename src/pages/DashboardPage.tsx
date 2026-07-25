@@ -6,6 +6,7 @@ import type { FilterState } from '../components/expenses';
 import { InsightsPanel } from '../components/insights';
 import { Spinner } from '../components/ui';
 import { currencySymbols } from '../constants/currency';
+import { useCountUp } from '../hooks/useCountUp';
 import styles from './DashboardPage.module.css';
 
 export default function DashboardPage() {
@@ -82,6 +83,13 @@ export default function DashboardPage() {
         return { todayTotal, weekTotal, monthTotal, balance };
     }, [expenses]);
 
+    // startAt: 0 so the numbers count up every time the dashboard is shown
+    // (e.g. right after adding a transaction), not just on the very first load.
+    const animatedToday = useCountUp(todayTotal, 600, 0);
+    const animatedWeek = useCountUp(weekTotal, 600, 0);
+    const animatedMonth = useCountUp(monthTotal, 600, 0);
+    const animatedBalance = useCountUp(balance, 600, 0);
+
     const hasActiveFilters =
         filters.month !== '' || filters.search !== '' || filters.type !== 'all' || filters.category !== '';
 
@@ -98,7 +106,7 @@ export default function DashboardPage() {
             <div className={`${styles.balanceCard} ${balance < 0 ? styles.balanceNegative : ''}`}>
                 <h3 className={styles.balanceTitle}>{t('net_balance')}</h3>
                 <div className={styles.balanceValue}>
-                    {balance.toFixed(2)} {symbol}
+                    {animatedBalance.toFixed(2)} {symbol}
                 </div>
             </div>
 
@@ -106,21 +114,21 @@ export default function DashboardPage() {
                 <div className={`${styles.card} ${styles.cardToday}`}>
                     <h3 className={styles.cardTitle}>{t('today')}</h3>
                     <div className={styles.cardValue}>
-                        {todayTotal.toFixed(2)} {symbol}
+                        {animatedToday.toFixed(2)} {symbol}
                     </div>
                 </div>
 
                 <div className={`${styles.card} ${styles.cardWeek}`}>
                     <h3 className={styles.cardTitle}>{t('this_week')}</h3>
                     <div className={styles.cardValue}>
-                        {weekTotal.toFixed(2)} {symbol}
+                        {animatedWeek.toFixed(2)} {symbol}
                     </div>
                 </div>
 
                 <div className={`${styles.card} ${styles.cardMonth}`}>
                     <h3 className={styles.cardTitle}>{t('this_month')}</h3>
                     <div className={styles.cardValue}>
-                        {monthTotal.toFixed(2)} {symbol}
+                        {animatedMonth.toFixed(2)} {symbol}
                     </div>
                 </div>
             </div>

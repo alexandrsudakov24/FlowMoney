@@ -35,6 +35,10 @@
     transform: translateY(-2px);
 }
 
+.card:active {
+    transform: scale(0.98);
+}
+
 .cardToday {
     background: linear-gradient(135deg, #22c55e, #15803d);
 }
@@ -76,6 +80,10 @@
 .balanceCard:hover {
     box-shadow: var(--shadow-lg);
     transform: translateY(-2px);
+}
+
+.balanceCard:active {
+    transform: scale(0.99);
 }
 
 .balanceNegative {

@@ -6,15 +6,24 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useApp, INCOME_CATEGORIES } from '../../context/AppContext';
 import { currencySymbols } from '../../constants/currency';
 import { getCatLabel } from '../../utils/getCatLabel';
+import { useSlidingIndicator } from '../../hooks/useSlidingIndicator';
+import { ButtonSpinner } from '../ui';
 
 type FormData = TransactionFormData;
 
+const TYPE_OPTIONS = ['expense', 'income'] as const;
+const REPEAT_OPTIONS = ['none', 'once', 'monthly'] as const;
+
 export default function ExpenseForm({
     defaultValues,
-    onSubmit
+    onSubmit,
+    justSaved = false,
 }: {
     defaultValues?: Partial<FormData> | Partial<Expense>;
     onSubmit: (data: FormData) => void | Promise<void>;
+    /** Shows a brief "saved" confirmation on the submit button — set true
+     *  once the caller's onSubmit has resolved but before it navigates away. */
+    justSaved?: boolean;
 }) {
     const { t } = useLanguage();
     const { currency, expenses, categories } = useApp();
@@ -33,6 +42,9 @@ export default function ExpenseForm({
     const selectedCategory = watch('category');
     const repeat = watch('repeat') || 'none';
     const todayStr = new Date().toISOString().slice(0, 10);
+
+    const typeIndicator = useSlidingIndicator(TYPE_OPTIONS.indexOf(type));
+    const repeatIndicator = useSlidingIndicator(REPEAT_OPTIONS.indexOf(repeat));
 
     useEffect(() => {
         if (defaultValues && 'type' in (defaultValues as object)) {
@@ -63,23 +75,41 @@ export default function ExpenseForm({
         return [...INCOME_CATEGORIES].sort((a, b) => (map[b] || 0) - (map[a] || 0)).slice(0, 3);
     }, [expenses]);
 
+    const topCategories = type === 'expense' ? topExpenseCategories : topIncomeCategories;
+    const categoryIndicator = useSlidingIndicator(
+        topCategories.indexOf(selectedCategory ?? ''),
+        [type, topCategories.join('|')]
+    );
+
     return (
         <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-            <div className={styles.toggle} role="tablist" aria-label={t('transaction_type')}>
-                <button
-                    type="button"
-                    className={`${styles.toggleButton} ${type === 'expense' ? styles.active : ''}`}
-                    onClick={() => setValue('type', 'expense')}
-                >
-                    {t('expense')}
-                </button>
-                <button
-                    type="button"
-                    className={`${styles.toggleButton} ${type === 'income' ? styles.active : ''}`}
-                    onClick={() => setValue('type', 'income')}
-                >
-                    {t('income')}
-                </button>
+            <div
+                className={styles.toggle}
+                role="tablist"
+                aria-label={t('transaction_type')}
+                ref={typeIndicator.containerRef}
+            >
+                {typeIndicator.rect && (
+                    <span
+                        className={styles.toggleIndicator}
+                        style={{
+                            transform: `translate(${typeIndicator.rect.left}px, ${typeIndicator.rect.top}px)`,
+                            width: typeIndicator.rect.width,
+                            height: typeIndicator.rect.height,
+                        }}
+                    />
+                )}
+                {TYPE_OPTIONS.map((opt, i) => (
+                    <button
+                        key={opt}
+                        type="button"
+                        className={`${styles.toggleButton} ${type === opt ? styles.active : ''}`}
+                        onClick={() => setValue('type', opt)}
+                        ref={(el) => { typeIndicator.itemRefs.current[i] = el; }}
+                    >
+                        {t(opt)}
+                    </button>
+                ))}
             </div>
 
             <label className={styles.label}>
@@ -97,49 +127,36 @@ export default function ExpenseForm({
 
             <label className={styles.label}>
                 <span>{t('category')}</span>
-                {type === 'expense' ? (
-                    <>
-                        {topExpenseCategories.length > 0 && (
-                            <div className={styles.chips}>
-                                {topExpenseCategories.map(cat => (
-                                    <button
-                                        key={cat}
-                                        type="button"
-                                        className={`${styles.chip} ${selectedCategory === cat ? styles.chipActive : ''}`}
-                                        onClick={() => setValue('category', cat)}
-                                    >
-                                        {getCatLabel(cat, t)}
-                                    </button>
-                                ))}
-                            </div>
+                {topCategories.length > 0 && (
+                    <div className={styles.chips} ref={categoryIndicator.containerRef}>
+                        {categoryIndicator.rect && (
+                            <span
+                                className={styles.chipIndicator}
+                                style={{
+                                    transform: `translate(${categoryIndicator.rect.left}px, ${categoryIndicator.rect.top}px)`,
+                                    width: categoryIndicator.rect.width,
+                                    height: categoryIndicator.rect.height,
+                                }}
+                            />
                         )}
-                        <select className={styles.select} {...register('category')}>
-                            {categories.map(cat => (
-                                <option key={cat} value={cat}>{getCatLabel(cat, t)}</option>
-                            ))}
-                        </select>
-                    </>
-                ) : (
-                    <>
-                        <div className={styles.chips}>
-                            {topIncomeCategories.map(cat => (
-                                <button
-                                    key={cat}
-                                    type="button"
-                                    className={`${styles.chip} ${selectedCategory === cat ? styles.chipActive : ''}`}
-                                    onClick={() => setValue('category', cat)}
-                                >
-                                    {getCatLabel(cat, t)}
-                                </button>
-                            ))}
-                        </div>
-                        <select className={styles.select} {...register('category')}>
-                            {INCOME_CATEGORIES.map(cat => (
-                                <option key={cat} value={cat}>{getCatLabel(cat, t)}</option>
-                            ))}
-                        </select>
-                    </>
+                        {topCategories.map((cat, i) => (
+                            <button
+                                key={cat}
+                                type="button"
+                                className={`${styles.chip} ${selectedCategory === cat ? styles.chipActive : ''}`}
+                                onClick={() => setValue('category', cat)}
+                                ref={(el) => { categoryIndicator.itemRefs.current[i] = el; }}
+                            >
+                                {getCatLabel(cat, t)}
+                            </button>
+                        ))}
+                    </div>
                 )}
+                <select className={styles.select} {...register('category')}>
+                    {(type === 'expense' ? categories : INCOME_CATEGORIES).map(cat => (
+                        <option key={cat} value={cat}>{getCatLabel(cat, t)}</option>
+                    ))}
+                </select>
             </label>
 
             <label className={styles.label}>
@@ -156,28 +173,33 @@ export default function ExpenseForm({
 
             <label className={styles.label}>
                 <span>{t('repeat')}</span>
-                <div className={styles.toggle} role="tablist" aria-label={t('repeat')}>
-                    <button
-                        type="button"
-                        className={`${styles.toggleButton} ${repeat === 'none' ? styles.active : ''}`}
-                        onClick={() => setValue('repeat', 'none')}
-                    >
-                        {t('repeat_none')}
-                    </button>
-                    <button
-                        type="button"
-                        className={`${styles.toggleButton} ${repeat === 'once' ? styles.active : ''}`}
-                        onClick={() => setValue('repeat', 'once')}
-                    >
-                        {t('repeat_once')}
-                    </button>
-                    <button
-                        type="button"
-                        className={`${styles.toggleButton} ${repeat === 'monthly' ? styles.active : ''}`}
-                        onClick={() => setValue('repeat', 'monthly')}
-                    >
-                        {t('repeat_monthly')}
-                    </button>
+                <div
+                    className={styles.toggle}
+                    role="tablist"
+                    aria-label={t('repeat')}
+                    ref={repeatIndicator.containerRef}
+                >
+                    {repeatIndicator.rect && (
+                        <span
+                            className={styles.toggleIndicator}
+                            style={{
+                                transform: `translate(${repeatIndicator.rect.left}px, ${repeatIndicator.rect.top}px)`,
+                                width: repeatIndicator.rect.width,
+                                height: repeatIndicator.rect.height,
+                            }}
+                        />
+                    )}
+                    {REPEAT_OPTIONS.map((opt, i) => (
+                        <button
+                            key={opt}
+                            type="button"
+                            className={`${styles.toggleButton} ${repeat === opt ? styles.active : ''}`}
+                            onClick={() => setValue('repeat', opt)}
+                            ref={(el) => { repeatIndicator.itemRefs.current[i] = el; }}
+                        >
+                            {t(opt === 'none' ? 'repeat_none' : opt === 'once' ? 'repeat_once' : 'repeat_monthly')}
+                        </button>
+                    ))}
                 </div>
             </label>
             {repeat !== 'none' && (
@@ -198,8 +220,16 @@ export default function ExpenseForm({
             </label>
 
             <div className={styles.formActions}>
-                <button className={styles.button} type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? t('saving') : t('save')}
+                <button
+                    className={`${styles.button} ${justSaved ? styles.buttonSuccess : ''}`}
+                    type="submit"
+                    disabled={isSubmitting || justSaved}
+                >
+                    {justSaved ? (
+                        <span className={styles.buttonSuccessContent}>✓ {t('saved')}</span>
+                    ) : isSubmitting ? (
+                        <span className={styles.buttonSuccessContent}><ButtonSpinner /> {t('saving')}</span>
+                    ) : t('save')}
                 </button>
             </div>
         </form>

@@ -10,6 +10,7 @@ import { ConfirmModal } from '../ui';
 import styles from './ExpenseList.module.css';
 
 const PAGE_SIZE = 20;
+const EXIT_ANIM_MS = 220;
 
 export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
     const { deleteExpense, currency } = useApp();
@@ -17,7 +18,7 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
     const { family } = useFamily();
     const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
     const [confirmingId, setConfirmingId] = useState<string | null>(null);
-    const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
+    const [removingId, setRemovingId] = useState<string | null>(null);
 
     const sorted = useMemo(
         () => [...expenses].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
@@ -53,7 +54,10 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
                     const amount = Number(e.amount).toFixed(2);
                     const symbol = currencySymbols[currency] ?? currency;
                     return (
-                        <li key={e.id} className={styles.expenseItem}>
+                        <li
+                            key={e.id}
+                            className={`${styles.expenseItem} ${removingId === e.id ? styles.removing : ''}`}
+                        >
                             <div className={styles.left}>
                                 <div className={styles.category}>{getCatLabel(e.category, t)}</div>
                                 <div className={styles.note}>{e.note || t('no_note')}</div>
@@ -94,15 +98,18 @@ export default function ExpenseList({ expenses }: { expenses: Expense[] }) {
                 onClose={() => setConfirmingId(null)}
                 onConfirm={async () => {
                     if (!confirmingId) return;
-                    setIsDeletingId(confirmingId);
+                    const id = confirmingId;
+                    setConfirmingId(null);
+                    setRemovingId(id);
+                    // Let the exit animation play before the row actually
+                    // disappears from the underlying data.
+                    await new Promise((resolve) => setTimeout(resolve, EXIT_ANIM_MS));
                     try {
-                        await deleteExpense(confirmingId);
+                        await deleteExpense(id);
                     } finally {
-                        setIsDeletingId(null);
-                        setConfirmingId(null);
+                        setRemovingId(null);
                     }
                 }}
-                loading={!!isDeletingId}
                 title={t('delete')}
                 message={
                     confirmingExpense

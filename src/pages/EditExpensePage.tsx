@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { deleteField } from 'firebase/firestore';
 import { useApp } from '../context/AppContext';
@@ -8,11 +9,14 @@ import styles from './EditExpensePage.module.css';
 
 type FormData = TransactionFormData;
 
+const SAVED_CONFIRMATION_MS = 450;
+
 export default function EditExpensePage() {
     const { id } = useParams();
     const { expenses, updateExpense } = useApp();
     const { t } = useLanguage();
     const navigate = useNavigate();
+    const [justSaved, setJustSaved] = useState(false);
 
     const expense = expenses.find((e) => e.id === id);
 
@@ -35,6 +39,8 @@ export default function EditExpensePage() {
                 scheduled: repeat === 'none' ? deleteField() : true,
                 repeat: repeat === 'monthly' ? 'monthly' : deleteField(),
             });
+            setJustSaved(true);
+            await new Promise((resolve) => setTimeout(resolve, SAVED_CONFIRMATION_MS));
             navigate('/');
         } catch {
             // error already shown via toast
@@ -49,7 +55,11 @@ export default function EditExpensePage() {
         <div className={styles.page}>
             <h2 className={styles.title}>{t('edit_transaction')}</h2>
             <p className={styles.description}>{t('edit_transaction_desc')}</p>
-            <ExpenseForm defaultValues={{ ...expense, repeat: initialRepeat } as unknown as Partial<FormData>} onSubmit={handleSubmit} />
+            <ExpenseForm
+                defaultValues={{ ...expense, repeat: initialRepeat } as unknown as Partial<FormData>}
+                onSubmit={handleSubmit}
+                justSaved={justSaved}
+            />
         </div>
     );
 }

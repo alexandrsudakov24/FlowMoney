@@ -5,35 +5,50 @@
 }
 
 .toggle {
+  position: relative;
   display: flex;
-  gap: 12px;
+  gap: 4px;
+  padding: 4px;
   margin-bottom: 10px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+}
+
+.toggleIndicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  border-radius: var(--radius-md);
+  background: var(--success);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.3s ease;
 }
 
 .toggleButton {
+  position: relative;
+  z-index: 1;
   flex: 1;
   padding: 12px;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   font-size: var(--font-size-md);
   font-weight: 600;
   border: none;
+  background: transparent;
+  color: var(--text-secondary);
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease, color 0.2s ease;
-}
-
-.toggleButton:not(.active) {
-  background: var(--accent);
-  color: white;
+  transition: color 0.2s ease, transform 0.1s ease;
 }
 
 .toggleButton.active {
-  background: var(--success);
-  color: white;
+  color: #fff;
 }
 
-.toggleButton:hover {
-  transform: scale(0.97);
-  opacity: 0.9;
+.toggleButton:hover:not(.active) {
+  color: var(--text);
+}
+
+.toggleButton:active {
+  transform: scale(0.96);
 }
 
 .label {
@@ -75,14 +90,27 @@
 }
 
 .chips {
+  position: relative;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
 }
 
+.chipIndicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.3s ease;
+}
+
 .chip {
-  flex: 1;
-  min-width: 80px;
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-width: 64px;
   padding: 10px 16px;
   border-radius: var(--radius-lg);
   border: 2px solid var(--border);
@@ -93,6 +121,7 @@
   cursor: pointer;
   transition: all 0.15s ease;
   text-align: center;
+  white-space: nowrap;
 }
 
 .chip:hover {
@@ -100,9 +129,13 @@
   color: var(--accent);
 }
 
+.chip:active {
+  transform: scale(0.95);
+}
+
 .chipActive {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: transparent;
+  border-color: transparent;
   color: #fff;
 }
 
@@ -140,4 +173,23 @@
 
 .button:active {
   transform: scale(0.97);
+}
+
+.buttonSuccessContent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.buttonSuccess {
+  background: var(--success);
+  cursor: default;
+  animation: buttonSuccessPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes buttonSuccessPop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.04); }
+  100% { transform: scale(1); }
 }

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -7,10 +8,13 @@ import styles from './AddExpensePage.module.css';
 
 type FormData = TransactionFormData;
 
+const SAVED_CONFIRMATION_MS = 450;
+
 export default function AddExpensePage() {
     const { addExpense } = useApp();
     const { t } = useLanguage();
     const navigate = useNavigate();
+    const [justSaved, setJustSaved] = useState(false);
 
     const handleSubmit = async (data: FormData) => {
         const { repeat, ...rest } = data;
@@ -23,6 +27,10 @@ export default function AddExpensePage() {
                 ...(repeat === 'once' ? { scheduled: true } : {}),
                 ...(repeat === 'monthly' ? { scheduled: true, repeat: 'monthly' } : {}),
             });
+            setJustSaved(true);
+            // Briefly show the "saved" confirmation before handing off to the
+            // dashboard, where the summary numbers animate in on arrival.
+            await new Promise((resolve) => setTimeout(resolve, SAVED_CONFIRMATION_MS));
             navigate('/');
         } catch {
             // error already shown via toast
@@ -35,7 +43,7 @@ export default function AddExpensePage() {
             <div className={styles.page}>
                 <h2 className={styles.title}>{t('add_transaction')}</h2>
                 <p className={styles.description}>{t('add_transaction_desc')}</p>
-                <ExpenseForm onSubmit={handleSubmit} defaultValues={undefined} />
+                <ExpenseForm onSubmit={handleSubmit} defaultValues={undefined} justSaved={justSaved} />
             </div>
         </div>
     );

@@ -71,7 +71,7 @@
     font-size: var(--font-size-sm);
     font-family: var(--font-family);
     cursor: pointer;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
     white-space: nowrap;
 }
 
@@ -80,6 +80,10 @@
     color: #fff;
     font-weight: 600;
     border-color: var(--accent);
+}
+
+.typeBtn:active {
+    transform: scale(0.95);
 }
 
 .activeChips {
@@ -106,12 +110,16 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
 }
 
 .chip:hover {
     background: var(--card);
     border-color: var(--accent);
+}
+
+.chip:active {
+    transform: scale(0.95);
 }
 
 .chip span {
