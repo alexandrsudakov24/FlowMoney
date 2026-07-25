@@ -115,13 +115,29 @@ describe('ExpenseForm', () => {
         expect(screen.getByRole('textbox')).toHaveValue('bus');
     });
 
-    it('note input has maxLength of 200', () => {
+    it('hides date/repeat/notes behind a toggle when adding', () => {
         renderForm();
+        expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'more_details' })).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('shows date/repeat/notes by default when editing', () => {
+        renderForm({
+            defaultValues: { amount: '99', category: 'Transport', date: '2025-01-15', note: 'bus', type: 'expense' },
+        });
+        expect(screen.getByRole('textbox')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'more_details' })).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('note input has maxLength of 200', async () => {
+        renderForm();
+        await userEvent.click(screen.getByRole('button', { name: 'more_details' }));
         expect(screen.getByRole('textbox')).toHaveAttribute('maxLength', '200');
     });
 
     it('caps note input at 200 characters', async () => {
         renderForm();
+        await userEvent.click(screen.getByRole('button', { name: 'more_details' }));
         const noteInput = screen.getByRole('textbox');
         await userEvent.type(noteInput, 'a'.repeat(201));
         expect(noteInput).toHaveValue('a'.repeat(200));

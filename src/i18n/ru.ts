@@ -17,6 +17,7 @@ const ru: Record<TranslationKeys, string> = {
     dark: 'Тёмная',
     close: 'Закрыть',
     loading: 'Загрузка…',
+    more_details: 'Дата, повтор, заметка',
     avatar: 'Аватар',
     remove_filter: 'Убрать фильтр',
     transaction_type: 'Тип операции',

@@ -15,6 +15,7 @@ const en = {
     dark: 'Dark',
     close: 'Close',
     loading: 'Loading…',
+    more_details: 'Date, repeat, notes',
     avatar: 'Avatar',
     remove_filter: 'Remove filter',
     transaction_type: 'Transaction type',

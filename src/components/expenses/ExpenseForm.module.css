@@ -150,6 +150,58 @@
   margin: -12px 0 0;
 }
 
+.advancedToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin: -10px 0 0;
+  padding: 4px 2px;
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  text-shadow: none;
+  color: var(--accent);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  font-family: var(--font-family);
+  cursor: pointer;
+}
+
+.advancedToggle:hover {
+  transform: none;
+  box-shadow: none;
+  opacity: 0.8;
+}
+
+.chevron {
+  display: inline-block;
+  transition: transform 0.25s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.advancedWrapper {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+
+.advancedOpen {
+  grid-template-rows: 1fr;
+}
+
+.advancedInner {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .formActions {
   margin-top: 10px;
 }

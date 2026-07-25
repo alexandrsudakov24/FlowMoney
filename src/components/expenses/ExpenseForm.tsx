@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styles from './ExpenseForm.module.css';
 import type { Expense, TransactionFormData } from '../../types';
@@ -42,6 +42,11 @@ export default function ExpenseForm({
     const selectedCategory = watch('category');
     const repeat = watch('repeat') || 'none';
     const todayStr = new Date().toISOString().slice(0, 10);
+
+    // Date/repeat/notes default to "today, no repeat, no note" — hide them
+    // behind a toggle when adding so Save is reachable without scrolling,
+    // but keep them open when editing so existing values stay visible.
+    const [advancedOpen, setAdvancedOpen] = useState(!!defaultValues);
 
     const typeIndicator = useSlidingIndicator(TYPE_OPTIONS.indexOf(type));
     const repeatIndicator = useSlidingIndicator(REPEAT_OPTIONS.indexOf(repeat));
@@ -159,65 +164,82 @@ export default function ExpenseForm({
                 </select>
             </label>
 
-            <label className={styles.label}>
-                <span>{t('date')}</span>
-                <input
-                    className={`${styles.input} ${errors.date ? styles.inputError : ''}`}
-                    type="date"
-                    {...register('date', {
-                        validate: (v) => repeat !== 'once' || v > todayStr || t('schedule_date_future_required'),
-                    })}
-                />
-                {errors.date && <span className={styles.errorMsg}>{errors.date.message}</span>}
-            </label>
+            <button
+                type="button"
+                className={styles.advancedToggle}
+                onClick={() => setAdvancedOpen((v) => !v)}
+                aria-expanded={advancedOpen}
+            >
+                {t('more_details')}
+                <span className={`${styles.chevron} ${advancedOpen ? styles.chevronOpen : ''}`} aria-hidden="true">▾</span>
+            </button>
 
-            <label className={styles.label}>
-                <span>{t('repeat')}</span>
-                <div
-                    className={styles.toggle}
-                    role="tablist"
-                    aria-label={t('repeat')}
-                    ref={repeatIndicator.containerRef}
-                >
-                    {repeatIndicator.rect && (
-                        <span
-                            className={styles.toggleIndicator}
-                            style={{
-                                transform: `translate(${repeatIndicator.rect.left}px, ${repeatIndicator.rect.top}px)`,
-                                width: repeatIndicator.rect.width,
-                                height: repeatIndicator.rect.height,
-                            }}
+            <div
+                className={`${styles.advancedWrapper} ${advancedOpen ? styles.advancedOpen : ''}`}
+                aria-hidden={!advancedOpen}
+            >
+                <div className={styles.advancedInner}>
+                    <label className={styles.label}>
+                        <span>{t('date')}</span>
+                        <input
+                            className={`${styles.input} ${errors.date ? styles.inputError : ''}`}
+                            type="date"
+                            {...register('date', {
+                                validate: (v) => repeat !== 'once' || v > todayStr || t('schedule_date_future_required'),
+                            })}
                         />
-                    )}
-                    {REPEAT_OPTIONS.map((opt, i) => (
-                        <button
-                            key={opt}
-                            type="button"
-                            className={`${styles.toggleButton} ${repeat === opt ? styles.active : ''}`}
-                            onClick={() => setValue('repeat', opt)}
-                            ref={(el) => { repeatIndicator.itemRefs.current[i] = el; }}
-                        >
-                            {t(opt === 'none' ? 'repeat_none' : opt === 'once' ? 'repeat_once' : 'repeat_monthly')}
-                        </button>
-                    ))}
-                </div>
-            </label>
-            {repeat !== 'none' && (
-                <p className={styles.hint}>
-                    {repeat === 'monthly' ? t('repeat_monthly_hint') : t('schedule_later_hint')}
-                </p>
-            )}
+                        {errors.date && <span className={styles.errorMsg}>{errors.date.message}</span>}
+                    </label>
 
-            <label className={styles.label}>
-                <span>{t('notes')}</span>
-                <input
-                    className={styles.input}
-                    type="text"
-                    placeholder={t('note_placeholder')}
-                    {...register('note', { maxLength: 200 })}
-                    maxLength={200}
-                />
-            </label>
+                    <label className={styles.label}>
+                        <span>{t('repeat')}</span>
+                        <div
+                            className={styles.toggle}
+                            role="tablist"
+                            aria-label={t('repeat')}
+                            ref={repeatIndicator.containerRef}
+                        >
+                            {repeatIndicator.rect && (
+                                <span
+                                    className={styles.toggleIndicator}
+                                    style={{
+                                        transform: `translate(${repeatIndicator.rect.left}px, ${repeatIndicator.rect.top}px)`,
+                                        width: repeatIndicator.rect.width,
+                                        height: repeatIndicator.rect.height,
+                                    }}
+                                />
+                            )}
+                            {REPEAT_OPTIONS.map((opt, i) => (
+                                <button
+                                    key={opt}
+                                    type="button"
+                                    className={`${styles.toggleButton} ${repeat === opt ? styles.active : ''}`}
+                                    onClick={() => setValue('repeat', opt)}
+                                    ref={(el) => { repeatIndicator.itemRefs.current[i] = el; }}
+                                >
+                                    {t(opt === 'none' ? 'repeat_none' : opt === 'once' ? 'repeat_once' : 'repeat_monthly')}
+                                </button>
+                            ))}
+                        </div>
+                    </label>
+                    {repeat !== 'none' && (
+                        <p className={styles.hint}>
+                            {repeat === 'monthly' ? t('repeat_monthly_hint') : t('schedule_later_hint')}
+                        </p>
+                    )}
+
+                    <label className={styles.label}>
+                        <span>{t('notes')}</span>
+                        <input
+                            className={styles.input}
+                            type="text"
+                            placeholder={t('note_placeholder')}
+                            {...register('note', { maxLength: 200 })}
+                            maxLength={200}
+                        />
+                    </label>
+                </div>
+            </div>
 
             <div className={styles.formActions}>
                 <button

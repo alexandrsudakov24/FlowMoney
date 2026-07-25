@@ -17,6 +17,7 @@ const he: Record<TranslationKeys, string> = {
     dark: 'אפל',
     close: 'סגור',
     loading: 'טוען…',
+    more_details: 'תאריך, חזרה, הערה',
     avatar: 'תמונת פרופיל',
     remove_filter: 'הסר מסנן',
     transaction_type: 'סוג עסקה',
