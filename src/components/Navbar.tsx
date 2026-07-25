@@ -79,21 +79,21 @@ export default function Navbar() {
                         to="/"
                         className={`${styles.navItem} ${isActive('/') ? styles.navItemActive : ''}`}
                     >
-                        <IconDashboard />
+                        <span className={styles.navIconWrap}><IconDashboard /></span>
                         <span className={styles.navLabel}>{t('dashboard')}</span>
                     </Link>
                     <Link
                         to="/add"
                         className={`${styles.navItem} ${isActive('/add') ? styles.navItemActive : ''}`}
                     >
-                        <IconAdd />
+                        <span className={styles.navIconWrap}><IconAdd /></span>
                         <span className={styles.navLabel}>{t('add')}</span>
                     </Link>
                     <Link
                         to="/profile"
                         className={`${styles.navItem} ${isActive('/profile') ? styles.navItemActive : ''}`}
                     >
-                        <IconProfile />
+                        <span className={styles.navIconWrap}><IconProfile /></span>
                         <span className={styles.navLabel}>{t('profile')}</span>
                     </Link>
                 </nav>
