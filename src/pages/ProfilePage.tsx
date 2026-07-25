@@ -6,7 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useFamily } from '../context/FamilyContext';
 import { getCatLabel } from '../utils/getCatLabel';
 import { currencySymbols } from '../constants/currency';
-import { ThemeModal, LanguageModal, CurrencyModal, CategoryModal, FamilyModal, FeedbackModal, ScheduledPaymentsModal } from '../components/modals';
+import { ThemeModal, LanguageModal, CurrencyModal, CategoryModal, FamilyModal, FeedbackModal, ScheduledPaymentsModal, AboutModal } from '../components/modals';
 import styles from './ProfilePage.module.css';
 
 export default function ProfilePage() {
@@ -22,6 +22,7 @@ export default function ProfilePage() {
     const [familyOpen, setFamilyOpen] = useState(false);
     const [feedbackOpen, setFeedbackOpen] = useState(false);
     const [scheduledOpen, setScheduledOpen] = useState(false);
+    const [aboutOpen, setAboutOpen] = useState(false);
 
     const { totalExpenses, totalIncome, topCategory } = useMemo(() => {
         const map: Record<string, number> = {};
@@ -175,6 +176,13 @@ export default function ProfilePage() {
                 </button>
             </div>
 
+            <div className={styles.block}>
+                <h3 className={styles.blockTitle}>{t('about_app')}</h3>
+                <button className={styles.exportBtn} onClick={() => setAboutOpen(true)}>
+                    {t('about_app')}
+                </button>
+            </div>
+
             {role === 'admin' && (
                 <a href="/admin" className={styles.adminBtn}>
                     {t('admin_panel')}
@@ -194,6 +202,7 @@ export default function ProfilePage() {
             <FamilyModal isOpen={familyOpen} onClose={() => setFamilyOpen(false)} />
             <FeedbackModal isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
             <ScheduledPaymentsModal isOpen={scheduledOpen} onClose={() => setScheduledOpen(false)} />
+            <AboutModal isOpen={aboutOpen} onClose={() => setAboutOpen(false)} />
         </div>
     );
 }

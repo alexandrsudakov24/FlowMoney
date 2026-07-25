@@ -92,6 +92,8 @@ const he: Record<TranslationKeys, string> = {
     category_in_use: 'הקטגוריה בשימוש בעסקאות',
     category_default: 'לא ניתן למחוק קטגוריה ברירת מחדל',
     app_version: 'גרסת אפליקציה',
+    about_app: 'אודות האפליקציה',
+    about_app_description: 'FlowMoney היא אפליקציית מעקב פיננסי אישי מסוג PWA. עקבו אחרי ההכנסות וההוצאות שלכם, נתחו הוצאות בעזרת גרפים, שתפו תקציב עם המשפחה וקבלו תובנות מבוססות בינה מלאכותית על ההוצאות שלכם.',
     auto: 'אוטומטי',
     family: 'משפחה',
     family_budget: 'תקציב משפחתי',

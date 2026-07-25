@@ -90,6 +90,8 @@ const en = {
     category_in_use: 'Category is used in transactions',
     category_default: 'Default category cannot be deleted',
     app_version: 'App Version',
+    about_app: 'About the App',
+    about_app_description: 'FlowMoney is a personal finance tracker PWA. Track your income and expenses, analyze spending with charts, share a budget with your family, and get AI-powered insights into your spending.',
     auto: 'Auto',
     family: 'Family',
     family_budget: 'Family Budget',
