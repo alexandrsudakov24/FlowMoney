@@ -13,11 +13,11 @@ const COLORS = [
 
 interface ChartsProps {
     expenses: Expense[];
-    selectedCategory?: string;
+    selectedCategories?: string[];
     onSelectCategory?: (category: string) => void;
 }
 
-export default function Charts({ expenses, selectedCategory = '', onSelectCategory }: ChartsProps) {
+export default function Charts({ expenses, selectedCategories = [], onSelectCategory }: ChartsProps) {
     const { t } = useLanguage();
 
     const byCategory = useMemo(() => {
@@ -31,9 +31,8 @@ export default function Charts({ expenses, selectedCategory = '', onSelectCatego
         return Object.entries(map).map(([key, value]) => ({ key, name: getCatLabel(key, t), value }));
     }, [expenses, t]);
 
-    const handleSelect = (key: string) => {
-        onSelectCategory?.(selectedCategory === key ? '' : key);
-    };
+    const hasSelection = selectedCategories.length > 0;
+    const isSelected = (key: string) => selectedCategories.includes(key);
 
     return (
         <div className={styles.charts}>
@@ -55,11 +54,11 @@ export default function Charts({ expenses, selectedCategory = '', onSelectCatego
                                         <Cell
                                             key={`cell-${index}`}
                                             fill={COLORS[index % COLORS.length]}
-                                            opacity={selectedCategory && selectedCategory !== entry.key ? 0.35 : 1}
-                                            stroke={selectedCategory === entry.key ? 'var(--card)' : undefined}
-                                            strokeWidth={selectedCategory === entry.key ? 2 : 0}
+                                            opacity={hasSelection && !isSelected(entry.key) ? 0.35 : 1}
+                                            stroke={isSelected(entry.key) ? 'var(--card)' : undefined}
+                                            strokeWidth={isSelected(entry.key) ? 2 : 0}
                                             cursor={onSelectCategory ? 'pointer' : undefined}
-                                            onClick={() => handleSelect(entry.key)}
+                                            onClick={() => onSelectCategory?.(entry.key)}
                                         />
                                     ))}
                                 </Pie>
@@ -71,9 +70,9 @@ export default function Charts({ expenses, selectedCategory = '', onSelectCatego
                                 <li key={entry.key} className={styles.legendItem}>
                                     <button
                                         type="button"
-                                        className={`${styles.legendBtn} ${selectedCategory === entry.key ? styles.legendBtnActive : ''}`}
-                                        style={{ opacity: selectedCategory && selectedCategory !== entry.key ? 0.5 : 1 }}
-                                        onClick={() => handleSelect(entry.key)}
+                                        className={`${styles.legendBtn} ${isSelected(entry.key) ? styles.legendBtnActive : ''}`}
+                                        style={{ opacity: hasSelection && !isSelected(entry.key) ? 0.5 : 1 }}
+                                        onClick={() => onSelectCategory?.(entry.key)}
                                     >
                                         <span
                                             className={styles.legendDot}

@@ -7,6 +7,7 @@ import { InsightsPanel } from '../components/insights';
 import { Spinner } from '../components/ui';
 import { currencySymbols } from '../constants/currency';
 import { useCountUp } from '../hooks/useCountUp';
+import { getCatLabel } from '../utils/getCatLabel';
 import styles from './DashboardPage.module.css';
 
 export default function DashboardPage() {
@@ -17,15 +18,15 @@ export default function DashboardPage() {
         month: '',
         search: '',
         type: 'all',
-        category: '',
+        categories: [],
     });
 
     // Shared predicate for both lists below. `skipCategory` lets the chart keep showing
-    // every category (with the selected one highlighted) instead of collapsing to one slice.
+    // every category (with the selected ones highlighted) instead of collapsing to them.
     const matchesFilters = (e: (typeof expenses)[number], skipCategory = false) => {
         if (filters.month && !e.date.startsWith(filters.month)) return false;
         if (filters.type !== 'all' && e.type !== filters.type) return false;
-        if (!skipCategory && filters.category && e.category !== filters.category) return false;
+        if (!skipCategory && filters.categories.length > 0 && !filters.categories.includes(e.category)) return false;
         if (filters.search) {
             const q = filters.search.toLowerCase();
             const matchNote = e.note?.toLowerCase().includes(q) ?? false;
@@ -45,10 +46,13 @@ export default function DashboardPage() {
         [expenses, filters]
     );
 
-    // Charts already toggles: it passes '' when re-clicking the currently
-    // selected category, or the new key otherwise — so this just applies it.
-    const selectCategory = (category: string) => {
-        setFilters((f) => ({ ...f, category }));
+    const toggleCategory = (category: string) => {
+        setFilters((f) => ({
+            ...f,
+            categories: f.categories.includes(category)
+                ? f.categories.filter((c) => c !== category)
+                : [...f.categories, category],
+        }));
     };
 
     const { todayTotal, weekTotal, monthTotal, balance } = useMemo(() => {
@@ -90,8 +94,18 @@ export default function DashboardPage() {
     const animatedMonth = useCountUp(monthTotal, 600, 0);
     const animatedBalance = useCountUp(balance, 600, 0);
 
+    // Sum of expense amounts within the categories currently selected in the
+    // chart — filteredExpenses already respects the category (and other) filters.
+    const selectedCategoriesTotal = useMemo(
+        () => filteredExpenses
+            .filter((e) => e.type === 'expense')
+            .reduce((sum, e) => sum + Number(e.amount || 0), 0),
+        [filteredExpenses]
+    );
+    const animatedCategoriesTotal = useCountUp(selectedCategoriesTotal, 600, 0);
+
     const hasActiveFilters =
-        filters.month !== '' || filters.search !== '' || filters.type !== 'all' || filters.category !== '';
+        filters.month !== '' || filters.search !== '' || filters.type !== 'all' || filters.categories.length > 0;
 
     const symbol = currencySymbols[currency];
 
@@ -143,13 +157,24 @@ export default function DashboardPage() {
                 />
             )}
 
+            {filters.categories.length > 0 && (
+                <div className={styles.categoryTotalCard}>
+                    <h3 className={styles.categoryTotalTitle}>
+                        {filters.categories.map((c) => getCatLabel(c, t)).join(', ')}
+                    </h3>
+                    <div className={styles.categoryTotalValue}>
+                        {animatedCategoriesTotal.toFixed(2)} {symbol}
+                    </div>
+                </div>
+            )}
+
             {chartExpenses.length > 0 && (
                 <div className={styles.chartsSection}>
                     <h2 className={styles.chartsTitle}>{t('analytics')}</h2>
                     <Charts
                         expenses={chartExpenses}
-                        selectedCategory={filters.category}
-                        onSelectCategory={selectCategory}
+                        selectedCategories={filters.categories}
+                        onSelectCategory={toggleCategory}
                     />
                 </div>
             )}

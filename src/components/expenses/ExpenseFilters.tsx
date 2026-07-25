@@ -8,7 +8,7 @@ export interface FilterState {
     month: string;
     search: string;
     type: 'all' | 'income' | 'expense';
-    category: string;
+    categories: string[];
 }
 
 interface Props {
@@ -38,7 +38,11 @@ export default function ExpenseFilters({ expenses, filters, onChange }: Props) {
     const chips: { key: string; label: string; clear: () => void }[] = [];
     if (filters.month) chips.push({ key: 'month', label: formatMonth(filters.month), clear: () => set({ month: '' }) });
     if (filters.type !== 'all') chips.push({ key: 'type', label: t(filters.type), clear: () => set({ type: 'all' }) });
-    if (filters.category) chips.push({ key: 'category', label: getCatLabel(filters.category, t), clear: () => set({ category: '' }) });
+    filters.categories.forEach((cat) => chips.push({
+        key: `category-${cat}`,
+        label: getCatLabel(cat, t),
+        clear: () => set({ categories: filters.categories.filter((c) => c !== cat) }),
+    }));
     if (filters.search) chips.push({ key: 'search', label: `"${filters.search}"`, clear: () => set({ search: '' }) });
 
     return (
