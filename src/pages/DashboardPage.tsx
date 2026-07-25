@@ -16,21 +16,37 @@ export default function DashboardPage() {
         month: '',
         search: '',
         type: 'all',
+        category: '',
     });
 
-    const filteredExpenses = useMemo(() => {
-        return expenses.filter((e) => {
-            if (filters.month && !e.date.startsWith(filters.month)) return false;
-            if (filters.type !== 'all' && e.type !== filters.type) return false;
-            if (filters.search) {
-                const q = filters.search.toLowerCase();
-                const matchNote = e.note?.toLowerCase().includes(q) ?? false;
-                const matchCat = e.category.toLowerCase().includes(q);
-                if (!matchNote && !matchCat) return false;
-            }
-            return true;
-        });
-    }, [expenses, filters]);
+    // Shared predicate for both lists below. `skipCategory` lets the chart keep showing
+    // every category (with the selected one highlighted) instead of collapsing to one slice.
+    const matchesFilters = (e: (typeof expenses)[number], skipCategory = false) => {
+        if (filters.month && !e.date.startsWith(filters.month)) return false;
+        if (filters.type !== 'all' && e.type !== filters.type) return false;
+        if (!skipCategory && filters.category && e.category !== filters.category) return false;
+        if (filters.search) {
+            const q = filters.search.toLowerCase();
+            const matchNote = e.note?.toLowerCase().includes(q) ?? false;
+            const matchCat = e.category.toLowerCase().includes(q);
+            if (!matchNote && !matchCat) return false;
+        }
+        return true;
+    };
+
+    const filteredExpenses = useMemo(
+        () => expenses.filter((e) => matchesFilters(e)),
+        [expenses, filters]
+    );
+
+    const chartExpenses = useMemo(
+        () => expenses.filter((e) => matchesFilters(e, true)),
+        [expenses, filters]
+    );
+
+    const selectCategory = (category: string) => {
+        setFilters((f) => ({ ...f, category: f.category === category ? '' : category }));
+    };
 
     const { todayTotal, weekTotal, monthTotal, balance } = useMemo(() => {
         const toDateStr = (d: Date) => {
@@ -65,7 +81,7 @@ export default function DashboardPage() {
     }, [expenses]);
 
     const hasActiveFilters =
-        filters.month !== '' || filters.search !== '' || filters.type !== 'all';
+        filters.month !== '' || filters.search !== '' || filters.type !== 'all' || filters.category !== '';
 
     const symbol = currencySymbols[currency];
 
@@ -124,22 +140,26 @@ export default function DashboardPage() {
                 />
             )}
 
-            {filteredExpenses.length > 0 && (
-                <>
-                    <div className={styles.chartsSection}>
-                        <h2 className={styles.chartsTitle}>{t('analytics')}</h2>
-                        <Charts expenses={filteredExpenses} />
-                    </div>
+            {chartExpenses.length > 0 && (
+                <div className={styles.chartsSection}>
+                    <h2 className={styles.chartsTitle}>{t('analytics')}</h2>
+                    <Charts
+                        expenses={chartExpenses}
+                        selectedCategory={filters.category}
+                        onSelectCategory={selectCategory}
+                    />
+                </div>
+            )}
 
-                    <h2 className={styles.recentTitle}>
-                        {t('recent_transactions')}
-                        {hasActiveFilters && filteredExpenses.length !== expenses.length && (
-                            <span className={styles.countBadge}>
-                                {filteredExpenses.length} / {expenses.length}
-                            </span>
-                        )}
-                    </h2>
-                </>
+            {filteredExpenses.length > 0 && (
+                <h2 className={styles.recentTitle}>
+                    {t('recent_transactions')}
+                    {hasActiveFilters && filteredExpenses.length !== expenses.length && (
+                        <span className={styles.countBadge}>
+                            {filteredExpenses.length} / {expenses.length}
+                        </span>
+                    )}
+                </h2>
             )}
 
             {expenses.length > 0 && filteredExpenses.length === 0 ? (

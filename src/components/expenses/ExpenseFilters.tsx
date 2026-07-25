@@ -7,6 +7,7 @@ export interface FilterState {
     month: string;
     search: string;
     type: 'all' | 'income' | 'expense';
+    category: string;
 }
 
 interface Props {
@@ -31,7 +32,7 @@ export default function ExpenseFilters({ expenses, filters, onChange }: Props) {
         return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
     };
 
-    const hasActive = filters.month !== '' || filters.search !== '' || filters.type !== 'all';
+    const hasActive = filters.month !== '' || filters.search !== '' || filters.type !== 'all' || filters.category !== '';
     const set = (patch: Partial<FilterState>) => onChange({ ...filters, ...patch });
 
     return (
@@ -71,7 +72,7 @@ export default function ExpenseFilters({ expenses, filters, onChange }: Props) {
             {hasActive && (
                 <button
                     className={styles.clearBtn}
-                    onClick={() => onChange({ month: '', search: '', type: 'all' })}
+                    onClick={() => onChange({ month: '', search: '', type: 'all', category: '' })}
                     title="Clear filters"
                     aria-label="Clear filters"
                 >
