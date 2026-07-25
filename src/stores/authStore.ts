@@ -11,6 +11,8 @@ import {
     linkWithCredential,
     GoogleAuthProvider,
     signInWithPopup,
+    linkWithPopup,
+    signInWithCredential,
 } from 'firebase/auth';
 import type { User as FirebaseUser } from 'firebase/auth';
 import {
@@ -33,6 +35,8 @@ async function migrateGuestCurrency(uid: string): Promise<void> {
         console.warn('Failed to migrate guest currency to Firestore:', e);
     }
 }
+
+const DEFAULT_LANGUAGE = 'en';
 
 type RegisterData = { name: string; email: string; password: string; language?: 'en' | 'ru' | 'he' };
 type LoginData = { email: string; password: string };
@@ -68,6 +72,16 @@ function buildPublicUser(fbUser: FirebaseUser, language?: 'en' | 'ru' | 'he'): U
     };
 }
 
+// isAuthenticated/isGuest are fully determined by `user` — deriving them here
+// (instead of setting all 3 fields by hand at every call site) means they can
+// never drift out of sync with it.
+function deriveAuthFlags(user: User | null): Pick<AuthStore, 'isAuthenticated' | 'isGuest'> {
+    return {
+        isAuthenticated: !!user && !user.isAnonymous,
+        isGuest: !!user?.isAnonymous,
+    };
+}
+
 export const useAuthStore = create<AuthStore>((set, get) => ({
     user: null,
     isAdmin: false,
@@ -82,13 +96,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             if (fbUser) {
                 if (fbUser.isAnonymous) {
                     // Anonymous user — no Firestore profile needed
-                    set({
-                        user: { id: fbUser.uid, name: '', email: '', isAnonymous: true },
-                        isAdmin: false,
-                        authReady: true,
-                        isAuthenticated: false,
-                        isGuest: true,
-                    });
+                    const user: User = { id: fbUser.uid, name: '', email: '', isAnonymous: true };
+                    set({ user, isAdmin: false, authReady: true, ...deriveAuthFlags(user) });
                     return;
                 }
                 try {
@@ -97,26 +106,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                         fetchUserLanguage(fbUser.uid),
                         fbUser.getIdTokenResult(),
                     ]);
-                    set({
-                        user: buildPublicUser(fbUser, language),
-                        isAdmin: tokenResult.claims['admin'] === true,
-                        authReady: true,
-                        isAuthenticated: true,
-                        isGuest: false,
-                    });
+                    const user = buildPublicUser(fbUser, language);
+                    set({ user, isAdmin: tokenResult.claims['admin'] === true, authReady: true, ...deriveAuthFlags(user) });
                 } catch (e) {
                     console.warn('Failed to load auth profile from Firestore', e);
-                    set({
-                        user: buildPublicUser(fbUser),
-                        isAdmin: false,
-                        authReady: true,
-                        isAuthenticated: true,
-                        isGuest: false,
-                    });
+                    const user = buildPublicUser(fbUser);
+                    set({ user, isAdmin: false, authReady: true, ...deriveAuthFlags(user) });
                 }
             } else {
                 // Logged out
-                set({ user: null, isAdmin: false, authReady: true, isAuthenticated: false, isGuest: false });
+                set({ user: null, isAdmin: false, authReady: true, ...deriveAuthFlags(null) });
             }
         });
         return unsub;
@@ -138,23 +137,26 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
                 await createUserProfile(linked.user.uid, {
                     name: data.name,
                     email: data.email,
-                    language: data.language || 'en',
+                    language: data.language || DEFAULT_LANGUAGE,
                 });
                 await migrateGuestCurrency(linked.user.uid);
                 const publicUser: User = {
                     id: linked.user.uid,
                     name: data.name,
                     email: data.email,
-                    language: data.language || 'en',
+                    language: data.language || DEFAULT_LANGUAGE,
                 };
-                set({ user: publicUser, isAuthenticated: true, isGuest: false });
+                set({ user: publicUser, ...deriveAuthFlags(publicUser) });
                 return publicUser;
             } catch (linkErr: unknown) {
                 const code = (linkErr as { code?: string })?.code;
                 if (code === 'auth/email-already-in-use') {
                     throw Object.assign(new Error('email_already_in_use'), { code: 'email_already_in_use' });
                 }
-                console.warn('Failed to link anonymous account, falling back to createUser:', linkErr);
+                // Any other failure while upgrading the guest account is fatal here —
+                // falling through to createUserWithEmailAndPassword would silently
+                // create a second account and orphan the guest's existing data.
+                throw linkErr;
             }
         }
 
@@ -164,15 +166,15 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         await createUserProfile(cred.user.uid, {
             name: data.name,
             email: data.email,
-            language: data.language || 'en',
+            language: data.language || DEFAULT_LANGUAGE,
         });
         const publicUser: User = {
             id: cred.user.uid,
             name: data.name,
             email: data.email,
-            language: data.language || 'en',
+            language: data.language || DEFAULT_LANGUAGE,
         };
-        set({ user: publicUser, isAuthenticated: true, isGuest: false });
+        set({ user: publicUser, ...deriveAuthFlags(publicUser) });
         return publicUser;
     },
 
@@ -185,58 +187,47 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
             console.warn('Failed to load profile from Firestore:', err);
         }
         const publicUser = buildPublicUser(cred.user, language);
-        set({ user: publicUser, isAuthenticated: true, isGuest: false });
+        set({ user: publicUser, ...deriveAuthFlags(publicUser) });
         return publicUser;
     },
 
     loginWithGoogle: async () => {
         const provider = new GoogleAuthProvider();
 
+        // Finishes a Google sign-in once we have a Firebase user, whether that
+        // came from a fresh popup sign-in or from upgrading a guest account.
+        const finishGoogleLogin = async (fbUser: FirebaseUser, language?: 'en' | 'ru' | 'he') => {
+            await ensureUserProfile(fbUser.uid, {
+                name: fbUser.displayName || '',
+                email: fbUser.email || '',
+                language: DEFAULT_LANGUAGE,
+            });
+            const publicUser = buildPublicUser(fbUser, language);
+            set({ user: publicUser, ...deriveAuthFlags(publicUser) });
+            return publicUser;
+        };
+
         // Same as register — try to upgrade anonymous account first
         if (auth.currentUser?.isAnonymous) {
             try {
-                const { linkWithPopup } = await import('firebase/auth');
                 const linked = await linkWithPopup(auth.currentUser, provider);
-                const fbUser = linked.user;
-                await ensureUserProfile(fbUser.uid, {
-                    name: fbUser.displayName || '',
-                    email: fbUser.email || '',
-                    language: 'en',
-                });
-                await migrateGuestCurrency(fbUser.uid);
-                const publicUser = buildPublicUser(fbUser);
-                set({ user: publicUser, isAuthenticated: true, isGuest: false });
-                return publicUser;
+                await migrateGuestCurrency(linked.user.uid);
+                return await finishGoogleLogin(linked.user);
             } catch (linkErr: unknown) {
                 console.warn('Failed to link Google to anonymous account:', linkErr);
-                const { GoogleAuthProvider: GA, signInWithCredential } = await import('firebase/auth');
-                const credential = GA.credentialFromError(linkErr as Parameters<typeof GA.credentialFromError>[0]);
+                const credential = GoogleAuthProvider.credentialFromError(
+                    linkErr as Parameters<typeof GoogleAuthProvider.credentialFromError>[0],
+                );
                 if (!credential) throw new Error('Failed to extract Google credential');
                 const result = await signInWithCredential(auth, credential);
-                const fbUser = result.user;
-                await ensureUserProfile(fbUser.uid, {
-                    name: fbUser.displayName || '',
-                    email: fbUser.email || '',
-                    language: 'en',
-                });
-                await migrateGuestCurrency(fbUser.uid);
-                const publicUser = buildPublicUser(fbUser);
-                set({ user: publicUser, isAuthenticated: true, isGuest: false });
-                return publicUser;
+                await migrateGuestCurrency(result.user.uid);
+                return await finishGoogleLogin(result.user);
             }
         }
 
         const cred = await signInWithPopup(auth, provider);
-        const fbUser = cred.user;
-        const language = await fetchUserLanguage(fbUser.uid);
-        await ensureUserProfile(fbUser.uid, {
-            name: fbUser.displayName || '',
-            email: fbUser.email || '',
-            language: 'en',
-        });
-        const publicUser = buildPublicUser(fbUser, language ?? 'en');
-        set({ user: publicUser, isAuthenticated: true, isGuest: false });
-        return publicUser;
+        const language = await fetchUserLanguage(cred.user.uid);
+        return await finishGoogleLogin(cred.user, language ?? DEFAULT_LANGUAGE);
     },
 
     logout: async () => {
