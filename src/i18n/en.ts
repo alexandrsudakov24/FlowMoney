@@ -31,6 +31,7 @@ const en = {
     today: 'Today',
     this_week: 'This Week',
     this_month: 'This Month',
+    expense_transactions: 'Expense Transactions',
     hi: 'Hi',
     recent_transactions: 'Recent Transactions',
     analytics: 'Analytics',

@@ -6,3 +6,4 @@ export { default as FamilyModal } from './FamilyModal';
 export { default as FeedbackModal } from './FeedbackModal';
 export { default as ScheduledPaymentsModal } from './ScheduledPaymentsModal';
 export { default as AboutModal } from './AboutModal';
+export { default as TransactionsModal } from './TransactionsModal';

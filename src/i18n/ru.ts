@@ -33,6 +33,7 @@ const ru: Record<TranslationKeys, string> = {
     today: 'Сегодня',
     this_week: 'На этой неделе',
     this_month: 'В этом месяце',
+    expense_transactions: 'Расходные операции',
     hi: 'Привет',
     recent_transactions: 'Последние операции',
     analytics: 'Аналитика',

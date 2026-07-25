@@ -33,6 +33,7 @@ const he: Record<TranslationKeys, string> = {
     today: 'היום',
     this_week: 'השבוע',
     this_month: 'החודש',
+    expense_transactions: 'עסקאות הוצאה',
     hi: 'שלום',
     recent_transactions: 'עסקאות אחרונות',
     analytics: 'אנליטיקה',

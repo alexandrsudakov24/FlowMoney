@@ -30,6 +30,11 @@
     transition: all 0.3s ease;
 }
 
+.cardToday,
+.cardWeek {
+    cursor: pointer;
+}
+
 .card:hover {
     box-shadow: var(--shadow-lg);
     transform: translateY(-2px);
@@ -88,6 +93,7 @@
 
 .balanceNegative {
     background: linear-gradient(135deg, #ef4444, #991b1b);
+    cursor: pointer;
 }
 
 .balanceTitle {

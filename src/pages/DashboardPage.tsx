@@ -5,6 +5,7 @@ import { ExpenseList, Charts, ExpenseFilters } from '../components/expenses';
 import type { FilterState } from '../components/expenses';
 import { InsightsPanel } from '../components/insights';
 import { Spinner } from '../components/ui';
+import { TransactionsModal } from '../components/modals';
 import { currencySymbols } from '../constants/currency';
 import { useCountUp } from '../hooks/useCountUp';
 import { getCatLabel } from '../utils/getCatLabel';
@@ -56,7 +57,7 @@ export default function DashboardPage() {
         }));
     };
 
-    const { todayTotal, weekTotal, monthTotal, balance } = useMemo(() => {
+    const { todayTotal, weekTotal, monthTotal, balance, todayExpenses, weekExpenses } = useMemo(() => {
         const toDateStr = (d: Date) => {
             const y = d.getFullYear();
             const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -76,17 +77,32 @@ export default function DashboardPage() {
         let weekTotal = 0;
         let monthTotal = 0;
         let balance = 0;
+        const todayExpenses: typeof expenses = [];
+        const weekExpenses: typeof expenses = [];
         expenses.forEach((e) => {
             const amount = Number(e.amount || 0);
             balance += e.type === 'income' ? amount : -amount;
             if (e.type !== 'expense') return;
-            if (e.date === todayStr) todayTotal += amount;
-            if (e.date >= weekStartStr && e.date <= todayStr) weekTotal += amount;
+            if (e.date === todayStr) {
+                todayTotal += amount;
+                todayExpenses.push(e);
+            }
+            if (e.date >= weekStartStr && e.date <= todayStr) {
+                weekTotal += amount;
+                weekExpenses.push(e);
+            }
             if (e.date.startsWith(monthStr)) monthTotal += amount;
         });
 
-        return { todayTotal, weekTotal, monthTotal, balance };
+        return { todayTotal, weekTotal, monthTotal, balance, todayExpenses, weekExpenses };
     }, [expenses]);
+
+    const expenseTransactions = useMemo(
+        () => expenses.filter((e) => e.type === 'expense'),
+        [expenses]
+    );
+
+    const [openSummaryModal, setOpenSummaryModal] = useState<'today' | 'week' | 'negative' | null>(null);
 
     // startAt: 0 so the numbers count up every time the dashboard is shown
     // (e.g. right after adding a transaction), not just on the very first load.
@@ -123,7 +139,13 @@ export default function DashboardPage() {
         <div className={styles.dashboard}>
             <h2 className={styles.title}>{t('dashboard')}</h2>
 
-            <div className={`${styles.balanceCard} ${balance < 0 ? styles.balanceNegative : ''}`}>
+            <div
+                className={`${styles.balanceCard} ${balance < 0 ? styles.balanceNegative : ''}`}
+                onClick={balance < 0 ? () => setOpenSummaryModal('negative') : undefined}
+                role={balance < 0 ? 'button' : undefined}
+                tabIndex={balance < 0 ? 0 : undefined}
+                onKeyDown={balance < 0 ? (e) => e.key === 'Enter' && setOpenSummaryModal('negative') : undefined}
+            >
                 <h3 className={styles.balanceTitle}>{t('net_balance')}</h3>
                 <div className={styles.balanceValue}>
                     {animatedBalance.toFixed(2)} {symbol}
@@ -131,14 +153,26 @@ export default function DashboardPage() {
             </div>
 
             <div className={styles.summary}>
-                <div className={`${styles.card} ${styles.cardToday}`}>
+                <div
+                    className={`${styles.card} ${styles.cardToday}`}
+                    onClick={() => setOpenSummaryModal('today')}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && setOpenSummaryModal('today')}
+                >
                     <h3 className={styles.cardTitle}>{t('today')}</h3>
                     <div className={styles.cardValue}>
                         {animatedToday.toFixed(2)} {symbol}
                     </div>
                 </div>
 
-                <div className={`${styles.card} ${styles.cardWeek}`}>
+                <div
+                    className={`${styles.card} ${styles.cardWeek}`}
+                    onClick={() => setOpenSummaryModal('week')}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && setOpenSummaryModal('week')}
+                >
                     <h3 className={styles.cardTitle}>{t('this_week')}</h3>
                     <div className={styles.cardValue}>
                         {animatedWeek.toFixed(2)} {symbol}
@@ -205,6 +239,25 @@ export default function DashboardPage() {
                 <div className={styles.noResults}>{t('filter_no_results')}</div>            ) : (
                 <ExpenseList expenses={filteredExpenses} />
             )}
+
+            <TransactionsModal
+                isOpen={openSummaryModal === 'today'}
+                onClose={() => setOpenSummaryModal(null)}
+                title={t('today')}
+                expenses={todayExpenses}
+            />
+            <TransactionsModal
+                isOpen={openSummaryModal === 'week'}
+                onClose={() => setOpenSummaryModal(null)}
+                title={t('this_week')}
+                expenses={weekExpenses}
+            />
+            <TransactionsModal
+                isOpen={openSummaryModal === 'negative'}
+                onClose={() => setOpenSummaryModal(null)}
+                title={t('expense_transactions')}
+                expenses={expenseTransactions}
+            />
         </div>
     );
 }
