@@ -89,7 +89,7 @@ const en = {
     category_exists: 'Category already exists',
     category_in_use: 'Category is used in transactions',
     category_default: 'Default category cannot be deleted',
-    update_app: 'Update App',
+    app_version: 'App Version',
     auto: 'Auto',
     family: 'Family',
     family_budget: 'Family Budget',

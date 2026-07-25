@@ -91,7 +91,7 @@ const ru: Record<TranslationKeys, string> = {
     category_exists: 'Категория уже существует',
     category_in_use: 'Категория используется в операциях',
     category_default: 'Базовую категорию нельзя удалить',
-    update_app: 'Обновить приложение',
+    app_version: 'Версия приложения',
     auto: 'Авто',
     family: 'Семья',
     family_budget: 'Семейный бюджет',

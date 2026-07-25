@@ -1,8 +1,20 @@
+import { execSync } from 'node:child_process'
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+function getAppVersion() {
+  try {
+    return execSync('git rev-list --count HEAD').toString().trim()
+  } catch {
+    return '0'
+  }
+}
+
 export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(getAppVersion()),
+  },
   test: {
     globals: true,
     environment: 'jsdom',

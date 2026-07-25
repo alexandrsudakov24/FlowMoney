@@ -46,14 +46,6 @@ export default function ProfilePage() {
 
     const symbol = currencySymbols[currency] ?? currency;
 
-    const handleAppUpdate = async () => {
-        if ('serviceWorker' in navigator) {
-            const regs = await navigator.serviceWorker.getRegistrations();
-            for (const reg of regs) await reg.update();
-        }
-        window.location.reload();
-    };
-
     const handleExport = () => {
         const json = JSON.stringify(expenses, null, 2);
         const blob = new Blob([json], { type: 'application/json' });
@@ -153,13 +145,10 @@ export default function ProfilePage() {
                         {t('change')}
                     </button>
                 </div>
-            </div>
-
-            <div className={styles.block}>
-                <h3 className={styles.blockTitle}>{t('update_app')}</h3>
-                <button className={styles.exportBtn} onClick={handleAppUpdate}>
-                    {t('update_app')}
-                </button>
+                <div className={styles.settingRow}>
+                    <span>{t('app_version')}</span>
+                    <span>v{__APP_VERSION__}</span>
+                </div>
             </div>
 
             <div className={styles.block}>

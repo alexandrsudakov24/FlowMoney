@@ -91,7 +91,7 @@ const he: Record<TranslationKeys, string> = {
     category_exists: 'הקטגוריה כבר קיימת',
     category_in_use: 'הקטגוריה בשימוש בעסקאות',
     category_default: 'לא ניתן למחוק קטגוריה ברירת מחדל',
-    update_app: 'עדכן אפליקציה',
+    app_version: 'גרסת אפליקציה',
     auto: 'אוטומטי',
     family: 'משפחה',
     family_budget: 'תקציב משפחתי',
