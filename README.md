@@ -78,7 +78,7 @@ src/
 ├── components/     # UI components (Navbar, Charts, ExpenseForm, ...)
 ├── constants/      # App-wide constants
 ├── context/        # React contexts (Auth, App, Language, Theme, Family, Toast)
-├── hooks/          # Custom hooks (useExpenses, useCategories, useCurrency, ...)
+├── hooks/          # Custom hooks (useFirestoreRef, ...)
 ├── i18n/           # Translation files (en, ru, he)
 ├── pages/          # Pages (Dashboard, Add, Edit, Profile, Admin, ...)
 ├── services/       # Firestore service layer (expenses, categories, family, auth)
@@ -193,7 +193,7 @@ src/
 ├── components/     # UI-компоненты (Navbar, Charts, ExpenseForm, ...)
 ├── constants/      # Константы приложения
 ├── context/        # React-контексты (Auth, App, Language, Theme, Family, Toast)
-├── hooks/          # Кастомные хуки (useExpenses, useCategories, useCurrency, ...)
+├── hooks/          # Кастомные хуки (useFirestoreRef, ...)
 ├── i18n/           # Файлы переводов (en, ru, he)
 ├── pages/          # Страницы (Dashboard, Add, Edit, Profile, Admin, ...)
 ├── services/       # Сервисный слой Firestore (expenses, categories, family, auth)
