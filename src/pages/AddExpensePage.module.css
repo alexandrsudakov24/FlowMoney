@@ -3,25 +3,7 @@
     padding: 8px 24px 0 24px;
 }
 
-.title {
-    margin: 0 0 20px 0;
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    color: var(--text);
-}
-
-.description {
-    color: var(--muted);
-    margin-bottom: 20px;
-    font-size: var(--font-size-md);
-}
-
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0); }
-}
-
-@media (max-width: 640px) {
-    .title       { font-size: 24px; }
-    .description { font-size: var(--font-size-sm); }
 }

@@ -53,8 +53,7 @@ export default function EditExpensePage() {
 
     return (
         <div className={styles.page}>
-            <h2 className={styles.title}>{t('edit_transaction')}</h2>
-            <p className={styles.description}>{t('edit_transaction_desc')}</p>
+            <h2 className="sr-only">{t('edit_transaction')}</h2>
             <ExpenseForm
                 defaultValues={{ ...expense, repeat: initialRepeat } as unknown as Partial<FormData>}
                 onSubmit={handleSubmit}

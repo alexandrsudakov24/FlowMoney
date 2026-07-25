@@ -41,8 +41,7 @@ export default function AddExpensePage() {
     return (
         <div className="container">
             <div className={styles.page}>
-                <h2 className={styles.title}>{t('add_transaction')}</h2>
-                <p className={styles.description}>{t('add_transaction_desc')}</p>
+                <h2 className="sr-only">{t('add_transaction')}</h2>
                 <ExpenseForm onSubmit={handleSubmit} defaultValues={undefined} justSaved={justSaved} />
             </div>
         </div>
