@@ -1,0 +1,138 @@
+.panel {
+    margin-bottom: 24px;
+}
+
+.teaser {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    padding: 18px 20px;
+    border: none;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    box-shadow: var(--shadow-md);
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.teaser:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.teaserText {
+    min-width: 0;
+}
+
+.teaserLabel {
+    display: block;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.teaserTitle {
+    margin: 0;
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    color: #fff;
+}
+
+.teaserDesc {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.chevron {
+    flex-shrink: 0;
+    color: #fff;
+    font-size: 14px;
+    transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+    transform: rotate(180deg);
+}
+
+.content {
+    margin-top: 10px;
+    padding: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    animation: fadeIn 0.25s ease-in;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.regenerateBtn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.15s ease;
+    min-width: 140px;
+}
+
+.regenerateBtn:hover:not(:disabled) {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.regenerateBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.cooldownHint {
+    font-size: var(--font-size-sm);
+    color: var(--muted);
+}
+
+.updatedAt {
+    margin: 0 0 16px 0;
+    font-size: var(--font-size-xs);
+    color: var(--muted);
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.empty {
+    text-align: center;
+    padding: 32px 20px;
+    color: var(--muted);
+    font-size: var(--font-size-md);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

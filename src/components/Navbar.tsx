@@ -28,14 +28,6 @@ const IconProfile = () => (
     </svg>
 );
 
-const IconInsights = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 19V10" />
-        <path d="M11 19V5" />
-        <path d="M18 19v-6" />
-    </svg>
-);
-
 export default function Navbar() {
     const { role, user } = useAuth();
     const { t } = useLanguage();
@@ -61,7 +53,6 @@ export default function Navbar() {
                         <>
                             <Link to="/">{t('dashboard')}</Link>
                             <Link to="/add">{t('add_transaction')}</Link>
-                            <Link to="/insights">{t('insights')}</Link>
                             <Link to="/profile">{t('profile')}</Link>
                             <Avatar name={user?.name || ''} photoURL={user?.photoURL} size="medium" />
                             <span className={styles.greeting}>
@@ -97,13 +88,6 @@ export default function Navbar() {
                     >
                         <IconAdd />
                         <span className={styles.navLabel}>{t('add')}</span>
-                    </Link>
-                    <Link
-                        to="/insights"
-                        className={`${styles.navItem} ${isActive('/insights') ? styles.navItemActive : ''}`}
-                    >
-                        <IconInsights />
-                        <span className={styles.navLabel}>{t('insights')}</span>
                     </Link>
                     <Link
                         to="/profile"

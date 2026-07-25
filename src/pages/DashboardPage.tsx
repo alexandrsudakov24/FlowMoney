@@ -1,15 +1,15 @@
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import { ExpenseList, Charts, ExpenseFilters } from '../components/expenses';
 import type { FilterState } from '../components/expenses';
+import { InsightsPanel } from '../components/insights';
 import { Spinner } from '../components/ui';
 import { currencySymbols } from '../constants/currency';
 import styles from './DashboardPage.module.css';
 
 export default function DashboardPage() {
-    const { activeExpenses: expenses, loading, currency, insightsDoc } = useApp();
+    const { activeExpenses: expenses, loading, currency } = useApp();
     const { t } = useLanguage();
 
     const [filters, setFilters] = useState<FilterState>({
@@ -123,14 +123,7 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            <Link to="/insights" className={styles.insightsTeaser}>
-                <span className={styles.insightsTeaserLabel}>{t('insights')}</span>
-                {insightsDoc?.insights[0] ? (
-                    <h3 className={styles.insightsTeaserTitle}>{insightsDoc.insights[0].title}</h3>
-                ) : (
-                    <p className={styles.insightsTeaserDesc}>{t('insights_teaser_desc')}</p>
-                )}
-            </Link>
+            <InsightsPanel />
 
             {expenses.length > 0 && (
                 <ExpenseFilters
