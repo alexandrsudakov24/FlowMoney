@@ -1,0 +1,16 @@
+.infoLine {
+    font-size: var(--font-size-sm);
+    color: var(--muted);
+    margin: 0;
+}
+
+.optionList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.optionBtn {
+    text-align: left;
+    padding: 12px 14px;
+}

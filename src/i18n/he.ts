@@ -185,6 +185,17 @@ const he: Record<TranslationKeys, string> = {
     insights_regenerate_cta: 'רענן',
     insights_cooldown_hint: 'הרענון הבא יהיה זמין בעוד {time}',
     insights_last_updated: 'עודכן {time}',
+    rollover_settings: 'העברת יתרה',
+    carried_over: 'הועבר מהחודש שעבר: {amount}',
+    rollover_mode: 'כאשר מתחיל חודש חדש',
+    rollover_reset: 'להתחיל מחדש',
+    rollover_reset_hint: 'העודף או החריגה לא מועברים — כל חודש מתחיל מאפס.',
+    rollover_full: 'להעביר הכול',
+    rollover_full_hint: 'העודף מתווסף לחודש הבא; החריגה מנוכה ממנו.',
+    rollover_surplus_only: 'להעביר רק עודף',
+    rollover_surplus_only_hint: 'כסף שלא נוצל מועבר הלאה, אך חריגה לא מנוכה.',
+    rollover_deficit_only: 'להעביר רק חריגה',
+    rollover_deficit_only_hint: 'חריגה מנוכה מהחודש הבא, אך עודף לא מועבר.',
 };
 
 export default he;

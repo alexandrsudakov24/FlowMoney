@@ -183,6 +183,17 @@ const en = {
     insights_regenerate_cta: 'Regenerate',
     insights_cooldown_hint: 'Next regeneration available in {time}',
     insights_last_updated: 'Last updated {time}',
+    rollover_settings: 'Rollover Rule',
+    carried_over: 'Carried over from last month: {amount}',
+    rollover_mode: 'When a new month starts',
+    rollover_reset: 'Start fresh',
+    rollover_reset_hint: 'Leftover or overspend does not carry over — every month starts at zero.',
+    rollover_full: 'Carry everything over',
+    rollover_full_hint: 'Leftover is added to next month; overspending is subtracted from it.',
+    rollover_surplus_only: 'Carry leftover only',
+    rollover_surplus_only_hint: 'Unspent money carries forward, but overspending is not deducted.',
+    rollover_deficit_only: 'Carry overspend only',
+    rollover_deficit_only_hint: 'Overspending is deducted from next month, but leftover is not carried forward.',
 } as const;
 
 export default en;

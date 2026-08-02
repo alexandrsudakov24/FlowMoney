@@ -6,25 +6,35 @@ import { useLanguage } from '../context/LanguageContext';
 import { useFamily } from '../context/FamilyContext';
 import { getCatLabel } from '../utils/getCatLabel';
 import { currencySymbols } from '../constants/currency';
-import { ThemeModal, LanguageModal, CurrencyModal, CategoryModal, FamilyModal, FeedbackModal, ScheduledPaymentsModal, AboutModal } from '../components/modals';
+import { ThemeModal, LanguageModal, CurrencyModal, RolloverModal, CategoryModal, FamilyModal, FeedbackModal, ScheduledPaymentsModal, AboutModal } from '../components/modals';
+import type { RolloverMode } from '../types';
+import type { TranslationKeys } from '../i18n';
 import styles from './ProfilePage.module.css';
+
+const ROLLOVER_MODE_LABELS: Record<RolloverMode, TranslationKeys> = {
+    reset: 'rollover_reset',
+    full: 'rollover_full',
+    surplus_only: 'rollover_surplus_only',
+    deficit_only: 'rollover_deficit_only',
+};
 
 export default function ProfilePage() {
     const { user, logout, role } = useAuth();
-    const { activeExpenses: expenses, scheduledExpenses, currency } = useApp();
+    const { activeExpenses: expenses, scheduledExpenses, currency, rolloverMode } = useApp();
     const { t } = useLanguage();
     const { family, invitations } = useFamily();
 
     const [themeOpen, setThemeOpen] = useState(false);
     const [languageOpen, setLanguageOpen] = useState(false);
     const [currencyOpen, setCurrencyOpen] = useState(false);
+    const [rolloverOpen, setRolloverOpen] = useState(false);
     const [categoriesOpen, setCategoriesOpen] = useState(false);
     const [familyOpen, setFamilyOpen] = useState(false);
     const [feedbackOpen, setFeedbackOpen] = useState(false);
     const [scheduledOpen, setScheduledOpen] = useState(false);
     const [aboutOpen, setAboutOpen] = useState(false);
 
-    const { totalExpenses, totalIncome, topCategory } = useMemo(() => {
+    const { totalExpenses, totalIncome, totalBalance, topCategory } = useMemo(() => {
         const map: Record<string, number> = {};
         let expenses_ = 0;
         let income = 0;
@@ -41,6 +51,7 @@ export default function ProfilePage() {
         return {
             totalExpenses: expenses_,
             totalIncome: income,
+            totalBalance: income - expenses_,
             topCategory: raw ? getCatLabel(raw, t) : '—',
         };
     }, [expenses, t]);
@@ -98,6 +109,12 @@ export default function ProfilePage() {
                     <strong>{symbol}{totalIncome.toFixed(2)}</strong>
                 </div>
                 <div className={styles.statRow}>
+                    <span>{t('net_balance')}</span>
+                    <strong className={totalBalance < 0 ? styles.statNegative : undefined}>
+                        {symbol}{totalBalance.toFixed(2)}
+                    </strong>
+                </div>
+                <div className={styles.statRow}>
                     <span>{t('top_category')}</span>
                     <strong>{topCategory}</strong>
                 </div>
@@ -138,6 +155,12 @@ export default function ProfilePage() {
                     <span>{t('currency')}</span>
                     <button className={styles.changeBtn} onClick={() => setCurrencyOpen(true)}>
                         {currency}
+                    </button>
+                </div>
+                <div className={styles.settingRow}>
+                    <span>{t('rollover_settings')}</span>
+                    <button className={styles.changeBtn} onClick={() => setRolloverOpen(true)}>
+                        {t(ROLLOVER_MODE_LABELS[rolloverMode])}
                     </button>
                 </div>
                 <div className={styles.settingRow}>
@@ -198,6 +221,7 @@ export default function ProfilePage() {
             <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
             <LanguageModal isOpen={languageOpen} onClose={() => setLanguageOpen(false)} />
             <CurrencyModal isOpen={currencyOpen} onClose={() => setCurrencyOpen(false)} />
+            <RolloverModal isOpen={rolloverOpen} onClose={() => setRolloverOpen(false)} />
             <CategoryModal isOpen={categoriesOpen} onClose={() => setCategoriesOpen(false)} />
             <FamilyModal isOpen={familyOpen} onClose={() => setFamilyOpen(false)} />
             <FeedbackModal isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />

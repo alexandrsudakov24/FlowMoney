@@ -185,6 +185,17 @@ const ru: Record<TranslationKeys, string> = {
     insights_regenerate_cta: 'Обновить',
     insights_cooldown_hint: 'Следующее обновление будет доступно через {time}',
     insights_last_updated: 'Обновлено {time}',
+    rollover_settings: 'Перенос остатка',
+    carried_over: 'Перенесено с прошлого месяца: {amount}',
+    rollover_mode: 'При наступлении нового месяца',
+    rollover_reset: 'Начинать заново',
+    rollover_reset_hint: 'Остаток или перерасход не переносятся — каждый месяц начинается с нуля.',
+    rollover_full: 'Переносить всё',
+    rollover_full_hint: 'Остаток добавляется к следующему месяцу, перерасход — вычитается из него.',
+    rollover_surplus_only: 'Переносить только остаток',
+    rollover_surplus_only_hint: 'Неизрасходованные деньги переносятся, но перерасход не вычитается.',
+    rollover_deficit_only: 'Переносить только перерасход',
+    rollover_deficit_only_hint: 'Перерасход вычитается из следующего месяца, но остаток не переносится.',
 };
 
 export default ru;

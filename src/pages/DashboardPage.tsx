@@ -13,7 +13,7 @@ import { getCategoryColorMap, darkenHex } from '../utils/getCategoryColors';
 import styles from './DashboardPage.module.css';
 
 export default function DashboardPage() {
-    const { activeExpenses: expenses, loading, currency } = useApp();
+    const { activeExpenses: expenses, loading, currency, monthlyRollover } = useApp();
     const { t } = useLanguage();
 
     const [filters, setFilters] = useState<FilterState>({
@@ -67,7 +67,7 @@ export default function DashboardPage() {
         }));
     };
 
-    const { todayTotal, weekTotal, monthTotal, balance, todayExpenses, weekExpenses } = useMemo(() => {
+    const { todayTotal, weekTotal, monthTotal, todayExpenses, weekExpenses, monthExpenses } = useMemo(() => {
         const toDateStr = (d: Date) => {
             const y = d.getFullYear();
             const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -86,12 +86,11 @@ export default function DashboardPage() {
         let todayTotal = 0;
         let weekTotal = 0;
         let monthTotal = 0;
-        let balance = 0;
         const todayExpenses: typeof expenses = [];
         const weekExpenses: typeof expenses = [];
+        const monthExpenses: typeof expenses = [];
         expenses.forEach((e) => {
             const amount = Number(e.amount || 0);
-            balance += e.type === 'income' ? amount : -amount;
             if (e.type !== 'expense') return;
             if (e.date === todayStr) {
                 todayTotal += amount;
@@ -101,16 +100,14 @@ export default function DashboardPage() {
                 weekTotal += amount;
                 weekExpenses.push(e);
             }
-            if (e.date.startsWith(monthStr)) monthTotal += amount;
+            if (e.date.startsWith(monthStr)) {
+                monthTotal += amount;
+                monthExpenses.push(e);
+            }
         });
 
-        return { todayTotal, weekTotal, monthTotal, balance, todayExpenses, weekExpenses };
+        return { todayTotal, weekTotal, monthTotal, todayExpenses, weekExpenses, monthExpenses };
     }, [expenses]);
-
-    const expenseTransactions = useMemo(
-        () => expenses.filter((e) => e.type === 'expense'),
-        [expenses]
-    );
 
     const [openSummaryModal, setOpenSummaryModal] = useState<'today' | 'week' | 'negative' | 'categories' | null>(null);
 
@@ -119,7 +116,7 @@ export default function DashboardPage() {
     const animatedToday = useCountUp(todayTotal, 600, 0);
     const animatedWeek = useCountUp(weekTotal, 600, 0);
     const animatedMonth = useCountUp(monthTotal, 600, 0);
-    const animatedBalance = useCountUp(balance, 600, 0);
+    const animatedBalance = useCountUp(monthlyRollover.total, 600, 0);
 
     // Expenses within the categories currently selected in the chart —
     // filteredExpenses already respects the category (and other) filters.
@@ -153,11 +150,11 @@ export default function DashboardPage() {
             <h2 className={styles.title}>{t('dashboard')}</h2>
 
             <div
-                className={`${styles.balanceCard} ${balance < 0 ? styles.balanceNegative : ''}`}
-                onClick={balance < 0 ? () => setOpenSummaryModal('negative') : undefined}
-                role={balance < 0 ? 'button' : undefined}
-                tabIndex={balance < 0 ? 0 : undefined}
-                onKeyDown={balance < 0 ? (e) => e.key === 'Enter' && setOpenSummaryModal('negative') : undefined}
+                className={`${styles.balanceCard} ${monthlyRollover.total < 0 ? styles.balanceNegative : ''}`}
+                onClick={monthlyRollover.total < 0 ? () => setOpenSummaryModal('negative') : undefined}
+                role={monthlyRollover.total < 0 ? 'button' : undefined}
+                tabIndex={monthlyRollover.total < 0 ? 0 : undefined}
+                onKeyDown={monthlyRollover.total < 0 ? (e) => e.key === 'Enter' && setOpenSummaryModal('negative') : undefined}
             >
                 <h3 className={styles.balanceTitle}>{t('net_balance')}</h3>
                 <div className={styles.balanceValue}>
@@ -289,7 +286,7 @@ export default function DashboardPage() {
                 isOpen={openSummaryModal === 'negative'}
                 onClose={() => setOpenSummaryModal(null)}
                 title={t('expense_transactions')}
-                expenses={expenseTransactions}
+                expenses={monthExpenses}
             />
             <TransactionsModal
                 isOpen={openSummaryModal === 'categories'}

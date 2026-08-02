@@ -1,17 +1,19 @@
 import { createContext, useContext, useEffect, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { UpdateData } from 'firebase/firestore';
-import type { Expense, InsightsDoc } from '../types';
+import type { Expense, InsightsDoc, RolloverMode } from '../types';
 import { useAuth } from './AuthContext';
 import { useFamily } from './FamilyContext';
 import { useToast } from './ToastContext';
 import { useLanguage } from './LanguageContext';
 import type { TranslationKeys, Language } from '../i18n';
-import { useExpensesRef, useCategoriesRef, useInsightsRef } from '../hooks/useFirestoreRef';
+import { useExpensesRef, useCategoriesRef, useInsightsRef, useRolloverRef } from '../hooks/useFirestoreRef';
 import { useExpenseStore } from '../stores/expenseStore';
 import { useCurrencyStore } from '../stores/currencyStore';
 import { useCategoryStore } from '../stores/categoryStore';
 import { useInsightsStore } from '../stores/insightsStore';
+import { useRolloverStore } from '../stores/rolloverStore';
+import { computeMonthlyRollover, type MonthlyRollover } from '../utils/computeMonthlyRollover';
 
 export const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Dividends', 'Gift', 'Other'];
 
@@ -33,6 +35,9 @@ type AppContextType = {
     insightsLoading: boolean;
     insightsGenerating: boolean;
     regenerateInsights: (expenses: Expense[], language: Language) => Promise<void>;
+    rolloverMode: RolloverMode;
+    updateRolloverMode: (mode: RolloverMode) => Promise<void>;
+    monthlyRollover: MonthlyRollover;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -52,6 +57,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const expensesCol = useExpensesRef(userId, familyId, hasAccess);
     const categoriesRef = useCategoriesRef(userId, familyId, hasAccess);
     const insightsRef = useInsightsRef(userId, familyId, hasAccess);
+    const rolloverRef = useRolloverRef(userId, familyId, hasAccess);
 
     const { _subscribe, expenses, loading, addExpense, updateExpense, deleteExpense, clearAll } =
         useExpenseStore();
@@ -69,8 +75,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     const { currency, changeCurrency, _init: initCurrency } = useCurrencyStore();
 
+    const { rolloverMode, updateRolloverMode, _subscribe: subscribeRollover } = useRolloverStore();
+
     const activeExpenses = useMemo(() => expenses.filter((e) => !e.scheduled), [expenses]);
     const scheduledExpenses = useMemo(() => expenses.filter((e) => e.scheduled), [expenses]);
+
+    const monthlyRollover = useMemo(
+        () => computeMonthlyRollover(activeExpenses, rolloverMode),
+        [activeExpenses, rolloverMode]
+    );
 
     // Wire Firestore collection + user context into the expense store
     useEffect(() => {
@@ -95,12 +108,19 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         return unsub;
     }, [insightsRef, user, showToast]);
 
+    // Wire Firestore rollover document into the rollover store
+    useEffect(() => {
+        const unsub = subscribeRollover(rolloverRef, showToast);
+        return unsub;
+    }, [rolloverRef, showToast]);
+
     return (
         <AppContext.Provider value={{
             expenses, activeExpenses, scheduledExpenses, loading, addExpense, updateExpense, deleteExpense, clearAll,
             currency, changeCurrency,
             categories, addCategory, removeCategory,
             insightsDoc, insightsLoading, insightsGenerating, regenerateInsights,
+            rolloverMode, updateRolloverMode, monthlyRollover,
         }}>
             {children}
         </AppContext.Provider>

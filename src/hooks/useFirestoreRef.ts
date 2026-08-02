@@ -25,3 +25,11 @@ export function useInsightsRef(userId: string | null, familyId: string | null, h
         return doc(db, 'users', userId, 'settings', 'insights');
     }, [hasAccess, userId, familyId]);
 }
+
+export function useRolloverRef(userId: string | null, familyId: string | null, hasAccess: boolean) {
+    return useMemo(() => {
+        if (!hasAccess || !userId) return null;
+        if (familyId) return doc(db, 'families', familyId, 'settings', 'rollover');
+        return doc(db, 'users', userId, 'settings', 'rollover');
+    }, [hasAccess, userId, familyId]);
+}

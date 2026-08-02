@@ -76,6 +76,14 @@
   outline: none;
 }
 
+.optionHint {
+  margin: 2px 0 0;
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+  text-align: left;
+  opacity: 0.8;
+}
+
 .textarea {
   width: 100%;
   padding: 12px 14px;
