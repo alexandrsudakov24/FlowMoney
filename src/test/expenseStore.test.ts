@@ -100,6 +100,24 @@ describe('expenseStore — scheduled payment firing', () => {
         expect(advancedData.date > today).toBe(true);
     });
 
+    it('does not double-fire a monthly payment when the snapshot re-fires before the writes settle', () => {
+        // Firestore's onSnapshot emits once from the local optimistic cache and again
+        // once the server confirms, and neither write below is awaited before the next
+        // snapshot can arrive — this reproduces that by invoking the callback several
+        // times with the same still-due template before its date has actually advanced.
+        useExpenseStore.getState()._subscribe(col, user, null, vi.fn());
+        const today = new Date().toISOString().slice(0, 10);
+        const snap = makeSnapshot([
+            { id: 'rent', data: { amount: 500, category: 'Home', date: today, type: 'expense', scheduled: true, repeat: 'monthly' } },
+        ]);
+
+        snapshotCallbacks[0](snap);
+        snapshotCallbacks[0](snap);
+        snapshotCallbacks[0](snap);
+
+        expect(mockAddDoc).toHaveBeenCalledTimes(1);
+    });
+
     it('clamps end-of-month recurrence (Jan 31 -> Feb 28)', () => {
         // Fixed past dates so the test doesn't depend on the real "today".
         useExpenseStore.getState()._subscribe(col, user, null, vi.fn());

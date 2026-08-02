@@ -67,6 +67,14 @@ export const useExpenseStore = create<ExpenseStore>((set) => {
 
             set({ loading: true });
 
+            // onSnapshot fires multiple times per write (once optimistically from the
+            // local cache, again once the server confirms), and the two writes below
+            // aren't awaited before the next snapshot arrives. Without this guard, a
+            // still-due scheduled item gets reprocessed — and re-cloned — on every one
+            // of those interim snapshots, until its date has actually advanced past
+            // today. Tracks IDs currently being fired so each one only fires once.
+            const firingIds = new Set<string>();
+
             // Listen to Firestore in real time — updates expenses on every change
             const unsub = onSnapshot(col, (snap) => {
                 const expenses = snap.docs.map((d) => ({
@@ -83,16 +91,20 @@ export const useExpenseStore = create<ExpenseStore>((set) => {
                 // transaction and the template's date advances to next month.
                 const todayStr = new Date().toISOString().slice(0, 10);
                 expenses
-                    .filter((e) => e.scheduled && e.date <= todayStr)
+                    .filter((e) => e.scheduled && e.date <= todayStr && !firingIds.has(e.id))
                     .forEach((e) => {
+                        firingIds.add(e.id);
+                        const clear = () => firingIds.delete(e.id);
                         if (e.repeat === 'monthly') {
                             const { id, ...rest } = e;
                             delete rest.scheduled;
                             delete rest.repeat;
-                            expenseSvc.addExpense(col, { ...rest, createdAt: Date.now() }).catch(() => {});
-                            expenseSvc.updateExpense(col, id, { date: addOneMonthClamped(e.date) }).catch(() => {});
+                            Promise.all([
+                                expenseSvc.addExpense(col, { ...rest, createdAt: Date.now() }),
+                                expenseSvc.updateExpense(col, id, { date: addOneMonthClamped(e.date) }),
+                            ]).catch(() => {}).finally(clear);
                         } else {
-                            expenseSvc.updateExpense(col, e.id, { scheduled: deleteField() }).catch(() => {});
+                            expenseSvc.updateExpense(col, e.id, { scheduled: deleteField() }).catch(() => {}).finally(clear);
                         }
                     });
             });
