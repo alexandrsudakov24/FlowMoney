@@ -16,8 +16,15 @@ export default function DashboardPage() {
     const { activeExpenses: expenses, loading, currency, monthlyRollover } = useApp();
     const { t } = useLanguage();
 
+    // Defaults to the current month so the chart/list match the rollover
+    // balance above, which is already scoped to the current period.
+    const currentMonthStr = () => {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    };
+
     const [filters, setFilters] = useState<FilterState>({
-        month: '',
+        month: currentMonthStr(),
         search: '',
         type: 'all',
         categories: [],
