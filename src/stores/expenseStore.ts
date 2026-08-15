@@ -1,19 +1,8 @@
 import { create } from 'zustand';
-import { onSnapshot, deleteField } from 'firebase/firestore';
+import { onSnapshot } from 'firebase/firestore';
 import type { CollectionReference, UpdateData } from 'firebase/firestore';
 import type { Expense, User, Family } from '../types';
 import * as expenseSvc from '../services/expenses';
-
-// Advances a YYYY-MM-DD date by one calendar month, clamping to the last
-// day of the target month when the original day doesn't exist there
-// (e.g. Jan 31 -> Feb 28/29). JS Date normalizes month/year overflow, so
-// December correctly rolls into January of the next year.
-function addOneMonthClamped(dateStr: string): string {
-    const [y, m, d] = dateStr.split('-').map(Number); // m is 1-based
-    const lastDayOfNextMonth = new Date(y, m + 1, 0).getDate();
-    const next = new Date(y, m, Math.min(d, lastDayOfNextMonth));
-    return `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, '0')}-${String(next.getDate()).padStart(2, '0')}`;
-}
 
 // Shape of the store — what data it holds and what actions it can do
 type ExpenseStore = {
@@ -68,11 +57,12 @@ export const useExpenseStore = create<ExpenseStore>((set) => {
             set({ loading: true });
 
             // onSnapshot fires multiple times per write (once optimistically from the
-            // local cache, again once the server confirms), and the two writes below
-            // aren't awaited before the next snapshot arrives. Without this guard, a
-            // still-due scheduled item gets reprocessed — and re-cloned — on every one
-            // of those interim snapshots, until its date has actually advanced past
-            // today. Tracks IDs currently being fired so each one only fires once.
+            // local cache, again once the server confirms), and the write below isn't
+            // awaited before the next snapshot arrives. This just avoids re-issuing a
+            // redundant transaction on every one of those interim snapshots from *this*
+            // client; the transaction itself (see expenseSvc.fireScheduledExpense) is
+            // what actually guards against double-firing, including from another family
+            // member's device racing on the same template.
             const firingIds = new Set<string>();
 
             // Listen to Firestore in real time — updates expenses on every change
@@ -95,17 +85,7 @@ export const useExpenseStore = create<ExpenseStore>((set) => {
                     .forEach((e) => {
                         firingIds.add(e.id);
                         const clear = () => firingIds.delete(e.id);
-                        if (e.repeat === 'monthly') {
-                            const { id, ...rest } = e;
-                            delete rest.scheduled;
-                            delete rest.repeat;
-                            Promise.all([
-                                expenseSvc.addExpense(col, { ...rest, createdAt: Date.now() }),
-                                expenseSvc.updateExpense(col, id, { date: addOneMonthClamped(e.date) }),
-                            ]).catch(() => {}).finally(clear);
-                        } else {
-                            expenseSvc.updateExpense(col, e.id, { scheduled: deleteField() }).catch(() => {}).finally(clear);
-                        }
+                        expenseSvc.fireScheduledExpense(col, e.id, todayStr).catch(() => {}).finally(clear);
                     });
             });
 
