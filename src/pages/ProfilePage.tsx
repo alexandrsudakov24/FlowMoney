@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useFamily } from '../context/FamilyContext';
+import { useToast } from '../context/ToastContext';
 import { getCatLabel } from '../utils/getCatLabel';
 import { currencySymbols } from '../constants/currency';
 import { ThemeModal, LanguageModal, CurrencyModal, RolloverModal, CategoryModal, FamilyModal, FeedbackModal, ScheduledPaymentsModal, AboutModal } from '../components/modals';
@@ -23,6 +24,7 @@ export default function ProfilePage() {
     const { activeExpenses: expenses, scheduledExpenses, currency, rolloverMode } = useApp();
     const { t } = useLanguage();
     const { family, invitations } = useFamily();
+    const { showToast } = useToast();
 
     const [themeOpen, setThemeOpen] = useState(false);
     const [languageOpen, setLanguageOpen] = useState(false);
@@ -67,6 +69,28 @@ export default function ProfilePage() {
         a.download = `flowmoney-export-${new Date().toISOString().slice(0, 10)}.json`;
         a.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
+    };
+
+    const handleShare = async () => {
+        const shareData = {
+            title: 'FlowMoney',
+            text: t('share_app_text'),
+            url: window.location.origin,
+        };
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch {
+                // user cancelled the share sheet — nothing to do
+            }
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(shareData.url);
+            showToast(t('share_link_copied'), 'success');
+        } catch {
+            showToast(t('save_error'), 'error');
+        }
     };
 
     const hasAccount = !!user?.email;
@@ -196,6 +220,13 @@ export default function ProfilePage() {
                 <h3 className={styles.blockTitle}>{t('contact_developer')}</h3>
                 <button className={styles.exportBtn} onClick={() => setFeedbackOpen(true)}>
                     {t('contact_developer')}
+                </button>
+            </div>
+
+            <div className={styles.block}>
+                <h3 className={styles.blockTitle}>{t('share_app')}</h3>
+                <button className={styles.exportBtn} onClick={handleShare}>
+                    {t('share_app')}
                 </button>
             </div>
 
