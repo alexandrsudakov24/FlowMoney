@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { generateInsights, GeminiRequestError } from '../services/gemini';
 
 function mockFetchOnce(response: Partial<Response> & { json?: () => Promise<unknown> }) {
-    global.fetch = vi.fn().mockResolvedValue({
+    globalThis.fetch = vi.fn().mockResolvedValue({
         ok: true,
         status: 200,
         ...response,
@@ -40,10 +40,28 @@ describe('generateInsights', () => {
         const result = await generateInsights({ total: 100 }, 'en');
 
         expect(result).toEqual(insights);
-        expect(global.fetch).toHaveBeenCalledWith(
+        expect(globalThis.fetch).toHaveBeenCalledWith(
             expect.stringContaining('generativelanguage.googleapis.com'),
             expect.objectContaining({ method: 'POST' })
         );
+    });
+
+    it('falls back to a current Gemini model when the legacy alias is rejected', async () => {
+        const insights = [{ title: 'Overspending', description: 'You spent more on food this month.', severity: 'warning' }];
+        const fetchMock = vi.fn()
+            .mockResolvedValueOnce({ ok: false, status: 404 })
+            .mockResolvedValueOnce({
+                ok: true,
+                status: 200,
+                json: () => Promise.resolve(geminiTextResponse(JSON.stringify({ insights }))),
+            });
+        globalThis.fetch = fetchMock;
+
+        const result = await generateInsights({ total: 100 }, 'en');
+
+        expect(result).toEqual(insights);
+        expect(fetchMock).toHaveBeenCalledTimes(2);
+        expect(fetchMock.mock.calls[0][0]).toContain('gemini-2.5-flash');
     });
 
     it('throws rate_limited on HTTP 429', async () => {
@@ -63,7 +81,7 @@ describe('generateInsights', () => {
     });
 
     it('throws network_error when fetch rejects', async () => {
-        global.fetch = vi.fn().mockRejectedValue(new Error('offline'));
+        globalThis.fetch = vi.fn().mockRejectedValue(new Error('offline'));
 
         await expect(generateInsights({}, 'en')).rejects.toMatchObject({
             code: 'network_error',

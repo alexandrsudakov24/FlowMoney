@@ -1,8 +1,8 @@
 import type { Language } from '../i18n';
 import type { Insight } from '../types';
 
-const MODEL = 'gemini-flash-latest';
-const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+const MODEL_FALLBACKS = ['gemini-2.5-flash', 'gemini-flash-latest'];
+const ENDPOINT_TEMPLATE = 'https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent';
 
 export type GeminiErrorCode = 'rate_limited' | 'blocked' | 'parse_error' | 'network_error' | 'no_api_key';
 
@@ -70,57 +70,72 @@ export async function generateInsights(stats: unknown, language: Language): Prom
         throw new GeminiRequestError('no_api_key');
     }
 
-    let response: Response;
-    try {
-        response = await fetch(`${ENDPOINT}?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: buildPrompt(stats, language) }] }],
-                generationConfig: {
-                    responseMimeType: 'application/json',
-                    responseSchema: RESPONSE_SCHEMA,
-                },
-            }),
-        });
-    } catch {
-        throw new GeminiRequestError('network_error');
-    }
+    let lastError: GeminiRequestError | null = null;
 
-    if (!response.ok) {
-        if (response.status === 429) {
-            throw new GeminiRequestError('rate_limited');
+    for (const model of MODEL_FALLBACKS) {
+        const endpoint = ENDPOINT_TEMPLATE.replace('{MODEL}', model);
+
+        let response: Response;
+        try {
+            response = await fetch(`${endpoint}?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: buildPrompt(stats, language) }] }],
+                    generationConfig: {
+                        responseMimeType: 'application/json',
+                        responseSchema: RESPONSE_SCHEMA,
+                    },
+                }),
+            });
+        } catch {
+            lastError = new GeminiRequestError('network_error');
+            continue;
         }
-        throw new GeminiRequestError('network_error');
+
+        if (!response.ok) {
+            if (response.status === 429) {
+                throw new GeminiRequestError('rate_limited');
+            }
+
+            if (response.status === 404 && model !== MODEL_FALLBACKS[MODEL_FALLBACKS.length - 1]) {
+                continue;
+            }
+
+            lastError = new GeminiRequestError('network_error');
+            break;
+        }
+
+        let data: GeminiApiResponse;
+        try {
+            data = await response.json();
+        } catch {
+            throw new GeminiRequestError('parse_error');
+        }
+
+        const candidate = data.candidates?.[0];
+        if (data.promptFeedback?.blockReason || candidate?.finishReason === 'SAFETY') {
+            throw new GeminiRequestError('blocked');
+        }
+
+        const text = candidate?.content?.parts?.[0]?.text;
+        if (!text) {
+            throw new GeminiRequestError('parse_error');
+        }
+
+        let parsed: { insights?: Insight[] };
+        try {
+            parsed = JSON.parse(text);
+        } catch {
+            throw new GeminiRequestError('parse_error');
+        }
+
+        if (!Array.isArray(parsed.insights)) {
+            throw new GeminiRequestError('parse_error');
+        }
+
+        return parsed.insights;
     }
 
-    let data: GeminiApiResponse;
-    try {
-        data = await response.json();
-    } catch {
-        throw new GeminiRequestError('parse_error');
-    }
-
-    const candidate = data.candidates?.[0];
-    if (data.promptFeedback?.blockReason || candidate?.finishReason === 'SAFETY') {
-        throw new GeminiRequestError('blocked');
-    }
-
-    const text = candidate?.content?.parts?.[0]?.text;
-    if (!text) {
-        throw new GeminiRequestError('parse_error');
-    }
-
-    let parsed: { insights?: Insight[] };
-    try {
-        parsed = JSON.parse(text);
-    } catch {
-        throw new GeminiRequestError('parse_error');
-    }
-
-    if (!Array.isArray(parsed.insights)) {
-        throw new GeminiRequestError('parse_error');
-    }
-
-    return parsed.insights;
+    throw lastError ?? new GeminiRequestError('network_error');
 }
