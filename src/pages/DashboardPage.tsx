@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
-import { ExpenseList, Charts, ExpenseFilters } from '../components/expenses';
+import { ExpenseList, Charts, ExpenseFilters, SmartSearchBar } from '../components/expenses';
 import type { FilterState } from '../components/expenses';
 import { InsightsPanel } from '../components/insights';
 import BudgetProgress from '../components/budget/BudgetProgress';
@@ -34,7 +34,12 @@ export default function DashboardPage() {
     // Shared predicate for both lists below. `skipCategory` lets the chart keep showing
     // every category (with the selected ones highlighted) instead of collapsing to them.
     const matchesFilters = (e: (typeof expenses)[number], skipCategory = false) => {
-        if (filters.month && !e.date.startsWith(filters.month)) return false;
+        if (filters.dateFrom || filters.dateTo) {
+            if (filters.dateFrom && e.date < filters.dateFrom) return false;
+            if (filters.dateTo && e.date > filters.dateTo) return false;
+        } else if (filters.month && !e.date.startsWith(filters.month)) {
+            return false;
+        }
         if (filters.type !== 'all' && e.type !== filters.type) return false;
         if (!skipCategory && filters.categories.length > 0 && !filters.categories.includes(e.category)) return false;
         if (filters.search) {
@@ -145,7 +150,8 @@ export default function DashboardPage() {
     const lastCategoryColor = categoryColorMap[filters.categories[filters.categories.length - 1]];
 
     const hasActiveFilters =
-        filters.month !== '' || filters.search !== '' || filters.type !== 'all' || filters.categories.length > 0;
+        filters.month !== '' || filters.search !== '' || filters.type !== 'all' || filters.categories.length > 0 ||
+        !!filters.dateFrom || !!filters.dateTo;
 
     const symbol = currencySymbols[currency];
 
@@ -218,11 +224,17 @@ export default function DashboardPage() {
 
             <div className={styles.filtersArea}>
                 {expenses.length > 0 && (
-                    <ExpenseFilters
-                        expenses={expenses}
-                        filters={filters}
-                        onChange={setFilters}
-                    />
+                    <>
+                        <SmartSearchBar
+                            categories={Array.from(new Set(expenses.map((e) => e.category)))}
+                            onApply={(patch) => setFilters((f) => ({ ...f, ...patch }))}
+                        />
+                        <ExpenseFilters
+                            expenses={expenses}
+                            filters={filters}
+                            onChange={setFilters}
+                        />
+                    </>
                 )}
             </div>
 

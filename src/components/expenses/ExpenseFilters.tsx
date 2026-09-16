@@ -10,6 +10,11 @@ export interface FilterState {
     search: string;
     type: 'all' | 'income' | 'expense';
     categories: string[];
+    // Set together by the smart (AI) search when a query implies a custom
+    // date range that a single month can't express (e.g. "this year").
+    // Takes priority over `month` when non-empty.
+    dateFrom?: string;
+    dateTo?: string;
 }
 
 const TYPE_FILTER_OPTIONS = ['all', 'expense', 'income'] as const;
@@ -40,8 +45,25 @@ export default function ExpenseFilters({ expenses, filters, onChange }: Props) {
 
     const typeIndicator = useSlidingIndicator(TYPE_FILTER_OPTIONS.indexOf(filters.type));
 
+    const formatDate = (iso: string) => {
+        const locale = language === 'ru' ? 'ru-RU' : language === 'he' ? 'he-IL' : 'en-US';
+        return new Date(iso).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
+    };
+
     const chips: { key: string; label: string; clear: () => void }[] = [];
-    if (filters.month) chips.push({ key: 'month', label: formatMonth(filters.month), clear: () => set({ month: '' }) });
+    if (filters.dateFrom || filters.dateTo) {
+        chips.push({
+            key: 'dateRange',
+            label: filters.dateFrom && filters.dateTo
+                ? `${formatDate(filters.dateFrom)} – ${formatDate(filters.dateTo)}`
+                : filters.dateFrom
+                    ? `${t('filter_from')} ${formatDate(filters.dateFrom)}`
+                    : `${t('filter_until')} ${formatDate(filters.dateTo!)}`,
+            clear: () => set({ dateFrom: '', dateTo: '' }),
+        });
+    } else if (filters.month) {
+        chips.push({ key: 'month', label: formatMonth(filters.month), clear: () => set({ month: '' }) });
+    }
     if (filters.type !== 'all') chips.push({ key: 'type', label: t(filters.type), clear: () => set({ type: 'all' }) });
     filters.categories.forEach((cat) => chips.push({
         key: `category-${cat}`,
@@ -55,7 +77,7 @@ export default function ExpenseFilters({ expenses, filters, onChange }: Props) {
             <div className={styles.filters}>
                 <select
                     value={filters.month}
-                    onChange={(e) => set({ month: e.target.value })}
+                    onChange={(e) => set({ month: e.target.value, dateFrom: '', dateTo: '' })}
                     className={styles.select}
                     aria-label={t('filter_all_time')}
                 >
