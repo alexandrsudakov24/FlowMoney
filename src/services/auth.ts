@@ -41,3 +41,12 @@ export async function getCurrencyPreference(uid: string): Promise<string | undef
 export async function saveCurrencyPreference(uid: string, currency: string): Promise<void> {
     await setDoc(doc(db, 'users', uid), { currency }, { merge: true });
 }
+
+export async function getAccentColorPreference(uid: string): Promise<string | undefined> {
+    const snap = await getDoc(doc(db, 'users', uid));
+    return snap.data()?.accentColor as string | undefined;
+}
+
+export async function saveAccentColorPreference(uid: string, accentColor: string): Promise<void> {
+    await setDoc(doc(db, 'users', uid), { accentColor }, { merge: true });
+}

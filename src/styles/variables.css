@@ -84,3 +84,97 @@
     --shadow-lg: 0 20px 40px rgba(2,6,23,0.7), 0 8px 12px rgba(2,6,23,0.6);
 }
 
+/* ============================================
+   Accent color overrides
+   `[data-accent]` is set alongside `[data-theme]`; the combined
+   selector below always wins over a plain [data-theme="dark"]
+   default because it has higher specificity.
+   ============================================ */
+[data-accent="blue"] {
+    --md-primary: #2563eb;
+    --md-primary-variant: #1d4ed8;
+    --md-primary-light: #60a5fa;
+}
+[data-theme="dark"][data-accent="blue"] {
+    --md-primary: #60a5fa;
+    --md-primary-variant: #3b82f6;
+    --md-primary-light: #93c5fd;
+}
+
+[data-accent="green"] {
+    --md-primary: #16a34a;
+    --md-primary-variant: #15803d;
+    --md-primary-light: #4ade80;
+}
+[data-theme="dark"][data-accent="green"] {
+    --md-primary: #4ade80;
+    --md-primary-variant: #22c55e;
+    --md-primary-light: #86efac;
+}
+
+[data-accent="red"] {
+    --md-primary: #dc2626;
+    --md-primary-variant: #b91c1c;
+    --md-primary-light: #f87171;
+}
+[data-theme="dark"][data-accent="red"] {
+    --md-primary: #f87171;
+    --md-primary-variant: #ef4444;
+    --md-primary-light: #fca5a5;
+}
+
+[data-accent="orange"] {
+    --md-primary: #ea580c;
+    --md-primary-variant: #c2410c;
+    --md-primary-light: #fb923c;
+}
+[data-theme="dark"][data-accent="orange"] {
+    --md-primary: #fb923c;
+    --md-primary-variant: #f97316;
+    --md-primary-light: #fdba74;
+}
+
+[data-accent="pink"] {
+    --md-primary: #db2777;
+    --md-primary-variant: #be185d;
+    --md-primary-light: #f472b6;
+}
+[data-theme="dark"][data-accent="pink"] {
+    --md-primary: #f472b6;
+    --md-primary-variant: #ec4899;
+    --md-primary-light: #f9a8d4;
+}
+
+[data-accent="teal"] {
+    --md-primary: #0d9488;
+    --md-primary-variant: #0f766e;
+    --md-primary-light: #2dd4bf;
+}
+[data-theme="dark"][data-accent="teal"] {
+    --md-primary: #2dd4bf;
+    --md-primary-variant: #14b8a6;
+    --md-primary-light: #5eead4;
+}
+
+[data-accent="indigo"] {
+    --md-primary: #4f46e5;
+    --md-primary-variant: #4338ca;
+    --md-primary-light: #818cf8;
+}
+[data-theme="dark"][data-accent="indigo"] {
+    --md-primary: #818cf8;
+    --md-primary-variant: #6366f1;
+    --md-primary-light: #a5b4fc;
+}
+
+[data-accent="amber"] {
+    --md-primary: #b45309;
+    --md-primary-variant: #92400e;
+    --md-primary-light: #f59e0b;
+}
+[data-theme="dark"][data-accent="amber"] {
+    --md-primary: #f59e0b;
+    --md-primary-variant: #d97706;
+    --md-primary-light: #fbbf24;
+}
+

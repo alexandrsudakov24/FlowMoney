@@ -1,0 +1,41 @@
+.swatchGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    justify-items: center;
+}
+
+.swatch {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.swatch:hover {
+    transform: scale(1.06);
+}
+
+.swatchActive {
+    border-color: var(--text);
+    box-shadow: var(--shadow-md);
+}
+
+.purple { background: linear-gradient(135deg, #8b5cf6, #6200ee); }
+.blue   { background: linear-gradient(135deg, #60a5fa, #2563eb); }
+.green  { background: linear-gradient(135deg, #4ade80, #16a34a); }
+.red    { background: linear-gradient(135deg, #f87171, #dc2626); }
+.orange { background: linear-gradient(135deg, #fb923c, #ea580c); }
+.pink   { background: linear-gradient(135deg, #f472b6, #db2777); }
+.teal   { background: linear-gradient(135deg, #2dd4bf, #0d9488); }
+.indigo { background: linear-gradient(135deg, #818cf8, #4f46e5); }
+.amber  { background: linear-gradient(135deg, #f59e0b, #b45309); }

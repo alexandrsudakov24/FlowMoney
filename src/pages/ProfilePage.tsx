@@ -7,7 +7,7 @@ import { useFamily } from '../context/FamilyContext';
 import { useToast } from '../context/ToastContext';
 import { getCatLabel } from '../utils/getCatLabel';
 import { currencySymbols } from '../constants/currency';
-import { ThemeModal, LanguageModal, CurrencyModal, RolloverModal, CategoryModal, FamilyModal, FeedbackModal, ScheduledPaymentsModal, AboutModal } from '../components/modals';
+import { ThemeModal, AccentColorModal, LanguageModal, CurrencyModal, RolloverModal, CategoryModal, FamilyModal, FeedbackModal, ScheduledPaymentsModal, AboutModal } from '../components/modals';
 import type { RolloverMode } from '../types';
 import type { TranslationKeys } from '../i18n';
 import styles from './ProfilePage.module.css';
@@ -21,12 +21,13 @@ const ROLLOVER_MODE_LABELS: Record<RolloverMode, TranslationKeys> = {
 
 export default function ProfilePage() {
     const { user, logout, role } = useAuth();
-    const { activeExpenses: expenses, scheduledExpenses, currency, rolloverMode } = useApp();
+    const { activeExpenses: expenses, scheduledExpenses, currency, rolloverMode, accentColor } = useApp();
     const { t } = useLanguage();
     const { family, invitations } = useFamily();
     const { showToast } = useToast();
 
     const [themeOpen, setThemeOpen] = useState(false);
+    const [accentColorOpen, setAccentColorOpen] = useState(false);
     const [languageOpen, setLanguageOpen] = useState(false);
     const [currencyOpen, setCurrencyOpen] = useState(false);
     const [rolloverOpen, setRolloverOpen] = useState(false);
@@ -202,6 +203,12 @@ export default function ProfilePage() {
                     </button>
                 </div>
                 <div className={styles.settingRow}>
+                    <span>{t('accent_color')}</span>
+                    <button className={styles.changeBtn} onClick={() => setAccentColorOpen(true)}>
+                        {t(accentColor)}
+                    </button>
+                </div>
+                <div className={styles.settingRow}>
                     <span>{t('language')}</span>
                     <button className={styles.changeBtn} onClick={() => setLanguageOpen(true)}>
                         {t('change')}
@@ -285,6 +292,7 @@ export default function ProfilePage() {
             )}
 
             <ThemeModal isOpen={themeOpen} onClose={() => setThemeOpen(false)} />
+            <AccentColorModal isOpen={accentColorOpen} onClose={() => setAccentColorOpen(false)} />
             <LanguageModal isOpen={languageOpen} onClose={() => setLanguageOpen(false)} />
             <CurrencyModal isOpen={currencyOpen} onClose={() => setCurrencyOpen(false)} />
             <RolloverModal isOpen={rolloverOpen} onClose={() => setRolloverOpen(false)} />

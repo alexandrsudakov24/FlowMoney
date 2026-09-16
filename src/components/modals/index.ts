@@ -1,4 +1,5 @@
 export { default as ThemeModal } from './ThemeModal';
+export { default as AccentColorModal } from './AccentColorModal';
 export { default as LanguageModal } from './LanguageModal';
 export { default as CurrencyModal } from './CurrencyModal';
 export { default as RolloverModal } from './RolloverModal';

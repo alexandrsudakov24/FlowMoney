@@ -10,6 +10,7 @@ import type { TranslationKeys, Language } from '../i18n';
 import { useExpensesRef, useCategoriesRef, useInsightsRef, useRolloverRef } from '../hooks/useFirestoreRef';
 import { useExpenseStore } from '../stores/expenseStore';
 import { useCurrencyStore } from '../stores/currencyStore';
+import { useAccentColorStore, type AccentColor } from '../stores/accentColorStore';
 import { useCategoryStore } from '../stores/categoryStore';
 import { useInsightsStore } from '../stores/insightsStore';
 import { useRolloverStore } from '../stores/rolloverStore';
@@ -28,6 +29,8 @@ type AppContextType = {
     clearAll: () => Promise<void>;
     currency: string;
     changeCurrency: (cur: string) => Promise<void>;
+    accentColor: AccentColor;
+    changeAccentColor: (color: AccentColor) => Promise<void>;
     categories: string[];
     addCategory: (name: string) => Promise<void>;
     removeCategory: (name: string) => Promise<boolean>;
@@ -75,6 +78,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
     const { currency, changeCurrency, _init: initCurrency } = useCurrencyStore();
 
+    const { accentColor, changeAccentColor, _init: initAccentColor } = useAccentColorStore();
+
     const { rolloverMode, updateRolloverMode, _subscribe: subscribeRollover } = useRolloverStore();
 
     const activeExpenses = useMemo(() => expenses.filter((e) => !e.scheduled), [expenses]);
@@ -95,6 +100,16 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     useEffect(() => {
         initCurrency(userId, isAnonymous);
     }, [userId, isAnonymous, initCurrency]);
+
+    // Re-init accent color store whenever the user changes (login, logout, etc.)
+    useEffect(() => {
+        initAccentColor(userId, isAnonymous);
+    }, [userId, isAnonymous, initAccentColor]);
+
+    // Reflect the chosen accent color on the document root so CSS variables pick it up
+    useEffect(() => {
+        document.documentElement.setAttribute('data-accent', accentColor);
+    }, [accentColor]);
 
     // Wire Firestore categories document into the category store
     useEffect(() => {
@@ -118,6 +133,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         <AppContext.Provider value={{
             expenses, activeExpenses, scheduledExpenses, loading, addExpense, updateExpense, deleteExpense, clearAll,
             currency, changeCurrency,
+            accentColor, changeAccentColor,
             categories, addCategory, removeCategory,
             insightsDoc, insightsLoading, insightsGenerating, regenerateInsights,
             rolloverMode, updateRolloverMode, monthlyRollover,
