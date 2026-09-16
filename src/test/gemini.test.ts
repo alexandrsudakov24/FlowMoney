@@ -42,14 +42,18 @@ describe('generateInsights', () => {
         expect(result).toEqual(insights);
         expect(globalThis.fetch).toHaveBeenCalledWith(
             expect.stringContaining('generativelanguage.googleapis.com'),
-            expect.objectContaining({ method: 'POST' })
+            expect.objectContaining({
+                method: 'POST',
+                headers: expect.objectContaining({ 'X-goog-api-key': 'test-key' }),
+            })
         );
     });
 
-    it('falls back to a current Gemini model when the legacy alias is rejected', async () => {
+    it('retries when the first model is unavailable and succeeds on the next one', async () => {
         const insights = [{ title: 'Overspending', description: 'You spent more on food this month.', severity: 'warning' }];
         const fetchMock = vi.fn()
             .mockResolvedValueOnce({ ok: false, status: 404 })
+            .mockResolvedValueOnce({ ok: false, status: 503 })
             .mockResolvedValueOnce({
                 ok: true,
                 status: 200,
@@ -60,8 +64,8 @@ describe('generateInsights', () => {
         const result = await generateInsights({ total: 100 }, 'en');
 
         expect(result).toEqual(insights);
-        expect(fetchMock).toHaveBeenCalledTimes(2);
-        expect(fetchMock.mock.calls[0][0]).toContain('gemini-2.5-flash');
+        expect(fetchMock).toHaveBeenCalledTimes(3);
+        expect(fetchMock.mock.calls[0][0]).toContain('gemini-3.6-flash');
     });
 
     it('throws rate_limited on HTTP 429', async () => {

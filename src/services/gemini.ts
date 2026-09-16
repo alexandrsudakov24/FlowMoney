@@ -1,10 +1,10 @@
 import type { Language } from '../i18n';
 import type { Insight } from '../types';
 
-const MODEL_FALLBACKS = ['gemini-2.5-flash', 'gemini-flash-latest'];
+const MODEL_FALLBACKS = ['gemini-3.6-flash', 'gemini-flash-latest', 'gemini-3.8-flash'];
 const ENDPOINT_TEMPLATE = 'https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent';
 
-export type GeminiErrorCode = 'rate_limited' | 'blocked' | 'parse_error' | 'network_error' | 'no_api_key';
+export type GeminiErrorCode = 'rate_limited' | 'blocked' | 'parse_error' | 'network_error' | 'no_api_key' | 'invalid_api_key';
 
 export class GeminiRequestError extends Error {
     code: GeminiErrorCode;
@@ -77,9 +77,9 @@ export async function generateInsights(stats: unknown, language: Language): Prom
 
         let response: Response;
         try {
-            response = await fetch(`${endpoint}?key=${apiKey}`, {
+            response = await fetch(endpoint, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'X-goog-api-key': apiKey },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: buildPrompt(stats, language) }] }],
                     generationConfig: {
@@ -98,7 +98,15 @@ export async function generateInsights(stats: unknown, language: Language): Prom
                 throw new GeminiRequestError('rate_limited');
             }
 
-            if (response.status === 404 && model !== MODEL_FALLBACKS[MODEL_FALLBACKS.length - 1]) {
+            if (response.status === 400 || response.status === 403 || response.status === 404) {
+                lastError = new GeminiRequestError('invalid_api_key');
+                if (model !== MODEL_FALLBACKS[MODEL_FALLBACKS.length - 1]) {
+                    continue;
+                }
+                break;
+            }
+
+            if ((response.status === 503 || response.status === 500) && model !== MODEL_FALLBACKS[MODEL_FALLBACKS.length - 1]) {
                 continue;
             }
 
