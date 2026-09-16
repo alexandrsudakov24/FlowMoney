@@ -157,14 +157,14 @@
 }
 
 [data-accent="indigo"] {
-    --md-primary: #4f46e5;
-    --md-primary-variant: #4338ca;
-    --md-primary-light: #818cf8;
+    --md-primary: #3730a3;
+    --md-primary-variant: #312e81;
+    --md-primary-light: #6366f1;
 }
 [data-theme="dark"][data-accent="indigo"] {
-    --md-primary: #818cf8;
-    --md-primary-variant: #6366f1;
-    --md-primary-light: #a5b4fc;
+    --md-primary: #6366f1;
+    --md-primary-variant: #4338ca;
+    --md-primary-light: #818cf8;
 }
 
 [data-accent="amber"] {
