@@ -213,7 +213,15 @@ export default function DashboardPage() {
 
             <div className={styles.insightsArea}>
                 <InsightsPanel />
-                <MoneyChat />
+                <div className={styles.aiToolbar}>
+                    {expenses.length > 0 && (
+                        <SmartSearchBar
+                            categories={Array.from(new Set(expenses.map((e) => e.category)))}
+                            onApply={(patch) => setFilters((f) => ({ ...f, ...patch }))}
+                        />
+                    )}
+                    <MoneyChat />
+                </div>
             </div>
 
             <BudgetProgress
@@ -225,17 +233,11 @@ export default function DashboardPage() {
 
             <div className={styles.filtersArea}>
                 {expenses.length > 0 && (
-                    <>
-                        <SmartSearchBar
-                            categories={Array.from(new Set(expenses.map((e) => e.category)))}
-                            onApply={(patch) => setFilters((f) => ({ ...f, ...patch }))}
-                        />
-                        <ExpenseFilters
-                            expenses={expenses}
-                            filters={filters}
-                            onChange={setFilters}
-                        />
-                    </>
+                    <ExpenseFilters
+                        expenses={expenses}
+                        filters={filters}
+                        onChange={setFilters}
+                    />
                 )}
             </div>
 

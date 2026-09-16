@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../context/LanguageContext';
 import InsightCard from './InsightCard';
 import { Spinner, ButtonSpinner } from '../ui';
 import { msUntilInsightsAvailable } from '../../utils/insightsCooldown';
+import { useClickOutside } from '../../hooks/useClickOutside';
 import styles from './InsightsPanel.module.css';
 
 function formatDuration(ms: number): string {
@@ -17,6 +18,8 @@ export default function InsightsPanel() {
     const { activeExpenses, insightsDoc, insightsLoading, insightsGenerating, regenerateInsights } = useApp();
     const { t, language } = useLanguage();
     const [expanded, setExpanded] = useState(false);
+    const panelRef = useRef<HTMLDivElement>(null);
+    useClickOutside(panelRef, () => setExpanded(false), expanded);
 
     // Ticks once a minute so the cooldown hint counts down without a refresh
     const [now, setNow] = useState(() => Date.now());
@@ -34,7 +37,7 @@ export default function InsightsPanel() {
     };
 
     return (
-        <div className={styles.panel}>
+        <div className={styles.panel} ref={panelRef}>
             <button
                 type="button"
                 className={styles.teaser}

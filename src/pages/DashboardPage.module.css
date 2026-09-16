@@ -3,6 +3,14 @@
     padding: 0 16px;
 }
 
+.aiToolbar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+    margin-bottom: 24px;
+}
+
 @media (min-width: 768px) {
     .dashboard {
         padding: 0;

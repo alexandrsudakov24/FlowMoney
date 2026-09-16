@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { answerMoneyQuestion, GeminiRequestError } from '../../services/gemini';
 import { buildMoneyChatStats } from '../../utils/moneyChatStats';
 import { ButtonSpinner } from '../ui';
+import { useClickOutside } from '../../hooks/useClickOutside';
 import styles from './MoneyChat.module.css';
 
 // One question, one answer — no conversation history. Answers are generated
@@ -12,10 +13,13 @@ import styles from './MoneyChat.module.css';
 export default function MoneyChat() {
     const { activeExpenses } = useApp();
     const { t, language } = useLanguage();
+    const [open, setOpen] = useState(false);
     const [question, setQuestion] = useState('');
     const [answer, setAnswer] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const wrapRef = useRef<HTMLDivElement>(null);
+    useClickOutside(wrapRef, () => setOpen(false), open);
 
     const handleAsk = async () => {
         const trimmed = question.trim();
@@ -36,29 +40,47 @@ export default function MoneyChat() {
     };
 
     return (
-        <div className={styles.section}>
-            <h3 className={styles.title}>{t('money_chat_title')}</h3>
-            <div className={styles.row}>
-                <input
-                    type="text"
-                    className={styles.input}
-                    placeholder={t('money_chat_placeholder')}
-                    value={question}
-                    onChange={(e) => setQuestion(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAsk()}
-                    disabled={loading}
-                />
-                <button
-                    type="button"
-                    className={styles.button}
-                    onClick={handleAsk}
-                    disabled={loading || !question.trim()}
-                >
-                    {loading ? <ButtonSpinner /> : t('money_chat_ask')}
-                </button>
-            </div>
-            {error && <p className={styles.error}>{error}</p>}
-            {answer && <p className={styles.answer}>{answer}</p>}
+        <div className={styles.wrap} ref={wrapRef}>
+            <button
+                type="button"
+                className={styles.teaser}
+                onClick={() => setOpen((v) => !v)}
+                aria-expanded={open}
+            >
+                <span className={styles.teaserIcon} aria-hidden="true">💬</span>
+                <div className={styles.teaserText}>
+                    <span className={styles.teaserLabel}>{t('money_chat_title')}</span>
+                    <p className={styles.teaserDesc}>{t('money_chat_placeholder')}</p>
+                </div>
+                <span className={`${styles.chevron} ${open ? styles.chevronOpen : ''}`}>▾</span>
+            </button>
+
+            {open && (
+                <div className={styles.section}>
+                    <div className={styles.row}>
+                        <input
+                            type="text"
+                            className={styles.input}
+                            placeholder={t('money_chat_placeholder')}
+                            value={question}
+                            onChange={(e) => setQuestion(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleAsk()}
+                            disabled={loading}
+                            autoFocus
+                        />
+                        <button
+                            type="button"
+                            className={styles.button}
+                            onClick={handleAsk}
+                            disabled={loading || !question.trim()}
+                        >
+                            {loading ? <ButtonSpinner /> : t('money_chat_ask')}
+                        </button>
+                    </div>
+                    {error && <p className={styles.error}>{error}</p>}
+                    {answer && <p className={styles.answer}>{answer}</p>}
+                </div>
+            )}
         </div>
     );
 }

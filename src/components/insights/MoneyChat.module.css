@@ -1,17 +1,82 @@
+.wrap {
+    position: relative;
+    min-width: 0;
+}
+
+.teaser {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 68px;
+    padding: 14px 16px;
+    border: none;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, #f59e0b, #b45309);
+    box-shadow: var(--shadow-md);
+    text-align: start;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.teaser:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.teaserIcon {
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+.teaserText {
+    min-width: 0;
+    flex: 1;
+}
+
+.teaserLabel {
+    display: block;
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.teaserDesc {
+    margin: 2px 0 0;
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.9);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.chevron {
+    flex-shrink: 0;
+    color: #fff;
+    font-size: 14px;
+    transition: transform 0.2s ease;
+}
+
+.chevronOpen {
+    transform: rotate(180deg);
+}
+
 .section {
-    margin-top: 16px;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: calc(200% + 12px);
+    max-width: calc(100vw - 32px);
     padding: 16px;
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-}
-
-.title {
-    margin: 0 0 10px 0;
-    font-size: var(--font-size-sm);
-    font-weight: 700;
-    color: var(--text);
+    box-shadow: var(--shadow-lg);
+    animation: fadeIn 0.2s ease-in;
+    z-index: 20;
 }
 
 .row {
@@ -77,4 +142,15 @@
     font-size: var(--font-size-sm);
     color: var(--text);
     line-height: 1.5;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
