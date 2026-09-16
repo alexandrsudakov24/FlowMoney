@@ -4,6 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { ExpenseList, Charts, ExpenseFilters } from '../components/expenses';
 import type { FilterState } from '../components/expenses';
 import { InsightsPanel } from '../components/insights';
+import BudgetProgress from '../components/budget/BudgetProgress';
 import { Spinner } from '../components/ui';
 import { TransactionsModal } from '../components/modals';
 import { currencySymbols } from '../constants/currency';
@@ -13,7 +14,7 @@ import { getCategoryColorMap, darkenHex } from '../utils/getCategoryColors';
 import styles from './DashboardPage.module.css';
 
 export default function DashboardPage() {
-    const { activeExpenses: expenses, loading, currency, monthlyRollover } = useApp();
+    const { activeExpenses: expenses, loading, currency, monthlyRollover, categoryLimits } = useApp();
     const { t } = useLanguage();
 
     // Defaults to the current month so the chart/list match the rollover
@@ -74,7 +75,7 @@ export default function DashboardPage() {
         }));
     };
 
-    const { todayTotal, weekTotal, monthTotal, todayExpenses, weekExpenses, monthExpenses } = useMemo(() => {
+    const { todayTotal, weekTotal, monthTotal, todayExpenses, weekExpenses, monthExpenses, monthStr } = useMemo(() => {
         const toDateStr = (d: Date) => {
             const y = d.getFullYear();
             const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -113,7 +114,7 @@ export default function DashboardPage() {
             }
         });
 
-        return { todayTotal, weekTotal, monthTotal, todayExpenses, weekExpenses, monthExpenses };
+        return { todayTotal, weekTotal, monthTotal, todayExpenses, weekExpenses, monthExpenses, monthStr };
     }, [expenses]);
 
     const [openSummaryModal, setOpenSummaryModal] = useState<'today' | 'week' | 'negative' | 'categories' | null>(null);
@@ -207,6 +208,13 @@ export default function DashboardPage() {
             <div className={styles.insightsArea}>
                 <InsightsPanel />
             </div>
+
+            <BudgetProgress
+                monthExpenses={monthExpenses}
+                monthStr={monthStr}
+                categoryLimits={categoryLimits}
+                symbol={symbol}
+            />
 
             <div className={styles.filtersArea}>
                 {expenses.length > 0 && (

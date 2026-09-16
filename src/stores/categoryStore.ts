@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { onSnapshot } from 'firebase/firestore';
 import type { DocumentReference } from 'firebase/firestore';
-import { saveCategories } from '../services/categories';
+import { saveCategories, saveCategoryLimits } from '../services/categories';
 
 // Default categories that every user starts with and cannot delete
 export const DEFAULT_CATEGORIES = ['Food', 'Transport', 'Home', 'Shopping', 'Health', 'Other'];
@@ -9,10 +9,12 @@ export const DEFAULT_CATEGORIES = ['Food', 'Transport', 'Home', 'Shopping', 'Hea
 type CategoryStore = {
     // --- state ---
     categories: string[];
+    categoryLimits: Record<string, number>;
 
     // --- actions (called from components) ---
     addCategory: (name: string) => Promise<void>;
     removeCategory: (name: string) => Promise<boolean>;
+    setCategoryLimit: (name: string, amount: number | null) => Promise<void>;
 
     // --- internal setup (called once from AppProvider when ref changes) ---
     _subscribe: (
@@ -28,6 +30,7 @@ export const useCategoryStore = create<CategoryStore>((set, get) => {
 
     return {
         categories: DEFAULT_CATEGORIES,
+        categoryLimits: {},
 
         // Called from AppProvider whenever the Firestore document ref changes.
         // Listens in real time and updates the categories list.
@@ -37,7 +40,7 @@ export const useCategoryStore = create<CategoryStore>((set, get) => {
 
             // No ref means the user is logged out — reset to defaults
             if (!ref) {
-                set({ categories: DEFAULT_CATEGORIES });
+                set({ categories: DEFAULT_CATEGORIES, categoryLimits: {} });
                 return () => {};
             }
 
@@ -46,6 +49,7 @@ export const useCategoryStore = create<CategoryStore>((set, get) => {
                     categories: snap.exists()
                         ? (snap.data().list ?? DEFAULT_CATEGORIES)
                         : DEFAULT_CATEGORIES,
+                    categoryLimits: snap.exists() ? (snap.data().limits ?? {}) : {},
                 });
             });
 
@@ -71,7 +75,28 @@ export const useCategoryStore = create<CategoryStore>((set, get) => {
                 console.error('Failed to remove category', err);
                 _showToast('save_error');
             });
+            const { [name]: _removed, ...rest } = get().categoryLimits;
+            if (name in get().categoryLimits) {
+                await saveCategoryLimits(_ref, rest).catch((err) => {
+                    console.error('Failed to remove category limit', err);
+                });
+            }
             return true;
+        },
+
+        // Set (or clear, with null) a monthly spending limit for a category
+        setCategoryLimit: async (name, amount) => {
+            if (!_ref) return;
+            const next = { ...get().categoryLimits };
+            if (amount === null || !Number.isFinite(amount) || amount <= 0) {
+                delete next[name];
+            } else {
+                next[name] = amount;
+            }
+            await saveCategoryLimits(_ref, next).catch((err) => {
+                console.error('Failed to save category limit', err);
+                _showToast('save_error');
+            });
         },
     };
 });

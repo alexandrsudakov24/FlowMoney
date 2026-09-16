@@ -3,6 +3,8 @@ import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { getCatLabel } from '../../utils/getCatLabel';
 import { useModalA11y } from '../../hooks/useModalA11y';
+import { currencySymbols } from '../../constants/currency';
+import BudgetLimitModal from './BudgetLimitModal';
 import styles from './CategoryModal.module.css';
 import modalStyles from './SettingsModal.module.css';
 
@@ -14,13 +16,17 @@ interface Props {
 }
 
 export default function CategoryModal({ isOpen, onClose }: Props) {
-    const { categories, addCategory, removeCategory, expenses } = useApp();
+    const { categories, addCategory, removeCategory, expenses, categoryLimits, setCategoryLimit, currency } = useApp();
     const { t } = useLanguage();
     const [input, setInput] = useState('');
     const [error, setError] = useState('');
     const [saved, setSaved] = useState(false);
     const savedTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
     const modalRef = useModalA11y(isOpen, onClose);
+    const symbol = currencySymbols[currency];
+
+    // Which category's "set limit" modal is currently open, if any.
+    const [limitModalCat, setLimitModalCat] = useState<string | null>(null);
 
     useEffect(() => () => clearTimeout(savedTimeout.current), []);
 
@@ -85,21 +91,34 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
                             const inUse = expenses.some(e => e.category === cat);
                             const count = usageMap[cat] || 0;
                             const cantDelete = isDefault || inUse;
+                            const limit = categoryLimits[cat];
                             return (
                                 <li key={cat} className={styles.item}>
-                                    <span className={styles.name}>
-                                        {getCatLabel(cat, t)}
-                                        {count > 0 && <span className={styles.count}>{count}</span>}
-                                    </span>
-                                    <button
-                                        className={styles.removeBtn}
-                                        onClick={() => handleRemove(cat)}
-                                        disabled={cantDelete}
-                                        title={isDefault ? t('category_default') : inUse ? t('category_in_use') : ''}
-                                        aria-label={`${t('delete')}: ${getCatLabel(cat, t)}`}
-                                    >
-                                        ✕
-                                    </button>
+                                    <div className={styles.itemRow}>
+                                        <span className={styles.name}>
+                                            {getCatLabel(cat, t)}
+                                            {count > 0 && <span className={styles.count}>{count}</span>}
+                                        </span>
+                                        <button
+                                            className={styles.removeBtn}
+                                            onClick={() => handleRemove(cat)}
+                                            disabled={cantDelete}
+                                            title={isDefault ? t('category_default') : inUse ? t('category_in_use') : ''}
+                                            aria-label={`${t('delete')}: ${getCatLabel(cat, t)}`}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                    <div className={styles.limitRow}>
+                                        <span className={styles.limitLabel}>{t('monthly_limit')}</span>
+                                        <button
+                                            type="button"
+                                            className={limit ? styles.limitValueBtn : styles.setLimitBtn}
+                                            onClick={() => setLimitModalCat(cat)}
+                                        >
+                                            {limit ? `${limit.toFixed(2)} ${symbol}` : t('set_limit')}
+                                        </button>
+                                    </div>
                                 </li>
                             );
                         })}
@@ -111,6 +130,16 @@ export default function CategoryModal({ isOpen, onClose }: Props) {
                     </button>
                 </div>
             </div>
+            {limitModalCat && (
+                <BudgetLimitModal
+                    isOpen={true}
+                    category={limitModalCat}
+                    currentLimit={categoryLimits[limitModalCat]}
+                    symbol={symbol}
+                    onClose={() => setLimitModalCat(null)}
+                    onConfirm={(amount) => setCategoryLimit(limitModalCat, amount)}
+                />
+            )}
         </>
     );
 }

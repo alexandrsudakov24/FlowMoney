@@ -1,0 +1,82 @@
+.section {
+    margin-top: 24px;
+    animation: fadeIn 0.3s ease;
+}
+
+.title {
+    margin: 0 0 12px 0;
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--text);
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+}
+
+.row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rowHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--font-size-sm);
+}
+
+.name {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.amount {
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs);
+}
+
+.amountExceeded {
+    color: var(--danger);
+    font-weight: 600;
+    font-size: var(--font-size-xs);
+}
+
+.track {
+    height: 8px;
+    border-radius: 99px;
+    background: var(--muted-bg);
+    overflow: hidden;
+}
+
+.fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #22c55e, #15803d);
+    transition: width 0.4s ease;
+}
+
+.fillExceeded {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #ef4444, #991b1b);
+    transition: width 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

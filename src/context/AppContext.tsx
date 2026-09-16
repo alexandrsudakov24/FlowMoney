@@ -34,6 +34,8 @@ type AppContextType = {
     categories: string[];
     addCategory: (name: string) => Promise<void>;
     removeCategory: (name: string) => Promise<boolean>;
+    categoryLimits: Record<string, number>;
+    setCategoryLimit: (name: string, amount: number | null) => Promise<void>;
     insightsDoc: InsightsDoc | null;
     insightsLoading: boolean;
     insightsGenerating: boolean;
@@ -65,7 +67,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const { _subscribe, expenses, loading, addExpense, updateExpense, deleteExpense, clearAll } =
         useExpenseStore();
 
-    const { categories, addCategory, removeCategory, _subscribe: subscribeCategories } =
+    const { categories, addCategory, removeCategory, categoryLimits, setCategoryLimit, _subscribe: subscribeCategories } =
         useCategoryStore();
 
     const {
@@ -134,7 +136,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             expenses, activeExpenses, scheduledExpenses, loading, addExpense, updateExpense, deleteExpense, clearAll,
             currency, changeCurrency,
             accentColor, changeAccentColor,
-            categories, addCategory, removeCategory,
+            categories, addCategory, removeCategory, categoryLimits, setCategoryLimit,
             insightsDoc, insightsLoading, insightsGenerating, regenerateInsights,
             rolloverMode, updateRolloverMode, monthlyRollover,
         }}>
