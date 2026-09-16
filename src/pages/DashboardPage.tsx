@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import { ExpenseList, Charts, ExpenseFilters, SmartSearchBar } from '../components/expenses';
 import type { FilterState } from '../components/expenses';
-import { InsightsPanel } from '../components/insights';
+import { InsightsPanel, MoneyChat } from '../components/insights';
 import BudgetProgress from '../components/budget/BudgetProgress';
 import { Spinner } from '../components/ui';
 import { TransactionsModal } from '../components/modals';
@@ -213,6 +213,7 @@ export default function DashboardPage() {
 
             <div className={styles.insightsArea}>
                 <InsightsPanel />
+                <MoneyChat />
             </div>
 
             <BudgetProgress

@@ -3,6 +3,7 @@ import type { Expense } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
 import { useToast } from '../../context/ToastContext';
 import { getCatLabel } from '../../utils/getCatLabel';
+import BudgetTipsPanel from './BudgetTipsPanel';
 import styles from './BudgetProgress.module.css';
 
 interface Props {
@@ -69,6 +70,7 @@ export default function BudgetProgress({ monthExpenses, monthStr, categoryLimits
                     </div>
                 ))}
             </div>
+            <BudgetTipsPanel />
         </div>
     );
 }

@@ -1,19 +1,20 @@
 import { createContext, useContext, useEffect, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import type { UpdateData } from 'firebase/firestore';
-import type { Expense, InsightsDoc, RolloverMode } from '../types';
+import type { Expense, InsightsDoc, RolloverMode, BudgetTipsDoc } from '../types';
 import { useAuth } from './AuthContext';
 import { useFamily } from './FamilyContext';
 import { useToast } from './ToastContext';
 import { useLanguage } from './LanguageContext';
 import type { TranslationKeys, Language } from '../i18n';
-import { useExpensesRef, useCategoriesRef, useInsightsRef, useRolloverRef } from '../hooks/useFirestoreRef';
+import { useExpensesRef, useCategoriesRef, useInsightsRef, useRolloverRef, useBudgetTipsRef } from '../hooks/useFirestoreRef';
 import { useExpenseStore } from '../stores/expenseStore';
 import { useCurrencyStore } from '../stores/currencyStore';
 import { useAccentColorStore, type AccentColor } from '../stores/accentColorStore';
 import { useCategoryStore } from '../stores/categoryStore';
 import { useInsightsStore } from '../stores/insightsStore';
 import { useRolloverStore } from '../stores/rolloverStore';
+import { useBudgetTipsStore } from '../stores/budgetTipsStore';
 import { computeMonthlyRollover, type MonthlyRollover } from '../utils/computeMonthlyRollover';
 
 export const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Dividends', 'Gift', 'Other'];
@@ -43,6 +44,10 @@ type AppContextType = {
     rolloverMode: RolloverMode;
     updateRolloverMode: (mode: RolloverMode) => Promise<void>;
     monthlyRollover: MonthlyRollover;
+    budgetTipsDoc: BudgetTipsDoc | null;
+    budgetTipsLoading: boolean;
+    budgetTipsGenerating: boolean;
+    regenerateBudgetTips: (expenses: Expense[], categoryLimits: Record<string, number>, language: Language) => Promise<void>;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -63,6 +68,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const categoriesRef = useCategoriesRef(userId, familyId, hasAccess);
     const insightsRef = useInsightsRef(userId, familyId, hasAccess);
     const rolloverRef = useRolloverRef(userId, familyId, hasAccess);
+    const budgetTipsRef = useBudgetTipsRef(userId, familyId, hasAccess);
 
     const { _subscribe, expenses, loading, addExpense, updateExpense, deleteExpense, clearAll } =
         useExpenseStore();
@@ -83,6 +89,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const { accentColor, changeAccentColor, _init: initAccentColor } = useAccentColorStore();
 
     const { rolloverMode, updateRolloverMode, _subscribe: subscribeRollover } = useRolloverStore();
+
+    const {
+        doc: budgetTipsDoc,
+        loading: budgetTipsLoading,
+        generating: budgetTipsGenerating,
+        regenerate: regenerateBudgetTips,
+        _subscribe: subscribeBudgetTips,
+    } = useBudgetTipsStore();
 
     const activeExpenses = useMemo(() => expenses.filter((e) => !e.scheduled), [expenses]);
     const scheduledExpenses = useMemo(() => expenses.filter((e) => e.scheduled), [expenses]);
@@ -131,6 +145,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         return unsub;
     }, [rolloverRef, showToast]);
 
+    // Wire Firestore budget tips document into the budget tips store
+    useEffect(() => {
+        const unsub = subscribeBudgetTips(budgetTipsRef, user, showToast);
+        return unsub;
+    }, [budgetTipsRef, user, showToast]);
+
     return (
         <AppContext.Provider value={{
             expenses, activeExpenses, scheduledExpenses, loading, addExpense, updateExpense, deleteExpense, clearAll,
@@ -139,6 +159,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             categories, addCategory, removeCategory, categoryLimits, setCategoryLimit,
             insightsDoc, insightsLoading, insightsGenerating, regenerateInsights,
             rolloverMode, updateRolloverMode, monthlyRollover,
+            budgetTipsDoc, budgetTipsLoading, budgetTipsGenerating, regenerateBudgetTips,
         }}>
             {children}
         </AppContext.Provider>

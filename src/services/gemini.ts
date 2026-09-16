@@ -1,5 +1,5 @@
 import type { Language } from '../i18n';
-import type { Insight } from '../types';
+import type { Insight, BudgetTip } from '../types';
 
 const MODEL_FALLBACKS = ['gemini-3.6-flash', 'gemini-flash-latest', 'gemini-3.8-flash'];
 const ENDPOINT_TEMPLATE = 'https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent';
@@ -22,7 +22,95 @@ const LANGUAGE_NAMES: Record<Language, string> = {
     he: 'Hebrew',
 };
 
-const RESPONSE_SCHEMA = {
+interface GeminiApiResponse {
+    promptFeedback?: { blockReason?: string };
+    candidates?: Array<{
+        finishReason?: string;
+        content?: { parts?: Array<{ text?: string }> };
+    }>;
+}
+
+// Shared request/retry/error-mapping logic for every structured-output call
+// this app makes to Gemini. Callers only supply the prompt + JSON schema and
+// get back the model's raw parsed JSON (already model-fallback-retried).
+async function callGeminiJson(prompt: string, schema: object): Promise<unknown> {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (!apiKey) {
+        throw new GeminiRequestError('no_api_key');
+    }
+
+    let lastError: GeminiRequestError | null = null;
+
+    for (const model of MODEL_FALLBACKS) {
+        const endpoint = ENDPOINT_TEMPLATE.replace('{MODEL}', model);
+
+        let response: Response;
+        try {
+            response = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-goog-api-key': apiKey },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        responseMimeType: 'application/json',
+                        responseSchema: schema,
+                    },
+                }),
+            });
+        } catch {
+            lastError = new GeminiRequestError('network_error');
+            continue;
+        }
+
+        if (!response.ok) {
+            if (response.status === 429) {
+                throw new GeminiRequestError('rate_limited');
+            }
+
+            if (response.status === 400 || response.status === 403 || response.status === 404) {
+                lastError = new GeminiRequestError('invalid_api_key');
+                if (model !== MODEL_FALLBACKS[MODEL_FALLBACKS.length - 1]) {
+                    continue;
+                }
+                break;
+            }
+
+            if ((response.status === 503 || response.status === 500) && model !== MODEL_FALLBACKS[MODEL_FALLBACKS.length - 1]) {
+                continue;
+            }
+
+            lastError = new GeminiRequestError('network_error');
+            break;
+        }
+
+        let data: GeminiApiResponse;
+        try {
+            data = await response.json();
+        } catch {
+            throw new GeminiRequestError('parse_error');
+        }
+
+        const candidate = data.candidates?.[0];
+        if (data.promptFeedback?.blockReason || candidate?.finishReason === 'SAFETY') {
+            throw new GeminiRequestError('blocked');
+        }
+
+        const text = candidate?.content?.parts?.[0]?.text;
+        if (!text) {
+            throw new GeminiRequestError('parse_error');
+        }
+
+        try {
+            return JSON.parse(text);
+        } catch {
+            throw new GeminiRequestError('parse_error');
+        }
+    }
+
+    throw lastError ?? new GeminiRequestError('network_error');
+}
+
+const INSIGHTS_RESPONSE_SCHEMA = {
     type: 'object',
     properties: {
         insights: {
@@ -41,7 +129,7 @@ const RESPONSE_SCHEMA = {
     required: ['insights'],
 };
 
-function buildPrompt(stats: unknown, language: Language): string {
+function buildInsightsPrompt(stats: unknown, language: Language): string {
     return [
         'You are a personal finance assistant. Based on the following spending statistics (JSON),',
         'generate 3 to 6 short, specific insights a user would find useful',
@@ -56,12 +144,12 @@ function buildPrompt(stats: unknown, language: Language): string {
     ].join('\n');
 }
 
-interface GeminiApiResponse {
-    promptFeedback?: { blockReason?: string };
-    candidates?: Array<{
-        finishReason?: string;
-        content?: { parts?: Array<{ text?: string }> };
-    }>;
+export async function generateInsights(stats: unknown, language: Language): Promise<Insight[]> {
+    const parsed = await callGeminiJson(buildInsightsPrompt(stats, language), INSIGHTS_RESPONSE_SCHEMA) as { insights?: Insight[] };
+    if (!Array.isArray(parsed.insights)) {
+        throw new GeminiRequestError('parse_error');
+    }
+    return parsed.insights;
 }
 
 export interface SmartSearchFilter {
@@ -112,162 +200,80 @@ export async function parseSmartSearchQuery(
     categories: string[],
     todayISO: string,
 ): Promise<SmartSearchFilter> {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey) {
-        throw new GeminiRequestError('no_api_key');
-    }
-
-    let lastError: GeminiRequestError | null = null;
-
-    for (const model of MODEL_FALLBACKS) {
-        const endpoint = ENDPOINT_TEMPLATE.replace('{MODEL}', model);
-
-        let response: Response;
-        try {
-            response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-goog-api-key': apiKey },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: buildSearchPrompt(query, categories, todayISO) }] }],
-                    generationConfig: {
-                        responseMimeType: 'application/json',
-                        responseSchema: buildSearchSchema(categories),
-                    },
-                }),
-            });
-        } catch {
-            lastError = new GeminiRequestError('network_error');
-            continue;
-        }
-
-        if (!response.ok) {
-            if (response.status === 429) {
-                throw new GeminiRequestError('rate_limited');
-            }
-
-            if (response.status === 400 || response.status === 403 || response.status === 404) {
-                lastError = new GeminiRequestError('invalid_api_key');
-                if (model !== MODEL_FALLBACKS[MODEL_FALLBACKS.length - 1]) {
-                    continue;
-                }
-                break;
-            }
-
-            if ((response.status === 503 || response.status === 500) && model !== MODEL_FALLBACKS[MODEL_FALLBACKS.length - 1]) {
-                continue;
-            }
-
-            lastError = new GeminiRequestError('network_error');
-            break;
-        }
-
-        let data: GeminiApiResponse;
-        try {
-            data = await response.json();
-        } catch {
-            throw new GeminiRequestError('parse_error');
-        }
-
-        const candidate = data.candidates?.[0];
-        if (data.promptFeedback?.blockReason || candidate?.finishReason === 'SAFETY') {
-            throw new GeminiRequestError('blocked');
-        }
-
-        const text = candidate?.content?.parts?.[0]?.text;
-        if (!text) {
-            throw new GeminiRequestError('parse_error');
-        }
-
-        try {
-            return JSON.parse(text) as SmartSearchFilter;
-        } catch {
-            throw new GeminiRequestError('parse_error');
-        }
-    }
-
-    throw lastError ?? new GeminiRequestError('network_error');
+    return await callGeminiJson(
+        buildSearchPrompt(query, categories, todayISO),
+        buildSearchSchema(categories),
+    ) as SmartSearchFilter;
 }
 
-export async function generateInsights(stats: unknown, language: Language): Promise<Insight[]> {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey) {
-        throw new GeminiRequestError('no_api_key');
+const BUDGET_TIPS_RESPONSE_SCHEMA = {
+    type: 'object',
+    properties: {
+        tips: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    category: { type: 'string' },
+                    message: { type: 'string' },
+                },
+                required: ['category', 'message'],
+            },
+        },
+    },
+    required: ['tips'],
+};
+
+function buildBudgetTipsPrompt(stats: unknown, language: Language): string {
+    return [
+        'You are a personal finance assistant. Based on the following JSON — this month\'s spending',
+        'so far against a user-set monthly limit, per category — write one short, specific,',
+        'actionable tip per category so the user stays within (or gets back within) their limit.',
+        'Reference concrete numbers where useful (e.g. a percentage to cut, or how much is left).',
+        'Keep each tip to one sentence. Only include categories that are present in the data.',
+        `Write every "message" in ${LANGUAGE_NAMES[language]}.`,
+        '',
+        'Data:',
+        JSON.stringify(stats),
+    ].join('\n');
+}
+
+export async function generateBudgetTips(stats: unknown, language: Language): Promise<BudgetTip[]> {
+    const parsed = await callGeminiJson(buildBudgetTipsPrompt(stats, language), BUDGET_TIPS_RESPONSE_SCHEMA) as { tips?: BudgetTip[] };
+    if (!Array.isArray(parsed.tips)) {
+        throw new GeminiRequestError('parse_error');
     }
+    return parsed.tips;
+}
 
-    let lastError: GeminiRequestError | null = null;
+const MONEY_CHAT_RESPONSE_SCHEMA = {
+    type: 'object',
+    properties: {
+        answer: { type: 'string', description: 'A short, direct answer to the user\'s question, in plain language.' },
+    },
+    required: ['answer'],
+};
 
-    for (const model of MODEL_FALLBACKS) {
-        const endpoint = ENDPOINT_TEMPLATE.replace('{MODEL}', model);
+function buildMoneyChatPrompt(question: string, stats: unknown, language: Language): string {
+    return [
+        'You are a personal finance assistant answering a question about the user\'s own transaction history.',
+        'You are given a JSON breakdown of their spending and income by month and category.',
+        'Answer using only this data. If it doesn\'t contain what\'s needed to answer, say so plainly',
+        'rather than guessing. Mention concrete numbers from the data when relevant. Keep the answer',
+        'to 1-3 short sentences.',
+        `Write the "answer" in ${LANGUAGE_NAMES[language]}.`,
+        '',
+        'Data (amounts are already in the user\'s chosen currency):',
+        JSON.stringify(stats),
+        '',
+        `Question: "${question}"`,
+    ].join('\n');
+}
 
-        let response: Response;
-        try {
-            response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-goog-api-key': apiKey },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: buildPrompt(stats, language) }] }],
-                    generationConfig: {
-                        responseMimeType: 'application/json',
-                        responseSchema: RESPONSE_SCHEMA,
-                    },
-                }),
-            });
-        } catch {
-            lastError = new GeminiRequestError('network_error');
-            continue;
-        }
-
-        if (!response.ok) {
-            if (response.status === 429) {
-                throw new GeminiRequestError('rate_limited');
-            }
-
-            if (response.status === 400 || response.status === 403 || response.status === 404) {
-                lastError = new GeminiRequestError('invalid_api_key');
-                if (model !== MODEL_FALLBACKS[MODEL_FALLBACKS.length - 1]) {
-                    continue;
-                }
-                break;
-            }
-
-            if ((response.status === 503 || response.status === 500) && model !== MODEL_FALLBACKS[MODEL_FALLBACKS.length - 1]) {
-                continue;
-            }
-
-            lastError = new GeminiRequestError('network_error');
-            break;
-        }
-
-        let data: GeminiApiResponse;
-        try {
-            data = await response.json();
-        } catch {
-            throw new GeminiRequestError('parse_error');
-        }
-
-        const candidate = data.candidates?.[0];
-        if (data.promptFeedback?.blockReason || candidate?.finishReason === 'SAFETY') {
-            throw new GeminiRequestError('blocked');
-        }
-
-        const text = candidate?.content?.parts?.[0]?.text;
-        if (!text) {
-            throw new GeminiRequestError('parse_error');
-        }
-
-        let parsed: { insights?: Insight[] };
-        try {
-            parsed = JSON.parse(text);
-        } catch {
-            throw new GeminiRequestError('parse_error');
-        }
-
-        if (!Array.isArray(parsed.insights)) {
-            throw new GeminiRequestError('parse_error');
-        }
-
-        return parsed.insights;
+export async function answerMoneyQuestion(question: string, stats: unknown, language: Language): Promise<string> {
+    const parsed = await callGeminiJson(buildMoneyChatPrompt(question, stats, language), MONEY_CHAT_RESPONSE_SCHEMA) as { answer?: string };
+    if (typeof parsed.answer !== 'string') {
+        throw new GeminiRequestError('parse_error');
     }
-
-    throw lastError ?? new GeminiRequestError('network_error');
+    return parsed.answer;
 }

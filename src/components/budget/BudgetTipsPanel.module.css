@@ -1,0 +1,83 @@
+.section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.title {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--text);
+}
+
+.regenerateBtn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: var(--font-size-xs);
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+    min-width: 110px;
+}
+
+.regenerateBtn:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.regenerateBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.cooldownHint {
+    display: block;
+    font-size: var(--font-size-xs);
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.tip {
+    padding: 10px 12px;
+    background: var(--muted-bg);
+    border-radius: var(--radius-md);
+}
+
+.tipCategory {
+    display: inline-block;
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+}
+
+.tipMessage {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--text);
+}
+
+.empty {
+    margin: 8px 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--muted);
+}

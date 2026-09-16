@@ -26,6 +26,14 @@ export function useInsightsRef(userId: string | null, familyId: string | null, h
     }, [hasAccess, userId, familyId]);
 }
 
+export function useBudgetTipsRef(userId: string | null, familyId: string | null, hasAccess: boolean) {
+    return useMemo(() => {
+        if (!hasAccess || !userId) return null;
+        if (familyId) return doc(db, 'families', familyId, 'settings', 'budgetTips');
+        return doc(db, 'users', userId, 'settings', 'budgetTips');
+    }, [hasAccess, userId, familyId]);
+}
+
 export function useRolloverRef(userId: string | null, familyId: string | null, hasAccess: boolean) {
     return useMemo(() => {
         if (!hasAccess || !userId) return null;
