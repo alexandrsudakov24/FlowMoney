@@ -4,6 +4,35 @@
   gap: 20px;
 }
 
+@media (min-width: 1024px) {
+  .form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .toggle,
+  .advancedToggle,
+  .advancedWrapper,
+  .formActions {
+    grid-column: 1 / -1;
+  }
+
+  .advancedInner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .advancedInner .hint {
+    grid-column: 1 / -1;
+  }
+
+  .advancedInner label:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
 .toggle {
   position: relative;
   display: flex;

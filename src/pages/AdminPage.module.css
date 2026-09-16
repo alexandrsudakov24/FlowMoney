@@ -183,6 +183,32 @@
     cursor: not-allowed;
 }
 
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1000px;
+    }
+
+    .item {
+        padding: 10px 16px;
+    }
+
+    .info {
+        display: grid;
+        grid-template-columns: 200px 1fr 160px 120px;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .uid,
+    .tag {
+        opacity: 1;
+    }
+
+    .feedbackMessage {
+        grid-column: 1 / -1;
+    }
+}
+
 .denied {
     display: flex;
     align-items: center;

@@ -9,6 +9,58 @@
     }
 }
 
+@media (min-width: 1024px) {
+    .dashboard {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        column-gap: 24px;
+        grid-template-areas:
+            "title title"
+            "balance balance"
+            "summary insights"
+            "filters chart"
+            "categoryTotal chart"
+            "list chart";
+        align-items: start;
+    }
+
+    .title {
+        grid-area: title;
+    }
+
+    .balanceCard {
+        grid-area: balance;
+    }
+
+    .summary {
+        grid-area: summary;
+    }
+
+    .insightsArea {
+        grid-area: insights;
+    }
+
+    .filtersArea {
+        grid-area: filters;
+    }
+
+    .categoryTotalCard {
+        grid-area: categoryTotal;
+    }
+
+    .listArea {
+        grid-area: list;
+    }
+
+    .chartsSection {
+        grid-area: chart;
+        margin-top: 0;
+        position: sticky;
+        top: 24px;
+        align-self: start;
+    }
+}
+
 .title {
     margin: 0 0 24px 0;
     font-size: var(--font-size-2xl);

@@ -29,6 +29,12 @@ const IconProfile = () => (
     </svg>
 );
 
+const IconAdmin = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2 4 5v6c0 5 3.4 8.7 8 11 4.6-2.3 8-6 8-11V5l-8-3Z" />
+    </svg>
+);
+
 const NAV_ITEMS = [
     { path: '/', Icon: IconDashboard, labelKey: 'dashboard' as const },
     { path: '/add', Icon: IconAdd, labelKey: 'add' as const },
@@ -76,6 +82,43 @@ export default function Navbar() {
 
     return (
         <>
+            {/* Desktop Sidebar */}
+            {isAuthenticatedPage && (
+                <nav className={styles.sidebarNav}>
+                    <Link to="/" className={styles.sidebarBrand}>
+                        <img src="/icon.png" className={styles.logo} alt="" />
+                        FlowMoney
+                    </Link>
+
+                    <div className={styles.sidebarLinks}>
+                        {NAV_ITEMS.map(({ path, Icon, labelKey }) => (
+                            <Link
+                                key={path}
+                                to={path}
+                                className={`${styles.sidebarItem} ${isActive(path) ? styles.sidebarItemActive : ''}`}
+                            >
+                                <Icon />
+                                <span>{t(labelKey)}</span>
+                            </Link>
+                        ))}
+                        {role === 'admin' && (
+                            <Link
+                                to="/admin"
+                                className={`${styles.sidebarItem} ${isActive('/admin') ? styles.sidebarItemActive : ''}`}
+                            >
+                                <IconAdmin />
+                                <span>{t('admin')}</span>
+                            </Link>
+                        )}
+                    </div>
+
+                    <Link to="/profile" className={styles.sidebarUser}>
+                        <Avatar name={user?.name || ''} photoURL={user?.photoURL} size="medium" />
+                        <span className={styles.sidebarUserName}>{user?.name}</span>
+                    </Link>
+                </nav>
+            )}
+
             {/* Desktop Header */}
             <header className={`${styles.navbar} ${styles.desktopNav}`}>
                 <Link to="/" className={styles.brand}>

@@ -339,6 +339,15 @@ button.secondary:hover {
 /* ============================================
     RESPONSIVE DESIGN
     ============================================ */
+@media (min-width: 1024px) {
+    .app {
+        flex-direction: row;
+        align-items: stretch;
+    }
+    .container {
+        margin: 0;
+    }
+}
 @media (max-width: 900px) {
     .summary {
         flex-direction: column;

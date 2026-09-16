@@ -136,6 +136,22 @@
   box-shadow: var(--shadow-md);
 }
 
+@media (min-width: 1024px) {
+  .expenseItem {
+    padding: 10px 14px;
+  }
+
+  .actions {
+    opacity: 0;
+    transition: opacity 0.12s ease;
+  }
+
+  .expenseItem:hover .actions,
+  .expenseItem:focus-within .actions {
+    opacity: 1;
+  }
+}
+
 @media (max-width: 360px) {
   .expenseItem {
     padding: 10px 12px;

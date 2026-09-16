@@ -95,6 +95,23 @@ export default function ProfilePage() {
 
     const hasAccount = !!user?.email;
 
+    type ProfileSection = 'stats' | 'family' | 'settings' | 'scheduled' | 'export' | 'contact' | 'share' | 'about';
+    const [activeSection, setActiveSection] = useState<ProfileSection>('stats');
+
+    const sectionNavItems: { key: ProfileSection; labelKey: TranslationKeys }[] = [
+        { key: 'stats', labelKey: 'stats' },
+        ...(hasAccount ? [{ key: 'family' as const, labelKey: 'family' as const }] : []),
+        { key: 'settings', labelKey: 'settings' },
+        { key: 'scheduled', labelKey: 'scheduled_payments' },
+        { key: 'export', labelKey: 'data_export' },
+        { key: 'contact', labelKey: 'contact_developer' },
+        { key: 'share', labelKey: 'share_app' },
+        { key: 'about', labelKey: 'about_app' },
+    ];
+
+    const sectionClass = (key: ProfileSection) =>
+        `${styles.block} ${activeSection !== key ? styles.sectionInactive : ''}`;
+
     return (
         <div className={styles.container}>
             <div className={styles.profileSection}>
@@ -118,7 +135,22 @@ export default function ProfilePage() {
                 </div>
             )}
 
-            <div className={styles.block}>
+            <div className={styles.layout}>
+            <nav className={styles.sectionNav}>
+                {sectionNavItems.map(({ key, labelKey }) => (
+                    <button
+                        key={key}
+                        type="button"
+                        className={`${styles.sectionNavItem} ${activeSection === key ? styles.sectionNavItemActive : ''}`}
+                        onClick={() => setActiveSection(key)}
+                    >
+                        {t(labelKey)}
+                    </button>
+                ))}
+            </nav>
+            <div className={styles.sectionContent}>
+
+            <div className={sectionClass('stats')}>
                 <h3 className={styles.blockTitle}>{t('stats')}</h3>
                 <div className={styles.statRow}>
                     <span>{t('transactions')}</span>
@@ -145,7 +177,7 @@ export default function ProfilePage() {
             </div>
 
             {hasAccount && (
-                <div className={styles.block}>
+                <div className={sectionClass('family')}>
                     <h3 className={styles.blockTitle}>{t('family')}</h3>
                     <div className={styles.settingRow}>
                         <div>
@@ -161,7 +193,7 @@ export default function ProfilePage() {
                 </div>
             )}
 
-            <div className={styles.block}>
+            <div className={sectionClass('settings')}>
                 <h3 className={styles.blockTitle}>{t('settings')}</h3>
                 <div className={styles.settingRow}>
                     <span>{t('theme')}</span>
@@ -199,7 +231,7 @@ export default function ProfilePage() {
                 </div>
             </div>
 
-            <div className={styles.block}>
+            <div className={sectionClass('scheduled')}>
                 <h3 className={styles.blockTitle}>{t('scheduled_payments')}</h3>
                 <button className={styles.exportBtn} onClick={() => setScheduledOpen(true)}>
                     {t('change')}
@@ -209,32 +241,35 @@ export default function ProfilePage() {
                 </button>
             </div>
 
-            <div className={styles.block}>
+            <div className={sectionClass('export')}>
                 <h3 className={styles.blockTitle}>{t('data_export')}</h3>
                 <button className={styles.exportBtn} onClick={handleExport}>
                     {t('export_json')}
                 </button>
             </div>
 
-            <div className={styles.block}>
+            <div className={sectionClass('contact')}>
                 <h3 className={styles.blockTitle}>{t('contact_developer')}</h3>
                 <button className={styles.exportBtn} onClick={() => setFeedbackOpen(true)}>
                     {t('contact_developer')}
                 </button>
             </div>
 
-            <div className={styles.block}>
+            <div className={sectionClass('share')}>
                 <h3 className={styles.blockTitle}>{t('share_app')}</h3>
                 <button className={styles.exportBtn} onClick={handleShare}>
                     {t('share_app')}
                 </button>
             </div>
 
-            <div className={styles.block}>
+            <div className={sectionClass('about')}>
                 <h3 className={styles.blockTitle}>{t('about_app')}</h3>
                 <button className={styles.exportBtn} onClick={() => setAboutOpen(true)}>
                     {t('about_app')}
                 </button>
+            </div>
+
+            </div>
             </div>
 
             {role === 'admin' && (

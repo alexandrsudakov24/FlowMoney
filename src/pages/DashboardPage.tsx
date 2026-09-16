@@ -204,15 +204,19 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            <InsightsPanel />
+            <div className={styles.insightsArea}>
+                <InsightsPanel />
+            </div>
 
-            {expenses.length > 0 && (
-                <ExpenseFilters
-                    expenses={expenses}
-                    filters={filters}
-                    onChange={setFilters}
-                />
-            )}
+            <div className={styles.filtersArea}>
+                {expenses.length > 0 && (
+                    <ExpenseFilters
+                        expenses={expenses}
+                        filters={filters}
+                        onChange={setFilters}
+                    />
+                )}
+            </div>
 
             {filters.categories.length > 0 && (
                 <div
@@ -246,36 +250,38 @@ export default function DashboardPage() {
                 </div>
             )}
 
-            {filters.categories.length > 0 ? (
-                <div className={styles.clearFiltersCard}>
-                    <button
-                        type="button"
-                        className={styles.clearFiltersBtn}
-                        onClick={() => setFilters((f) => ({ ...f, categories: [] }))}
-                    >
-                        {t('clear_filters')}
-                    </button>
-                </div>
-            ) : (
-                <>
-                    {filteredExpenses.length > 0 && (
-                        <h2 className={styles.recentTitle}>
-                            {t('recent_transactions')}
-                            {hasActiveFilters && filteredExpenses.length !== expenses.length && (
-                                <span className={styles.countBadge}>
-                                    {filteredExpenses.length} / {expenses.length}
-                                </span>
-                            )}
-                        </h2>
-                    )}
+            <div className={styles.listArea}>
+                {filters.categories.length > 0 ? (
+                    <div className={styles.clearFiltersCard}>
+                        <button
+                            type="button"
+                            className={styles.clearFiltersBtn}
+                            onClick={() => setFilters((f) => ({ ...f, categories: [] }))}
+                        >
+                            {t('clear_filters')}
+                        </button>
+                    </div>
+                ) : (
+                    <>
+                        {filteredExpenses.length > 0 && (
+                            <h2 className={styles.recentTitle}>
+                                {t('recent_transactions')}
+                                {hasActiveFilters && filteredExpenses.length !== expenses.length && (
+                                    <span className={styles.countBadge}>
+                                        {filteredExpenses.length} / {expenses.length}
+                                    </span>
+                                )}
+                            </h2>
+                        )}
 
-                    {expenses.length > 0 && filteredExpenses.length === 0 ? (
-                        <div className={styles.noResults}>{t('filter_no_results')}</div>
-                    ) : (
-                        <ExpenseList expenses={filteredExpenses} />
-                    )}
-                </>
-            )}
+                        {expenses.length > 0 && filteredExpenses.length === 0 ? (
+                            <div className={styles.noResults}>{t('filter_no_results')}</div>
+                        ) : (
+                            <ExpenseList expenses={filteredExpenses} />
+                        )}
+                    </>
+                )}
+            </div>
 
             <TransactionsModal
                 isOpen={openSummaryModal === 'today'}
