@@ -14,6 +14,10 @@ if (import.meta.env.DEV) {
 }
 
 if (import.meta.env.PROD) {
+    import('./utils/staleAppRecovery').then(({ installStaleAppRecovery }) => installStaleAppRecovery());
+}
+
+if (import.meta.env.PROD) {
     import('virtual:pwa-register').then(({ registerSW }) => {
         const updateSW = registerSW({
             immediate: true,

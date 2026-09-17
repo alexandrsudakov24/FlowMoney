@@ -1,5 +1,6 @@
 import { Component, type ReactNode } from 'react';
 import styles from './ErrorBoundary.module.css';
+import { clearAppCaches } from '../../utils/staleAppRecovery';
 
 interface Props {
     children: ReactNode;
@@ -40,7 +41,9 @@ export default class ErrorBoundary extends Component<Props, State> {
                     )}
                     <button
                         className={styles.btn}
-                        onClick={() => window.location.reload()}
+                        onClick={() => {
+                            clearAppCaches().finally(() => window.location.reload());
+                        }}
                     >
                         Reload page
                     </button>
