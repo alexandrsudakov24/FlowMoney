@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useCallback, useMemo } from 'react';
 import type { ReactNode } from 'react';
-import type { UpdateData } from 'firebase/firestore';
-import type { Expense, InsightsDoc, RolloverMode, BudgetTipsDoc } from '../types';
+import type { Expense, ExpenseUpdate, InsightsDoc, RolloverMode, BudgetTipsDoc } from '../types';
 import { useAuth } from './AuthContext';
 import { useFamily } from './FamilyContext';
 import { useToast } from './ToastContext';
@@ -16,6 +15,7 @@ import { useInsightsStore } from '../stores/insightsStore';
 import { useRolloverStore } from '../stores/rolloverStore';
 import { useBudgetTipsStore } from '../stores/budgetTipsStore';
 import { computeMonthlyRollover, type MonthlyRollover } from '../utils/computeMonthlyRollover';
+import * as feedbackSvc from '../services/feedback';
 
 export const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Dividends', 'Gift', 'Other'];
 
@@ -25,7 +25,7 @@ type AppContextType = {
     scheduledExpenses: Expense[];
     loading: boolean;
     addExpense: (e: Omit<Expense, 'id'>) => Promise<void>;
-    updateExpense: (id: string, data: UpdateData<Expense>) => Promise<void>;
+    updateExpense: (id: string, data: ExpenseUpdate) => Promise<void>;
     deleteExpense: (id: string) => Promise<void>;
     clearAll: () => Promise<void>;
     currency: string;
@@ -48,6 +48,7 @@ type AppContextType = {
     budgetTipsLoading: boolean;
     budgetTipsGenerating: boolean;
     regenerateBudgetTips: (expenses: Expense[], categoryLimits: Record<string, number>, language: Language) => Promise<void>;
+    sendFeedback: (message: string) => Promise<void>;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -151,6 +152,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         return unsub;
     }, [budgetTipsRef, user, showToast]);
 
+    // Sends feedback on behalf of the signed-in user
+    const sendFeedback = useCallback(async (message: string) => {
+        if (!user) throw new Error('Cannot send feedback without a signed-in user');
+        await feedbackSvc.sendFeedback(user, message);
+    }, [user]);
+
     return (
         <AppContext.Provider value={{
             expenses, activeExpenses, scheduledExpenses, loading, addExpense, updateExpense, deleteExpense, clearAll,
@@ -160,6 +167,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             insightsDoc, insightsLoading, insightsGenerating, regenerateInsights,
             rolloverMode, updateRolloverMode, monthlyRollover,
             budgetTipsDoc, budgetTipsLoading, budgetTipsGenerating, regenerateBudgetTips,
+            sendFeedback,
         }}>
             {children}
         </AppContext.Provider>

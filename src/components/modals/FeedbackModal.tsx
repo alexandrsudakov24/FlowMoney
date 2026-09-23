@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import styles from './SettingsModal.module.css';
 import { useAuth } from '../../context/AuthContext';
+import { useApp } from '../../context/AppContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useToast } from '../../context/ToastContext';
-import { sendFeedback } from '../../services/feedback';
 import { useModalA11y } from '../../hooks/useModalA11y';
 
 interface FeedbackModalProps {
@@ -13,6 +13,7 @@ interface FeedbackModalProps {
 
 export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     const { user } = useAuth();
+    const { sendFeedback } = useApp();
     const { t } = useLanguage();
     const { showToast } = useToast();
     const [message, setMessage] = useState('');
@@ -25,7 +26,7 @@ export default function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
         if (!user || !message.trim()) return;
         setSending(true);
         try {
-            await sendFeedback(user, message.trim());
+            await sendFeedback(message.trim());
             showToast(t('feedback_sent'), 'success');
             setMessage('');
             onClose();

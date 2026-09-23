@@ -5,3 +5,4 @@ export * from './feedback';
 export * from './insight';
 export * from './rollover';
 export * from './budgetTip';
+export * from './admin';

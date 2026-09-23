@@ -1,34 +1,22 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { db } from '../firebase';
-import {
-    collection, getDocs, deleteDoc, doc,
-    query, limit, startAfter, orderBy, type QueryDocumentSnapshot, type DocumentData,
-} from 'firebase/firestore';
+import { fetchUsersPage, deleteUserData, type UsersCursor } from '../services/admin';
+import { fetchFeedback, deleteFeedback } from '../services/feedback';
 import { ConfirmModal, Spinner } from '../components/ui';
-import type { Feedback } from '../types';
+import type { AdminUserRecord, Feedback } from '../types';
 import styles from './AdminPage.module.css';
 
 const PAGE_SIZE = 20;
 
-interface UserRecord {
-    id: string;
-    name: string;
-    email: string;
-    language?: string;
-    familyId?: string;
-    createdAt?: number;
-}
-
 export default function AdminPage() {
     const { user, role } = useAuth();
     const { t } = useLanguage();
-    const [users, setUsers] = useState<UserRecord[]>([]);
+    const [users, setUsers] = useState<AdminUserRecord[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [hasMore, setHasMore] = useState(false);
-    const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+    const [lastDoc, setLastDoc] = useState<UsersCursor | null>(null);
     const [deletingId, setDeletingId] = useState<string | null>(null);
     const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
@@ -38,18 +26,11 @@ export default function AdminPage() {
     const [deletingFeedbackId, setDeletingFeedbackId] = useState<string | null>(null);
     const [confirmDeleteFeedbackId, setConfirmDeleteFeedbackId] = useState<string | null>(null);
 
-    const fetchPage = useCallback(async (after: QueryDocumentSnapshot<DocumentData> | null = null) => {
-        const q = after
-            ? query(collection(db, 'users'), limit(PAGE_SIZE), startAfter(after))
-            : query(collection(db, 'users'), limit(PAGE_SIZE));
-        const snap = await getDocs(q);
-        const list: UserRecord[] = snap.docs.map((d) => ({
-            id: d.id,
-            ...(d.data() as Omit<UserRecord, 'id'>),
-        }));
-        setUsers((prev) => after ? [...prev, ...list] : list);
-        setLastDoc(snap.docs[snap.docs.length - 1] ?? null);
-        setHasMore(snap.docs.length === PAGE_SIZE);
+    const fetchPage = useCallback(async (after: UsersCursor | null = null) => {
+        const page = await fetchUsersPage(PAGE_SIZE, after);
+        setUsers((prev) => after ? [...prev, ...page.users] : page.users);
+        setLastDoc(page.cursor);
+        setHasMore(page.hasMore);
     }, []);
 
     useEffect(() => {
@@ -57,14 +38,8 @@ export default function AdminPage() {
     }, [fetchPage]);
 
     useEffect(() => {
-        const q = query(collection(db, 'feedback'), orderBy('createdAt', 'desc'), limit(100));
-        getDocs(q)
-            .then((snap) => {
-                setFeedback(snap.docs.map((d) => ({
-                    id: d.id,
-                    ...(d.data() as Omit<Feedback, 'id'>),
-                })));
-            })
+        fetchFeedback()
+            .then(setFeedback)
             .finally(() => setFeedbackLoading(false));
     }, []);
 
@@ -73,21 +48,11 @@ export default function AdminPage() {
         await fetchPage(lastDoc).finally(() => setLoadingMore(false));
     };
 
-    const handleDelete = async (target: UserRecord) => {
+    const handleDelete = async (target: AdminUserRecord) => {
         setDeletingId(target.id);
         setConfirmDeleteId(null);
         try {
-            // Delete expenses subcollection
-            const expSnap = await getDocs(collection(db, 'users', target.id, 'expenses'));
-            await Promise.all(expSnap.docs.map((d) => deleteDoc(d.ref)));
-
-            // Delete settings subcollection
-            const setSnap = await getDocs(collection(db, 'users', target.id, 'settings'));
-            await Promise.all(setSnap.docs.map((d) => deleteDoc(d.ref)));
-
-            // Delete user doc
-            await deleteDoc(doc(db, 'users', target.id));
-
+            await deleteUserData(target.id);
             setUsers((prev) => prev.filter((u) => u.id !== target.id));
         } finally {
             setDeletingId(null);
@@ -98,7 +63,7 @@ export default function AdminPage() {
         setDeletingFeedbackId(id);
         setConfirmDeleteFeedbackId(null);
         try {
-            await deleteDoc(doc(db, 'feedback', id));
+            await deleteFeedback(id);
             setFeedback((prev) => prev.filter((f) => f.id !== id));
         } finally {
             setDeletingFeedbackId(null);

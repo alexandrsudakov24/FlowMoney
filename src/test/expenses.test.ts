@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as expenseSvc from '../services/expenses';
-import type { CollectionReference } from 'firebase/firestore';
+import { updateDoc, type CollectionReference } from 'firebase/firestore';
 
 // A tiny in-memory stand-in for Firestore's server-side documents, so the
 // transaction mock below can model "read the current server state, then
@@ -126,5 +126,24 @@ describe('expenseSvc.fireScheduledExpense', () => {
 
         const clones = [...serverDocs.entries()].filter(([id]) => id !== 'rent');
         expect(clones).toHaveLength(1);
+    });
+});
+
+describe('expenseSvc.updateExpense', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('turns null fields into Firestore deleteField() and passes the rest through', async () => {
+        await expenseSvc.updateExpense(col, 'e-1', { amount: 12.5, scheduled: null, repeat: null });
+
+        expect(updateDoc).toHaveBeenCalledWith(
+            { id: 'e-1' },
+            {
+                amount: 12.5,
+                scheduled: { __op: 'deleteField' },
+                repeat: { __op: 'deleteField' },
+            },
+        );
     });
 });

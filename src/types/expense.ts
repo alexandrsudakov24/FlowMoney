@@ -11,6 +11,12 @@ export interface Expense {
     repeat?: 'monthly'; // only meaningful when `scheduled` is also true
 }
 
+// Partial update of an expense. A `null` value removes that field from
+// the stored document (e.g. turning a scheduled payment into a normal one).
+export type ExpenseUpdate = {
+    [K in keyof Omit<Expense, 'id'>]?: Expense[K] | null;
+};
+
 export type TransactionFormData = {
     amount: string;
     category?: string;

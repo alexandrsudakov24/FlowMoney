@@ -10,7 +10,7 @@ import {
     type Transaction,
     type UpdateData,
 } from 'firebase/firestore';
-import type { Expense } from '../types';
+import type { Expense, ExpenseUpdate } from '../types';
 
 // Advances a YYYY-MM-DD date by one calendar month, clamping to the last
 // day of the target month when the original day doesn't exist there
@@ -33,9 +33,14 @@ export async function addExpense(
 export async function updateExpense(
     col: CollectionReference,
     id: string,
-    data: UpdateData<Expense>,
+    data: ExpenseUpdate,
 ): Promise<void> {
-    await updateDoc(doc(col, id), data);
+    // Translate the domain-level `null` ("remove this field") into
+    // Firestore's deleteField() sentinel so callers stay storage-agnostic.
+    const firestoreData = Object.fromEntries(
+        Object.entries(data).map(([key, value]) => [key, value === null ? deleteField() : value]),
+    ) as UpdateData<Expense>;
+    await updateDoc(doc(col, id), firestoreData);
 }
 
 export async function deleteExpense(

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { deleteField } from 'firebase/firestore';
 import { useApp } from '../context/AppContext';
 import { useLanguage } from '../context/LanguageContext';
 import { ExpenseForm } from '../components/expenses';
@@ -36,8 +35,8 @@ export default function EditExpensePage() {
             await updateExpense(id, {
                 ...rest,
                 amount: Math.round(Number(data.amount) * 100) / 100,
-                scheduled: repeat === 'none' ? deleteField() : true,
-                repeat: repeat === 'monthly' ? 'monthly' : deleteField(),
+                scheduled: repeat === 'none' ? null : true,
+                repeat: repeat === 'monthly' ? 'monthly' : null,
             });
             setJustSaved(true);
             await new Promise((resolve) => setTimeout(resolve, SAVED_CONFIRMATION_MS));
