@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { generateInsights, GeminiRequestError } from '../services/gemini';
+import { generateInsights, scanReceipt, GeminiRequestError } from '../services/gemini';
 
 function mockFetchOnce(response: Partial<Response> & { json?: () => Promise<unknown> }) {
     globalThis.fetch = vi.fn().mockResolvedValue({
@@ -135,5 +135,46 @@ describe('generateInsights', () => {
         } catch (err) {
             expect(err).toBeInstanceOf(GeminiRequestError);
         }
+    });
+});
+
+describe('scanReceipt', () => {
+    const image = { mimeType: 'image/jpeg', data: 'BASE64DATA' };
+    const categories = ['Food', 'Transport', 'Other'];
+
+    beforeEach(() => {
+        vi.stubEnv('VITE_GEMINI_API_KEY', 'test-key');
+    });
+
+    afterEach(() => {
+        vi.unstubAllEnvs();
+        vi.restoreAllMocks();
+    });
+
+    it('sends the image inline and returns the parsed receipt', async () => {
+        const receipt = { isReceipt: true, amount: 42.5, date: '2026-09-20', category: 'Food', note: 'Shufersal' };
+        mockFetchOnce({ json: () => Promise.resolve(geminiTextResponse(JSON.stringify(receipt))) });
+
+        const result = await scanReceipt(image, categories, '2026-09-23', 'en');
+
+        expect(result).toEqual(receipt);
+        const body = JSON.parse((globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0][1].body);
+        expect(body.contents[0].parts[0]).toEqual({ inline_data: { mime_type: 'image/jpeg', data: 'BASE64DATA' } });
+    });
+
+    it('blanks out an unknown category, a malformed date and a future date', async () => {
+        const receipt = { isReceipt: true, amount: 10, date: '2026-12-01', category: 'Groceries', note: 'Shop' };
+        mockFetchOnce({ json: () => Promise.resolve(geminiTextResponse(JSON.stringify(receipt))) });
+
+        const result = await scanReceipt(image, categories, '2026-09-23', 'en');
+
+        expect(result.category).toBe('');
+        expect(result.date).toBe('');
+    });
+
+    it('throws parse_error when the amount is missing', async () => {
+        mockFetchOnce({ json: () => Promise.resolve(geminiTextResponse(JSON.stringify({ isReceipt: true }))) });
+
+        await expect(scanReceipt(image, categories, '2026-09-23', 'en')).rejects.toBeInstanceOf(GeminiRequestError);
     });
 });

@@ -30,10 +30,16 @@ interface GeminiApiResponse {
     }>;
 }
 
+export interface InlineImage {
+    mimeType: string;
+    data: string; // base64, without the data: prefix
+}
+
 // Shared request/retry/error-mapping logic for every structured-output call
-// this app makes to Gemini. Callers only supply the prompt + JSON schema and
-// get back the model's raw parsed JSON (already model-fallback-retried).
-async function callGeminiJson(prompt: string, schema: object): Promise<unknown> {
+// this app makes to Gemini. Callers only supply the prompt + JSON schema (and
+// optionally an image sent before the prompt) and get back the model's raw
+// parsed JSON (already model-fallback-retried).
+async function callGeminiJson(prompt: string, schema: object, image?: InlineImage): Promise<unknown> {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (!apiKey) {
         throw new GeminiRequestError('no_api_key');
@@ -50,7 +56,11 @@ async function callGeminiJson(prompt: string, schema: object): Promise<unknown> 
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-goog-api-key': apiKey },
                 body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
+                    contents: [{
+                        parts: image
+                            ? [{ inline_data: { mime_type: image.mimeType, data: image.data } }, { text: prompt }]
+                            : [{ text: prompt }],
+                    }],
                     generationConfig: {
                         responseMimeType: 'application/json',
                         responseSchema: schema,
@@ -276,4 +286,62 @@ export async function answerMoneyQuestion(question: string, stats: unknown, lang
         throw new GeminiRequestError('parse_error');
     }
     return parsed.answer;
+}
+
+export interface ReceiptScanResult {
+    isReceipt: boolean;
+    amount: number;
+    date: string; // YYYY-MM-DD, or '' when not visible
+    category: string; // one of the given categories, or '' when the model returned something else
+    note: string;
+}
+
+function buildReceiptSchema(categories: string[]) {
+    return {
+        type: 'object',
+        properties: {
+            isReceipt: { type: 'boolean', description: 'false if the image is not a receipt/invoice or the total is unreadable.' },
+            amount: { type: 'number', description: 'The final total paid (after discounts and tax). 0 if unreadable.' },
+            date: { type: 'string', description: 'Purchase date as YYYY-MM-DD, or "" if not visible.' },
+            category: { type: 'string', enum: categories, description: 'The best-matching category from the allowed list.' },
+            note: { type: 'string', description: 'Short note: the store/merchant name, optionally with 1-3 key items. Max 60 characters.' },
+        },
+        required: ['isReceipt', 'amount', 'date', 'category', 'note'],
+    };
+}
+
+function buildReceiptPrompt(categories: string[], todayISO: string, language: Language): string {
+    return [
+        'You read a photo of a shop receipt or invoice for a personal finance app.',
+        'Extract the final total the customer paid, the purchase date, and the merchant.',
+        `Today's date is ${todayISO}. Receipts often print dates as DD/MM/YY — interpret them so the date is not in the future.`,
+        `Pick the single best category from this exact list: ${categories.join(', ')}.`,
+        `Write the "note" in ${LANGUAGE_NAMES[language]}, keeping the merchant's name as printed.`,
+        'Return the amount as a plain number without any currency symbol.',
+    ].join('\n');
+}
+
+export async function scanReceipt(
+    image: InlineImage,
+    categories: string[],
+    todayISO: string,
+    language: Language,
+): Promise<ReceiptScanResult> {
+    const parsed = await callGeminiJson(
+        buildReceiptPrompt(categories, todayISO, language),
+        buildReceiptSchema(categories),
+        image,
+    ) as Partial<ReceiptScanResult>;
+    if (typeof parsed.isReceipt !== 'boolean' || typeof parsed.amount !== 'number') {
+        throw new GeminiRequestError('parse_error');
+    }
+    const date = parsed.date ?? '';
+    const category = parsed.category ?? '';
+    return {
+        isReceipt: parsed.isReceipt,
+        amount: parsed.amount,
+        date: /^\d{4}-\d{2}-\d{2}$/.test(date) && date <= todayISO ? date : '',
+        category: categories.includes(category) ? category : '',
+        note: (parsed.note ?? '').slice(0, 200),
+    };
 }

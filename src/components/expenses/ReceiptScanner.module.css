@@ -1,0 +1,156 @@
+.wrap {
+  margin-bottom: 20px;
+}
+
+.fileInput {
+  display: none;
+}
+
+.scanButton {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
+  box-shadow: var(--shadow-md);
+  color: #fff;
+  text-align: start;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.scanButton:hover:not(:disabled) {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.scanButton:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.scanButton:disabled {
+  opacity: 0.85;
+  cursor: progress;
+}
+
+.scanIcon {
+  flex-shrink: 0;
+  display: inline-flex;
+  font-size: 22px;
+}
+
+.scanText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.scanLabel {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.scanDesc {
+  margin-top: 2px;
+  font-size: var(--font-size-xs);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.card {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-md);
+  animation: cardIn 0.25s ease-out;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.amount {
+  margin: 4px 0 12px;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--danger);
+}
+
+.details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 16px;
+  margin: 0 0 16px;
+  font-size: var(--font-size-sm);
+}
+
+.details dt {
+  color: var(--text-secondary);
+}
+
+.details dd {
+  margin: 0;
+  color: var(--text);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.confirm,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+.confirm {
+  flex: 1 1 100%;
+  border: none;
+  background: var(--success);
+  color: #fff;
+}
+
+.secondary {
+  flex: 1 1 0;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text);
+}
+
+.confirm:hover:not(:disabled),
+.secondary:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.confirm:active:not(:disabled),
+.secondary:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.confirm:disabled,
+.secondary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
