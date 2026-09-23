@@ -345,3 +345,76 @@ export async function scanReceipt(
         note: (parsed.note ?? '').slice(0, 200),
     };
 }
+
+export interface ParsedTransaction {
+    isTransaction: boolean;
+    type: 'expense' | 'income';
+    amount: number;
+    date: string; // YYYY-MM-DD, or '' when not mentioned
+    category: string; // one of the lists for `type`, or '' when the model returned something else
+    note: string;
+}
+
+function buildTransactionTextSchema(categories: string[]) {
+    return {
+        type: 'object',
+        properties: {
+            isTransaction: { type: 'boolean', description: 'false if the text does not describe a spending or income with an amount.' },
+            type: { type: 'string', enum: ['expense', 'income'] },
+            amount: { type: 'number', description: 'The amount as a plain number. 0 if not mentioned.' },
+            date: { type: 'string', description: 'YYYY-MM-DD, or "" if no date is implied (means today).' },
+            category: { type: 'string', enum: categories, description: 'The best-matching category for the chosen type.' },
+            note: { type: 'string', description: 'Short note with what/where (e.g. merchant or item), or "". Max 60 characters.' },
+        },
+        required: ['isTransaction', 'type', 'amount', 'date', 'category', 'note'],
+    };
+}
+
+function buildTransactionTextPrompt(
+    text: string,
+    expenseCategories: string[],
+    incomeCategories: string[],
+    todayISO: string,
+    language: Language,
+): string {
+    return [
+        'You turn a short spoken or typed phrase into a single transaction for a personal finance app.',
+        `Today's date is ${todayISO}. Resolve relative dates ("yesterday", "on Monday") against it; never return a future date.`,
+        `Expense categories: ${expenseCategories.join(', ')}.`,
+        `Income categories: ${incomeCategories.join(', ')}.`,
+        'Use "income" only when the phrase clearly describes receiving money (salary, got paid, a gift received); otherwise "expense".',
+        'Pick the category from the list matching the chosen type. Numbers may be spelled out in words — convert them.',
+        `Write the "note" in ${LANGUAGE_NAMES[language]}. Don't repeat the amount or date in it.`,
+        '',
+        `Phrase: "${text}"`,
+    ].join('\n');
+}
+
+export async function parseTransactionText(
+    text: string,
+    expenseCategories: string[],
+    incomeCategories: string[],
+    todayISO: string,
+    language: Language,
+): Promise<ParsedTransaction> {
+    const allCategories = [...new Set([...expenseCategories, ...incomeCategories])];
+    const parsed = await callGeminiJson(
+        buildTransactionTextPrompt(text, expenseCategories, incomeCategories, todayISO, language),
+        buildTransactionTextSchema(allCategories),
+    ) as Partial<ParsedTransaction>;
+    if (typeof parsed.isTransaction !== 'boolean' || typeof parsed.amount !== 'number') {
+        throw new GeminiRequestError('parse_error');
+    }
+    const type = parsed.type === 'income' ? 'income' : 'expense';
+    const allowed = type === 'income' ? incomeCategories : expenseCategories;
+    const date = parsed.date ?? '';
+    const category = parsed.category ?? '';
+    return {
+        isTransaction: parsed.isTransaction,
+        type,
+        amount: parsed.amount,
+        date: /^\d{4}-\d{2}-\d{2}$/.test(date) && date <= todayISO ? date : '',
+        category: allowed.includes(category) ? category : '',
+        note: (parsed.note ?? '').slice(0, 200),
+    };
+}

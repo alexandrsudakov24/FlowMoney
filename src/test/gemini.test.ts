@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { generateInsights, scanReceipt, GeminiRequestError } from '../services/gemini';
+import { generateInsights, scanReceipt, parseTransactionText, GeminiRequestError } from '../services/gemini';
 
 function mockFetchOnce(response: Partial<Response> & { json?: () => Promise<unknown> }) {
     globalThis.fetch = vi.fn().mockResolvedValue({
@@ -176,5 +176,49 @@ describe('scanReceipt', () => {
         mockFetchOnce({ json: () => Promise.resolve(geminiTextResponse(JSON.stringify({ isReceipt: true }))) });
 
         await expect(scanReceipt(image, categories, '2026-09-23', 'en')).rejects.toBeInstanceOf(GeminiRequestError);
+    });
+});
+
+describe('parseTransactionText', () => {
+    const expenseCategories = ['Food', 'Transport', 'Other'];
+    const incomeCategories = ['Salary', 'Gift', 'Other'];
+
+    beforeEach(() => {
+        vi.stubEnv('VITE_GEMINI_API_KEY', 'test-key');
+    });
+
+    afterEach(() => {
+        vi.unstubAllEnvs();
+        vi.restoreAllMocks();
+    });
+
+    it('returns the parsed transaction and includes the phrase in the prompt', async () => {
+        const tx = { isTransaction: true, type: 'expense', amount: 230, date: '2026-09-22', category: 'Food', note: 'Groceries' };
+        mockFetchOnce({ json: () => Promise.resolve(geminiTextResponse(JSON.stringify(tx))) });
+
+        const result = await parseTransactionText('groceries 230 yesterday', expenseCategories, incomeCategories, '2026-09-23', 'en');
+
+        expect(result).toEqual(tx);
+        const body = JSON.parse((globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0][1].body);
+        expect(body.contents[0].parts[0].text).toContain('groceries 230 yesterday');
+    });
+
+    it('rejects a category that belongs to the other transaction type', async () => {
+        const tx = { isTransaction: true, type: 'income', amount: 8000, date: '', category: 'Food', note: '' };
+        mockFetchOnce({ json: () => Promise.resolve(geminiTextResponse(JSON.stringify(tx))) });
+
+        const result = await parseTransactionText('got my salary 8000', expenseCategories, incomeCategories, '2026-09-23', 'en');
+
+        expect(result.type).toBe('income');
+        expect(result.category).toBe('');
+    });
+
+    it('drops a future date', async () => {
+        const tx = { isTransaction: true, type: 'expense', amount: 15, date: '2026-10-01', category: 'Food', note: 'Coffee' };
+        mockFetchOnce({ json: () => Promise.resolve(geminiTextResponse(JSON.stringify(tx))) });
+
+        const result = await parseTransactionText('coffee 15', expenseCategories, incomeCategories, '2026-09-23', 'en');
+
+        expect(result.date).toBe('');
     });
 });

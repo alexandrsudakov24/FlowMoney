@@ -1,0 +1,67 @@
+/* Shared look for the AI quick-add entry points (receipt photo, voice). */
+.button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  color: #fff;
+  text-align: start;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.button:hover:not(:disabled) {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.button:disabled {
+  opacity: 0.85;
+  cursor: progress;
+}
+
+.teal {
+  background: linear-gradient(135deg, #14b8a6, #0f766e);
+}
+
+.indigo {
+  background: linear-gradient(135deg, #6366f1, #4338ca);
+}
+
+.icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  font-size: 22px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.desc {
+  margin-top: 2px;
+  font-size: var(--font-size-xs);
+  color: rgba(255, 255, 255, 0.9);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
