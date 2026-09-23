@@ -246,6 +246,7 @@ const he: Record<TranslationKeys, string> = {
     repeat_once: 'פעם אחת',
     repeat_monthly: 'כל חודש',
     repeat_monthly_hint: 'עסקה חדשה תתווסף אוטומטית כל חודש בתאריך הזה',
+    category_from_history: 'נבחר לפי עסקאות קודמות',
     insights_error_rate_limited: 'יותר מדי בקשות. נסה שוב בעוד רגע.',
     insights_error_blocked: 'ה-AI לא הצליח ליצור תובנות עבור נתונים אלה. נסה שוב מאוחר יותר.',
     insights_error_parse_error: 'משהו השתבש ביצירת התובנות. נסה שוב.',

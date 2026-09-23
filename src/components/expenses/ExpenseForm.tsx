@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import styles from './ExpenseForm.module.css';
 import type { Expense, TransactionFormData } from '../../types';
@@ -6,6 +6,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useApp, INCOME_CATEGORIES } from '../../context/AppContext';
 import { currencySymbols } from '../../constants/currency';
 import { getCatLabel } from '../../utils/getCatLabel';
+import { buildCategoryIndex, suggestCategory } from '../../utils/suggestCategory';
 import { useSlidingIndicator } from '../../hooks/useSlidingIndicator';
 import { ButtonSpinner } from '../ui';
 
@@ -40,6 +41,7 @@ export default function ExpenseForm({
 
     const type = watch('type');
     const selectedCategory = watch('category');
+    const note = watch('note');
     const repeat = watch('repeat') || 'none';
     const todayStr = new Date().toISOString().slice(0, 10);
 
@@ -63,6 +65,29 @@ export default function ExpenseForm({
         if (defaultCategory) return;
         setValue('category', type === 'income' ? INCOME_CATEGORIES[0] : categories[0] || 'Food');
     }, [type, defaultCategory, setValue, categories]);
+
+    // Fill the category from past transactions with a similar note, until the
+    // user picks one by hand (or it was given upfront — editing, AI draft).
+    const categoryIndex = useMemo(() => buildCategoryIndex(expenses), [expenses]);
+    const categoryChosenRef = useRef(!!defaultCategory);
+    const [categoryFromHistory, setCategoryFromHistory] = useState(false);
+
+    useEffect(() => {
+        if (categoryChosenRef.current) return;
+        const suggested = suggestCategory(
+            categoryIndex,
+            note ?? '',
+            type,
+            type === 'expense' ? categories : INCOME_CATEGORIES,
+        );
+        if (suggested) setValue('category', suggested);
+        setCategoryFromHistory(!!suggested);
+    }, [note, type, categoryIndex, categories, setValue]);
+
+    const chooseCategory = () => {
+        categoryChosenRef.current = true;
+        setCategoryFromHistory(false);
+    };
 
     const topExpenseCategories = useMemo(() => {
         const map: Record<string, number> = {};
@@ -149,7 +174,7 @@ export default function ExpenseForm({
                                 key={cat}
                                 type="button"
                                 className={`${styles.chip} ${selectedCategory === cat ? styles.chipActive : ''}`}
-                                onClick={() => setValue('category', cat)}
+                                onClick={() => { chooseCategory(); setValue('category', cat); }}
                                 ref={(el) => { categoryIndicator.itemRefs.current[i] = el; }}
                             >
                                 {getCatLabel(cat, t)}
@@ -157,11 +182,12 @@ export default function ExpenseForm({
                         ))}
                     </div>
                 )}
-                <select className={styles.select} {...register('category')}>
+                <select className={styles.select} {...register('category', { onChange: chooseCategory })}>
                     {(type === 'expense' ? categories : INCOME_CATEGORIES).map(cat => (
                         <option key={cat} value={cat}>{getCatLabel(cat, t)}</option>
                     ))}
                 </select>
+                {categoryFromHistory && <span className={styles.suggestHint}>{t('category_from_history')}</span>}
             </label>
 
             <button

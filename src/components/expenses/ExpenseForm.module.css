@@ -274,3 +274,8 @@
   40% { transform: scale(1.04); }
   100% { transform: scale(1); }
 }
+
+.suggestHint {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}

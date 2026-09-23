@@ -244,6 +244,7 @@ const en = {
     repeat_once: 'Once',
     repeat_monthly: 'Monthly',
     repeat_monthly_hint: 'A new transaction will be added automatically every month on this date',
+    category_from_history: 'Picked from your past transactions',
     insights_error_rate_limited: 'Too many requests. Please try again in a bit.',
     insights_error_blocked: "The AI couldn't generate insights for this data. Please try again later.",
     insights_error_parse_error: 'Something went wrong generating insights. Please try again.',
